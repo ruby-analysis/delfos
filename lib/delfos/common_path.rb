@@ -13,6 +13,7 @@ module Delfos
         take_while{|dn1,dn2| dn1 == dn2 }.
         map(&:first).
         join(separator)
+      path = "/" if path == ""
 
       Pathname.new(path)
     end

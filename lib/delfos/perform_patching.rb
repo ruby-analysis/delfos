@@ -38,7 +38,7 @@ class BasicObject
   )
 
   def self.method_added(name)
-    return if name.in? INSTANCE_METHOD_IGNORE_LIST
+    return if INSTANCE_METHOD_IGNORE_LIST.include? name.to_s
 
     m = self.instance_method(name)
     return if ::Delfos::MethodLogging.exclude_from_logging?(m)
@@ -63,24 +63,8 @@ class BasicObject
     @@added_methods[self][name]=true
   end
 
-  CLASS_METHOD_IGNORE_LIST = %w(
-    singleton_method_added 
-    method_added
-  )
-
-  POSSIBLE_CLASS_METHOD_IGNORE_LIST = %w(
-    respond_to?
-    initialize
-    new
-    include
-    included
-    extend
-    extended
-    super
-  )
-
   def self.singleton_method_added(name)
-    return if name.in? CLASS_METHOD_IGNORE_LIST
+    return if name.to_s == "singleton_method_added"
     return if method_has_been_added?(name)
 
 
