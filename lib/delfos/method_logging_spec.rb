@@ -4,6 +4,7 @@ describe Delfos::MethodLogging do
   describe ".log" do
     let(:block) { double "block" }
     let(:class_method) { false }
+
     let(:stack) do
       [
         "lib/something.rb:1:in `method_a'",
@@ -13,9 +14,11 @@ describe Delfos::MethodLogging do
         "lib/yet_another.rb:2:in `method_c'",
       ]
     end
+
     let(:called_method){ double called_method_name,
                          source_location: [called_source_file  , called_source_line],
                          name: called_method_name}
+
     let(:called_method_name) { "method_a" }
     let(:called_source_file) { "lib/another.rb" }
     let(:called_source_line) { 5 }
@@ -59,6 +62,90 @@ describe Delfos::MethodLogging do
         expect(called_code.object).to eq called_object
       end
     end
+  end
+end
+
+describe Delfos::MethodLogging::CodeLocation do
+  class SomeObject
+    def some_method(&block)
+      another_method(block, binding)
+    end
+
+    def another_method(block, caller_binding)
+      a_third_method(block, caller_binding)
+    end
+
+    def a_third_method(block, caller_binding)
+      $line_number = __LINE__ + 1
+      block.call self, caller_binding
+    end
+  end
+
+  describe ".from" do
+    before do
+      path = Pathname.new(__FILE__) + ".."
+
+      expect(Delfos).to receive(:application_directories).and_return [
+        path
+      ]
+    end
+
+    it do
+      result = nil
+      object = nil
+
+      SomeObject.new.some_method do |o, caller_binding|
+        object = o
+        result = described_class.from(caller, caller_binding, false)
+      end
+
+      #sanity check
+      expect(result.object).to be_a SomeObject
+      expect(result.object).to eq object
+
+      expect(result.method_name).to eq "call"
+      expect(result.file).to eq __FILE__
+      expect(result.line_number).to eq $line_number.to_s
+    end
+  end
+end
+
+describe Delfos::MethodLogging::Code do
+  describe "#file" do
+    let(:code) { described_class.new(code_location) }
+    let(:code_location) { double "code location", file: filename }
+    let(:dir) { "/Users/mark/code/some_app/" }
+
+    before do
+      expect(Delfos).to receive(:application_directories).and_return [
+        "/Users/mark/code/some_app/app",
+        "/Users/mark/code/some_app/lib"
+      ]
+    end
+
+    context "with a file in one of the defined directories" do
+      let(:filename) { "#{dir}app/models/user.rb" }
+      it do
+        expect(code.file).to eq "app/models/user.rb"
+      end
+    end
+
+    context "with a file in another directory" do
+      let(:filename) { "#{dir}lib/some_file.rb" }
+
+      it do
+        expect(code.file).to eq "lib/some_file.rb"
+      end
+    end
+
+    context "with a file in neither directory" do
+      let(:filename) { "/some_big/long/path/lib/any_file.rb" }
+
+      it do
+        expect(code.file).to eq "/some_big/long/path/lib/any_file.rb" 
+      end
+    end
+
   end
 end
 

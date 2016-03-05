@@ -17,7 +17,7 @@ module Delfos
   module MethodLogging
     class << self
       def log(called_object,
-              _, args, keyword_args, block,
+              args, keyword_args, block,
               class_method,
               stack, caller_binding,
               called_method)
@@ -90,7 +90,11 @@ module Delfos
 
         if file
           Delfos.application_directories.map do |d|
-            file = file.gsub(d.to_s.split("/")[0..-2].join("/"), "")
+            match = d.to_s.split("/")[0..-2].join("/")
+            if file[match]
+              file = file.gsub(match, "").
+                gsub(%r{^/},"")
+            end
           end
         end
 
