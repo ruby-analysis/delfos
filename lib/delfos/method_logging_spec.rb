@@ -41,7 +41,7 @@ describe Delfos::MethodLogging do
       caller_binding = binding
 
       Delfos::MethodLogging.log(
-        called_object, anything,
+        called_object,
         args, keyword_args, block,
         class_method,
         stack, caller_binding,
@@ -142,7 +142,7 @@ describe Delfos::MethodLogging::Code do
       let(:filename) { "/some_big/long/path/lib/any_file.rb" }
 
       it do
-        expect(code.file).to eq "/some_big/long/path/lib/any_file.rb" 
+        expect(code.file).to eq "/some_big/long/path/lib/any_file.rb"
       end
     end
 
