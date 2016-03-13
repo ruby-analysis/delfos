@@ -8,8 +8,10 @@ module Delfos
     attr_reader :klass, :name, :private_methods, :class_method
 
     def initialize(klass, name, private_methods, class_method)
-      @klass, @name, @private_methods, @class_method =
-        klass, name, private_methods, class_method
+      @klass = klass
+      @name = name
+      @private_methods = private_methods
+      @class_method = class_method
     end
 
     def setup
@@ -39,7 +41,7 @@ module Delfos
     private
 
     def bail?
-      already_added? || is_private_method?  || exclude?
+      already_added? || is_private_method? || exclude?
     end
 
     def is_private_method?
@@ -47,11 +49,11 @@ module Delfos
     end
 
     def exclude?
-       ::Delfos::MethodLogging.exclude_from_logging?(original_method)
+      ::Delfos::MethodLogging.exclude_from_logging?(original_method)
     end
 
     def already_added?
-      method_has_been_added?(klass, name, class_method: class_method) 
+      method_has_been_added?(klass, name, class_method: class_method)
     end
 
     def original_method
@@ -83,5 +85,3 @@ module Delfos
     end
   end
 end
-
-
