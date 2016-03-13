@@ -8,26 +8,26 @@ describe Delfos::Neo4j::Informer do
   class D; end
   class E; end
 
-  let(:args) { double args: [B], keyword_args: [C,D] }
+  let(:args) { double args: [B], keyword_args: [C, D] }
 
-  let(:caller_code) {
+  let(:caller_code) do
     double klass: A,
 
-    file: "a.rb",
-    line_number: "4",
-    method_name: "method_a",
-    method_type: "ClassMethod",
-    method_definition_file: "a.rb",
-    method_definition_line: 2
-  }
+           file: "a.rb",
+           line_number: "4",
+           method_name: "method_a",
+           method_type: "ClassMethod",
+           method_definition_file: "a.rb",
+           method_definition_line: 2
+  end
 
-  let(:called_code) {
+  let(:called_code) do
     double klass: E,
-    file: "e.rb",
-    line_number: "2",
-    method_name: "method_e",
-    method_type: "InstanceMethod"
-  }
+           file: "e.rb",
+           line_number: "2",
+           method_name: "method_e",
+           method_type: "InstanceMethod"
+  end
 
   describe "#args_query" do
     it do

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 describe "integration" do
   before do
     require "delfos"
@@ -5,7 +6,7 @@ describe "integration" do
 
     Delfos.setup!(
       logger: Delfos::Neo4j::Informer,
-      application_directories:([Pathname.new(File.expand_path(__FILE__)) + "../../../fixtures/"])
+      application_directories: [Pathname.new(File.expand_path(__FILE__)) + "../../../fixtures/"],
     )
 
     load "./fixtures/a.rb"
@@ -15,7 +16,7 @@ describe "integration" do
   it do
     a = A.new
     b = B.new
-    a.some_method(1,"",a,{something: b})
+    a.some_method(1, "", a, something: b)
 
     result = Neo4j::Session.query <<-QUERY
       MATCH (a:A)-[r:OWNS]->(im1:InstanceMethod{name: "some_method"})

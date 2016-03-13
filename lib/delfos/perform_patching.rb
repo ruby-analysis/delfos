@@ -28,7 +28,7 @@ module Delfos
       end
     end
 
-    def self.method_has_been_added?(klass, name, class_method:)
+    def self.method_has_been_added?(_klass, name, class_method:)
       return false unless added_methods[self]
 
       type = class_method ? "class_method" : "instance_method"
@@ -62,5 +62,3 @@ class BasicObject
     ::Delfos::Patching.setup_method_call_logging(self, name, private_methods, class_method: true)
   end
 end
-
-

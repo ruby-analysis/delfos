@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 class BasicObject
-  def self.method_added(*args)
+  def self.method_added(*_args)
     nil
   end
 
@@ -8,5 +8,3 @@ class BasicObject
     nil
   end
 end
-
-

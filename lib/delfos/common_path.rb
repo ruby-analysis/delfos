@@ -43,13 +43,12 @@ module Delfos
       def append_trailing_slashes!(*paths)
         paths.map do |path|
           if Pathname.new(path).directory?
-            path = path + SEPARATOR if path && path.to_s[-1] != SEPARATOR
+            path += SEPARATOR if path && path.to_s[-1] != SEPARATOR
           end
 
           path
         end
       end
-
     end
   end
 end

@@ -6,7 +6,7 @@ module Delfos
     class Code
       extend Forwardable
       delegate [:object, :method_type, :method_name, :line_number, :method_definition_file,
-                :method_definition_line ] => :code_location
+                :method_definition_line] => :code_location
 
       attr_reader :code_location
 

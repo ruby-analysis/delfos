@@ -12,16 +12,16 @@ module Delfos
         end
 
         def query_for(args, caller_code, called_code)
-           query_variables.assign(caller_code.klass, "k")
-           query_variables.assign(called_code.klass, "k")
+          query_variables.assign(caller_code.klass, "k")
+          query_variables.assign(called_code.klass, "k")
 
-           (args.args + args.keyword_args).uniq.each do |k|
-             query_variables.assign(k, "k")
-           end
+          (args.args + args.keyword_args).uniq.each do |k|
+            query_variables.assign(k, "k")
+          end
 
-           klasses_query = query_variables.map do |klass, name|
-             "MERGE (#{name}:#{klass})"
-           end.join("\n")
+          klasses_query = query_variables.map do |klass, name|
+            "MERGE (#{name}:#{klass})"
+          end.join("\n")
 
           <<-QUERY
             #{klasses_query}
@@ -48,7 +48,7 @@ module Delfos
         end
 
         def query_variables
-           @query_variables ||= QueryVariables.new
+          @query_variables ||= QueryVariables.new
         end
 
         class QueryVariables < Hash

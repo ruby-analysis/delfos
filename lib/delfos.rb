@@ -17,7 +17,11 @@ module Delfos
 
     def remove_patching!
       load "delfos/remove_patching.rb"
-      Delfos::Patching.instance_eval { @added_methods = nil } rescue nil
+      begin
+        Delfos::Patching.instance_eval { @added_methods = nil }
+      rescue
+        nil
+      end
     end
 
     def setup!(
@@ -36,9 +40,7 @@ module Delfos
     end
 
     def perform_patching!
-      unless BasicObject.respond_to?(:_delfos_setup_method_call_logging!)
-        load "delfos/perform_patching.rb"
-      end
+      load "delfos/perform_patching.rb"
     end
 
     attr_reader :application_directories, :neo4j_config
