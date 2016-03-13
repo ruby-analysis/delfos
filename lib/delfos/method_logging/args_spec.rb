@@ -15,15 +15,25 @@ describe Delfos::MethodLogging::Args do
   before do
     expect(BasicObject).
       to receive(:_delfos_added_methods).
-      and_return(added_methods).
+      and_return({}).
+      at_least(:once)
+
+    expect(A).
+      to receive(:_delfos_added_methods).
+      and_return(added_methods_a).
+      at_least(:once)
+    allow(B).
+      to receive(:_delfos_added_methods).
+      and_return(added_methods_b).
       at_least(:once)
   end
 
-  let(:added_methods) do
-    {
-      A => { "instance_method_some_method" => ["/Users/markburns/code/delfos/fixtures/a.rb", 4] },
-      B => { "instance_method_another_method" => ["/Users/markburns/code/delfos/fixtures/b.rb", 2] },
-    }
+  let(:added_methods_a) do
+    { "instance_method_some_method" => ["/Users/markburns/code/delfos/fixtures/a.rb", 4] }
+  end
+
+  let(:added_methods_b) do
+    { "instance_method_another_method" => ["/Users/markburns/code/delfos/fixtures/b.rb", 2] }
   end
 
   before do

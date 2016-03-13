@@ -19,7 +19,7 @@ module Delfos
       if BasicObject.respond_to?(:_delfos_undefine_methods!)
         load "delfos/remove_patching.rb"
         BasicObject.instance_eval { undef _delfos_undefine_methods! }
-        BasicObject.instance_eval { @@_delfos_added_methods = nil }
+        BasicObject.instance_eval { @_delfos_added_methods = nil }
       end
     end
 

@@ -16,20 +16,20 @@ describe Delfos::MethodLogging do
     let(:called_object) { double "called_object" }
     let(:logger) { double "logger", debug: nil }
 
-    let(:added_methods) do
-      {
-        A => { instance_method_some_method: [a_path, 4] },
-        B => { instance_method_another_method: [b_path, 2] },
-      }
-    end
     let(:a_path) { File.expand_path "./fixtures/a.rb" }
     let(:b_path) { File.expand_path "./fixtures/b.rb" }
 
     before do
-      expect(BasicObject).
+      expect(A).
         to receive(:_delfos_added_methods).
-        and_return(added_methods).
+        and_return({ instance_method_some_method: [a_path, 4] }).
         at_least(:once)
+
+      expect(B).
+        to receive(:_delfos_added_methods).
+        and_return({ instance_method_another_method: [b_path, 2] }).
+        at_least(:once)
+
 
       Delfos.logger = logger
       path_fixtures = Pathname.new(File.expand_path(__FILE__)) + "../../../fixtures"

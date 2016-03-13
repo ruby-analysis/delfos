@@ -33,7 +33,7 @@ class BasicObject
   end
 
   def self._delfos_added_methods
-    @@_delfos_added_methods ||= {}
+    @_delfos_added_methods ||= {}
   end
 
   def self._delfos_record_method_adding(meth, class_method:)
@@ -54,7 +54,5 @@ class BasicObject
     return if name == __method__
 
     _delfos_setup_method_call_logging(name, private_methods, class_method: true)
-  rescue ::Exception => e
-    nil
   end
 end
