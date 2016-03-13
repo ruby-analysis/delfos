@@ -1,9 +1,10 @@
-require 'spec_helper'
-require_relative 'delfos'
+# frozen_string_literal: true
+require "spec_helper"
+require_relative "delfos"
 
 describe Delfos do
   describe "#application_directories=" do
-    it 'requires the monkey patching file' do
+    it "requires the monkey patching file" do
       dir = double "Directories"
       expect(Delfos).to receive(:load).with "delfos/perform_patching.rb"
 

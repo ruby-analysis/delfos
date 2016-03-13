@@ -1,8 +1,9 @@
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+# frozen_string_literal: true
+$LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 require "binding_of_caller"
 
 class BasicObject
-  def dbg(variable_name=nil)
+  def dbg(variable_name = nil)
     puts
     puts
 
@@ -16,13 +17,13 @@ class BasicObject
       other_binding.eval("instance_variables")
 
     variable_name ||= vars.
-      reject{|v| v == :_}.
-      detect { |v| other_binding.eval(v.to_s) == self }
+                      reject { |v| v == :_ }.
+                      detect { |v| other_binding.eval(v.to_s) == self }
 
     if variable_name
-      puts "#{variable_name}: #{self.inspect}"
+      puts "#{variable_name}: #{inspect}"
     else
-      puts self.inspect
+      puts inspect
     end
 
     puts "<" * 80
@@ -31,7 +32,6 @@ class BasicObject
   end
 end
 require "byebug"
-
 
 RSpec.configure do |c|
   c.before(:each) do

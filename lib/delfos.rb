@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "delfos/version"
 require "delfos/method_logging"
 
@@ -23,13 +24,13 @@ module Delfos
     end
 
     def setup!(connection_type: :server_db,
-               host:'http://localhost:7474',
-               auth: {basic_auth: { username: 'neo4j', password: 'password'}},
-               application_directories: nil)
+      host:"http://localhost:7474",
+      auth: { basic_auth: { username: "neo4j", password: "password" } },
+      application_directories: nil)
 
       @application_directories = application_directories
 
-      @neo4j_config = [ connection_type, host, auth]
+      @neo4j_config = [connection_type, host, auth]
 
       perform_patching!
     end

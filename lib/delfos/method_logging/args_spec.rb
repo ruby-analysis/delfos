@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "args"
 require "./fixtures/b"
 require "./fixtures/a"
@@ -7,7 +8,7 @@ describe Delfos::MethodLogging::Args do
   let(:b) { B.new }
   let(:c) { 1 }
   let(:d) { "" }
-  let(:args) { described_class.new([a, b, c, d], {c: c, d: d}) }
+  let(:args) { described_class.new([a, b, c, d], c: c, d: d) }
   let(:a_path) { File.expand_path "./fixtures/a.rb" }
   let(:b_path) { File.expand_path "./fixtures/b.rb" }
 
@@ -20,15 +21,14 @@ describe Delfos::MethodLogging::Args do
 
   let(:added_methods) do
     {
-      A=>{"instance_method_some_method"=>["/Users/markburns/code/delfos/fixtures/a.rb", 4]},
-      B=>{"instance_method_another_method"=>["/Users/markburns/code/delfos/fixtures/b.rb", 2]},
+      A => { "instance_method_some_method" => ["/Users/markburns/code/delfos/fixtures/a.rb", 4] },
+      B => { "instance_method_another_method" => ["/Users/markburns/code/delfos/fixtures/b.rb", 2] },
     }
   end
 
   before do
     path = Pathname.new(File.expand_path(__FILE__)) + "../../../../fixtures"
     Delfos.application_directories = [path]
-
   end
 
   describe "#klass_location" do

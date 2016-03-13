@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "method_logging"
 require_relative "../../fixtures/a"
 require_relative "../../fixtures/b"
@@ -8,24 +9,21 @@ describe Delfos::MethodLogging do
     let(:class_method) { false }
 
     let(:args) { [A.new, B.new] }
-    let(:keyword_args) { {key1: keyword_value_1, key2: class_keyword  } }
+    let(:keyword_args) { { key1: keyword_value_1, key2: class_keyword } }
     let(:keyword_value_1) { A.new }
     let(:class_keyword) { B }
-
 
     let(:called_object) { double "called_object" }
     let(:logger) { double "logger", debug: nil }
 
     let(:added_methods) do
       {
-        A => {:instance_method_some_method    => [a_path, 4]},
-        B => {:instance_method_another_method => [b_path, 2]},
+        A => { instance_method_some_method: [a_path, 4] },
+        B => { instance_method_another_method: [b_path, 2] },
       }
     end
     let(:a_path) { File.expand_path "./fixtures/a.rb" }
     let(:b_path) { File.expand_path "./fixtures/b.rb" }
-
-
 
     before do
       expect(BasicObject).
@@ -40,7 +38,7 @@ describe Delfos::MethodLogging do
     end
 
     class CalledObject
-      #This method represents a method with the meta programming hooks added for the logging
+      # This method represents a method with the meta programming hooks added for the logging
       def called_method(args, keyword_args, block)
         $called_line = __LINE__ - 1
         caller_binding = binding
@@ -56,11 +54,11 @@ describe Delfos::MethodLogging do
     end
 
     class CallerObject
-      def caller_method(called_object, args, keyword_args, block, called_method)
+      def caller_method(called_object, args, keyword_args, block, _called_method)
         called_object = CalledObject.new
 
         $caller_line = __LINE__ + 1
-        called_object.called_method(args, keyword_args, block, )
+        called_object.called_method(args, keyword_args, block)
       end
     end
 
@@ -110,7 +108,7 @@ describe Delfos::MethodLogging::CodeLocation do
       path = Pathname.new(__FILE__) + ".."
 
       expect(Delfos).to receive(:application_directories).at_least(:once).and_return [
-        path
+        path,
       ]
     end
 
@@ -123,7 +121,7 @@ describe Delfos::MethodLogging::CodeLocation do
         result = described_class.from(caller, caller_binding, false)
       end
 
-      #sanity check
+      # sanity check
       expect(result.object).to be_a SomeObject
       expect(result.object).to eq object
 
@@ -133,5 +131,3 @@ describe Delfos::MethodLogging::CodeLocation do
     end
   end
 end
-
-

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "klass_determination"
 
 module Delfos
@@ -35,7 +36,7 @@ module Delfos
 
         if file[match]
           file = file.gsub(match, "").
-            gsub(%r{^/},"")
+                 gsub(%r{^/}, "")
         end
 
         file
@@ -43,36 +44,39 @@ module Delfos
 
       def klass
         name = code_location.klass.name || "__AnonymousClass"
-        name.gsub ":", "_"
+        name.tr ":", "_"
       end
     end
 
-    #This magic number is determined based on the specific implementation now
-    #E.g. if the line
-    #where we call this `caller_binding.of_caller(stack_index + STACK_OFFSET).eval('self')`
-    #is to be extracted into another method we will get a failing test and have to increment
-    #the value
+    # This magic number is determined based on the specific implementation now
+    # E.g. if the line
+    # where we call this `caller_binding.of_caller(stack_index + STACK_OFFSET).eval('self')`
+    # is to be extracted into another method we will get a failing test and have to increment
+    # the value
     STACK_OFFSET = 4
 
     class CodeLocation < Struct.new(:object, :method_name, :method_type, :file, :line_number)
       include KlassDetermination
 
       def self.from(stack, caller_binding, class_method)
-        current = stack.detect{|s|
+        current = stack.detect do |s|
           file = s.split(":")[0]
           Delfos::MethodLogging.include_file_in_logging?(file)
-        }
+        end
 
         return unless current
 
-        stack_index = stack.index{|c| c == current}
+        stack_index = stack.index { |c| c == current }
 
-
-        object = caller_binding.of_caller(stack_index + STACK_OFFSET ).eval('self')
+        object = caller_binding.of_caller(stack_index + STACK_OFFSET).eval("self")
 
         file, line_number, rest = current.split(":")
         method_name = rest[/`.*'$/]
-        method_name = method_name.gsub("`", "").gsub("'", "") rescue nil
+        method_name = begin
+                        method_name.delete("`").delete("'")
+                      rescue
+                        nil
+                      end
 
         new(object, method_name.to_s, class_method, file, line_number.to_i)
       end

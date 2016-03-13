@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Delfos
   module MethodLogging
     module KlassDetermination
@@ -13,5 +14,3 @@ module Delfos
     end
   end
 end
-
-

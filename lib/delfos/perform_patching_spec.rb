@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 describe "patching #{BasicObject}" do
   let(:a) { A.new }
   let(:b) { B.new }
@@ -17,12 +18,12 @@ describe "patching #{BasicObject}" do
 
   it do
     expect(B).to receive(:new).and_return b
-    a.some_method(b, 2, {c: b, b: "some string"})
+    a.some_method(b, 2, c: b, b: "some string")
 
     expect(logger).to have_received(:debug) do |args, caller_code, called_code|
       expect(caller_code.object).to eq(a)
       expect(called_code.object).to eq(b)
-      expect(args.args).to eq [A,B]
+      expect(args.args).to eq [A, B]
       expect(args.keyword_args).to eq([B])
     end
   end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "code"
 describe Delfos::MethodLogging::Code do
   describe "#file" do
@@ -8,7 +9,7 @@ describe Delfos::MethodLogging::Code do
     before do
       expect(Delfos).to receive(:application_directories).and_return [
         "/Users/mark/code/some_app/app",
-        "/Users/mark/code/some_app/lib"
+        "/Users/mark/code/some_app/lib",
       ]
     end
 
@@ -34,7 +35,5 @@ describe Delfos::MethodLogging::Code do
         expect(code.file).to eq "/some_big/long/path/lib/any_file.rb"
       end
     end
-
   end
 end
-

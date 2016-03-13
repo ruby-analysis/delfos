@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class BasicObject
   def self._delfos_setup_method_call_logging(name, private_methods, class_method:)
     return if _delfos_method_has_been_added?(name, class_method: class_method)
@@ -10,9 +11,9 @@ class BasicObject
 
     method_defining_method.call(name) do |*args, **keyword_args, &block|
       ::Delfos::MethodLogging.log(self,
-                                  args, keyword_args, block,
-                                  class_method, caller.dup, binding.dup,
-                                  original_method
+        args, keyword_args, block,
+        class_method, caller.dup, binding.dup,
+        original_method
                                  )
       method_to_call = class_method ? original_method : original_method.bind(self)
 
@@ -35,7 +36,7 @@ class BasicObject
     @@_delfos_added_methods ||= {}
   end
 
-  def self._delfos_record_method_adding(meth, class_method: )
+  def self._delfos_record_method_adding(meth, class_method:)
     return true if _delfos_method_has_been_added?(meth, class_method: class_method)
 
     type = class_method ? "class_method" : "instance_method"
@@ -54,8 +55,6 @@ class BasicObject
 
     _delfos_setup_method_call_logging(name, private_methods, class_method: true)
   rescue ::Exception => e
-    byebug
     nil
   end
 end
-

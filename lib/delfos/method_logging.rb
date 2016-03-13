@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "pathname"
 require "forwardable"
 require "binding_of_caller"
@@ -12,7 +13,7 @@ module Delfos
   end
 
   class ApplicationDirectoriesNotDefined < StandardError
-    def initialize *args
+    def initialize(*_args)
       super "Please set Delfos.application_directories"
     end
   end
@@ -24,10 +25,10 @@ module Delfos
       end
 
       def log(called_object,
-              args, keyword_args, block,
-              class_method,
-              stack, caller_binding,
-              called_method)
+        args, keyword_args, _block,
+        class_method,
+        stack, caller_binding,
+        called_method)
         check_setup!
 
         caller_code = Code.from(stack, caller_binding, class_method)
@@ -65,4 +66,3 @@ module Delfos
     end
   end
 end
-
