@@ -1,7 +1,7 @@
 require_relative "file_tree"
 require "byebug"
 
-describe FileTree::FileTree do
+describe Delfos::FileTree::FileTree do
   let(:tree) { described_class.new "./fixtures/tree" }
 
   it do

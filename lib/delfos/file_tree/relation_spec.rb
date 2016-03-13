@@ -1,8 +1,8 @@
 require_relative "relation"
 
-describe FileTree::Relation do
+describe Delfos::FileTree::Relation do
   describe "#others" do
-    let(:relation) { FileTree::Relation.new(path, anything) }
+    let(:relation) { described_class.new(path, anything) }
 
     context "with a file" do
       let(:path) { t("another_top_level_file") }
@@ -78,7 +78,7 @@ end
 
 
 
-describe FileTree::Relation do
+describe Delfos::FileTree::Relation do
   let(:instance) { described_class.new(a,b) }
   let(:a) { t("sub_directory/file_in_sub_directory") }
   let(:b) { t("sub_directory") }

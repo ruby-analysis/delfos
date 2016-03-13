@@ -1,12 +1,14 @@
 require "pathname"
 require_relative "relation"
 
-module FileTree
-  class TraversalCalculator
-    def traversals_for(a, b)
-      return ChildFile if (b + ".." == a)
+module Delfos
+  module FileTree
+    class TraversalCalculator
+      def traversals_for(a, b)
+        return ChildFile if (b + ".." == a)
 
-      Relation
+        Relation
+      end
     end
   end
 end
