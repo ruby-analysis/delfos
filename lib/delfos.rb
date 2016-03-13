@@ -36,7 +36,7 @@ module Delfos
     end
 
     def perform_patching!
-      unless BasicObject.respond_to?(:_delfos_undefine_methods!)
+      unless BasicObject.respond_to?(:_delfos_setup_method_call_logging!)
         load "delfos/perform_patching.rb"
       end
     end

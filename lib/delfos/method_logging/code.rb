@@ -3,9 +3,15 @@ require_relative "klass_determination"
 
 module Delfos
   module MethodLogging
-    class Code < Struct.new(:code_location)
+    class Code
       extend Forwardable
       delegate [:object, :method_type, :method_name, :line_number] => :code_location
+
+      attr_reader :code_location
+
+      def initialize(code_location)
+        @code_location = code_location
+      end
 
       def self.from(stack, caller_binding, class_method)
         location = CodeLocation.from(stack, caller_binding, class_method)
@@ -55,8 +61,18 @@ module Delfos
     # the value
     STACK_OFFSET = 4
 
-    class CodeLocation < Struct.new(:object, :method_name, :method_type, :file, :line_number)
+    class CodeLocation
       include KlassDetermination
+
+      attr_reader :object, :method_name, :method_type, :file, :line_number
+
+      def initialize(object, method_name, method_type, file, line_number)
+        @object = object
+        @method_name = method_name
+        @method_type = method_type
+        @file = file
+        @line_number = line_number
+      end
 
       def self.from(stack, caller_binding, class_method)
         current = stack.detect do |s|

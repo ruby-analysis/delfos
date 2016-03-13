@@ -22,14 +22,13 @@ describe Delfos::MethodLogging do
     before do
       expect(A).
         to receive(:_delfos_added_methods).
-        and_return({ instance_method_some_method: [a_path, 4] }).
+        and_return(instance_method_some_method: [a_path, 4]).
         at_least(:once)
 
       expect(B).
         to receive(:_delfos_added_methods).
-        and_return({ instance_method_another_method: [b_path, 2] }).
+        and_return(instance_method_another_method: [b_path, 2]).
         at_least(:once)
-
 
       Delfos.logger = logger
       path_fixtures = Pathname.new(File.expand_path(__FILE__)) + "../../../fixtures"
