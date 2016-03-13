@@ -87,7 +87,7 @@ module Delfos
       "#{type}_#{original_method.name}"
     end
 
-    def type 
+    def type
       class_method ? "class_method" : "instance_method"
     end
   end
