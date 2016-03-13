@@ -1,7 +1,5 @@
-require_relative "b"
-
 class A
-  def some_method
-    B.new.another_method(self)
+  def some_method(*args, **keyword_args)
+    B.new.another_method(self, *args, **keyword_args)
   end
 end

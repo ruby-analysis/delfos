@@ -1,64 +1,88 @@
 require_relative "method_logging"
+require_relative "../../fixtures/a"
+require_relative "../../fixtures/b"
 
 describe Delfos::MethodLogging do
   describe ".log" do
     let(:block) { double "block" }
     let(:class_method) { false }
 
-    let(:stack) do
-      [
-        "lib/something.rb:1:in `method_a'",
-        "lib/another.rb:5:in `method_b'",
-        "lib/another.rb:3:in `method_b'",
-        "lib/another.rb:2:in `method_b'",
-        "lib/yet_another.rb:2:in `method_c'",
-      ]
-    end
-
-    let(:called_method){ double called_method_name,
-                         source_location: [called_source_file  , called_source_line],
-                         name: called_method_name}
-
-    let(:called_method_name) { "method_a" }
-    let(:called_source_file) { "lib/another.rb" }
-    let(:called_source_line) { 5 }
-
-    let(:args) { [double("arg 1", class: "Arg1 Class"), double("arg 2", class: "Arg2 Class")] }
+    let(:args) { [A.new, B.new] }
     let(:keyword_args) { {key1: keyword_value_1, key2: class_keyword  } }
-    let(:keyword_value_1) { double "keyword value 1", class: "keyword arg 1 class" }
-    let(:class_keyword) { double "SomeClass", is_a?: true }
+    let(:keyword_value_1) { A.new }
+    let(:class_keyword) { B }
 
 
     let(:called_object) { double "called_object" }
     let(:logger) { double "logger", debug: nil }
 
+    let(:added_methods) do
+      {
+        A => {:instance_method_some_method    => [a_path, 4]},
+        B => {:instance_method_another_method => [b_path, 2]},
+      }
+    end
+    let(:a_path) { File.expand_path "./fixtures/a.rb" }
+    let(:b_path) { File.expand_path "./fixtures/b.rb" }
+
+
+
     before do
+      expect(BasicObject).
+        to receive(:_delfos_added_methods).
+        and_return(added_methods).
+        at_least(:once)
+
       Delfos.logger = logger
-      Delfos.application_directories = ["lib"]
+      path_fixtures = Pathname.new(File.expand_path(__FILE__)) + "../../../fixtures"
+      path_spec     = Pathname.new(File.expand_path(__FILE__)) + ".."
+      Delfos.application_directories = [path_spec, path_fixtures]
+    end
+
+    class CalledObject
+      #This method represents a method with the meta programming hooks added for the logging
+      def called_method(args, keyword_args, block)
+        $called_line = __LINE__ - 1
+        caller_binding = binding
+        stack = caller.dup
+
+        Delfos::MethodLogging.log(
+          self,
+          args, keyword_args, block,
+          class_method = false,
+          stack, caller_binding,
+          method(__method__))
+      end
+    end
+
+    class CallerObject
+      def caller_method(called_object, args, keyword_args, block, called_method)
+        called_object = CalledObject.new
+
+        $caller_line = __LINE__ + 1
+        called_object.called_method(args, keyword_args, block, )
+      end
     end
 
     it do
-      caller_binding = binding
+      called_object = CalledObject.new
+      expect(CalledObject).to receive(:new).and_return called_object
 
-      Delfos::MethodLogging.log(
-        called_object,
-        args, keyword_args, block,
-        class_method,
-        stack, caller_binding,
-        called_method)
+      caller_object = CallerObject.new
+      caller_object.caller_method(called_object, args, keyword_args, block, class_method)
 
       expect(logger).to have_received(:debug) do |args, caller_code, called_code|
-        expect(args.formatted_args).to eq ["Arg1 Class", "Arg2 Class"]
-        expect(args.formatted_keyword_args).to eq ["keyword arg 1 class", class_keyword]
+        expect(args.args).to eq [A, B]
+        expect(args.keyword_args).to eq [A, B]
 
-        expect(caller_code.line_number).to eq "1"
-        expect(caller_code.file).to eq "lib/something.rb"
-        expect(caller_code.method_name).to eq "method_a"
-        #expect(caller_code.object).to eq 1
+        expect(caller_code.file).to eq "delfos/method_logging_spec.rb"
+        expect(caller_code.line_number).to eq $caller_line
+        expect(caller_code.method_name).to eq "caller_method"
+        expect(caller_code.object).to eq caller_object
 
-        expect(called_code.line_number).to eq called_source_line
-        expect(called_code.file).to eq called_source_file
-        expect(called_code.method_name).to eq "method_a"
+        expect(called_code.file).to eq "delfos/method_logging_spec.rb"
+        expect(called_code.line_number).to eq $called_line
+        expect(called_code.method_name).to eq "called_method"
         expect(called_code.object).to eq called_object
       end
     end
@@ -85,7 +109,7 @@ describe Delfos::MethodLogging::CodeLocation do
     before do
       path = Pathname.new(__FILE__) + ".."
 
-      expect(Delfos).to receive(:application_directories).and_return [
+      expect(Delfos).to receive(:application_directories).at_least(:once).and_return [
         path
       ]
     end
@@ -105,47 +129,9 @@ describe Delfos::MethodLogging::CodeLocation do
 
       expect(result.method_name).to eq "call"
       expect(result.file).to eq __FILE__
-      expect(result.line_number).to eq $line_number.to_s
+      expect(result.line_number).to eq $line_number
     end
   end
 end
 
-describe Delfos::MethodLogging::Code do
-  describe "#file" do
-    let(:code) { described_class.new(code_location) }
-    let(:code_location) { double "code location", file: filename }
-    let(:dir) { "/Users/mark/code/some_app/" }
-
-    before do
-      expect(Delfos).to receive(:application_directories).and_return [
-        "/Users/mark/code/some_app/app",
-        "/Users/mark/code/some_app/lib"
-      ]
-    end
-
-    context "with a file in one of the defined directories" do
-      let(:filename) { "#{dir}app/models/user.rb" }
-      it do
-        expect(code.file).to eq "app/models/user.rb"
-      end
-    end
-
-    context "with a file in another directory" do
-      let(:filename) { "#{dir}lib/some_file.rb" }
-
-      it do
-        expect(code.file).to eq "lib/some_file.rb"
-      end
-    end
-
-    context "with a file in neither directory" do
-      let(:filename) { "/some_big/long/path/lib/any_file.rb" }
-
-      it do
-        expect(code.file).to eq "/some_big/long/path/lib/any_file.rb"
-      end
-    end
-
-  end
-end
 
