@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "file_tree"
 require "byebug"
 
@@ -11,9 +12,9 @@ describe Delfos::FileTree::FileTree do
   it do
     expect(tree.files.map(&:path)).to eq [
       "./fixtures/tree/another_top_level_file",
-     "./fixtures/tree/even_more",
-     "./fixtures/tree/some_file",
-     "./fixtures/tree/yet_another_file"
+      "./fixtures/tree/even_more",
+      "./fixtures/tree/some_file",
+      "./fixtures/tree/yet_another_file",
     ]
   end
 
@@ -31,7 +32,6 @@ describe Delfos::FileTree::FileTree do
 
     it do
       distance = a.distance_to(b)
-
     end
   end
 end

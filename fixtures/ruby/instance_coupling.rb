@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class EfferentCoupling
   def instance_coupling(some_parameter)
     some_parameter.this_message

@@ -1,8 +1,9 @@
+# frozen_string_literal: true
 require_relative "file_tree"
 require_relative "distance_calculation"
 
 describe Delfos::FileTree::DistanceCalculation do
-  let(:distance_calculation) { described_class.new(a,b) }
+  let(:distance_calculation) { described_class.new(a, b) }
 
   describe "#traversal_path" do
     let(:a) { t("another_top_level_file") }
@@ -19,7 +20,6 @@ describe Delfos::FileTree::DistanceCalculation do
       let(:a) { t("some_file") }
       let(:b) { t("sub_directory/file_in_sub_directory") }
 
-
       it do
         result = distance_calculation.traversal_path
 
@@ -35,7 +35,6 @@ describe Delfos::FileTree::DistanceCalculation do
   describe "#remove_traversals_from_files_to_parents_then_back_down_to_sub_directories" do
     let(:a) { t("some_file") }
     let(:b) { t("sub_directory/file_in_sub_directory") }
-
 
     it do
       result = distance_calculation.remove_traversals_from_files_to_parents_then_back_down_to_sub_directories [
@@ -88,33 +87,32 @@ describe Delfos::FileTree::DistanceCalculation do
     it do
       expect(distance_calculation.traversals.map(&:class)).to eq [
         Delfos::FileTree::Relation,
-        Delfos::FileTree::ChildFile
+        Delfos::FileTree::ChildFile,
       ]
 
       files = distance_calculation.traversals.first.traversed_files
 
-      match_file_array files, %w[
+      match_file_array files, %w(
         some_file
         even_more
         another_top_level_file
-      ]
+      )
     end
 
     it do
       files = distance_calculation.traversals.last.traversed_files
 
-      match_file_array files, %w[
+      match_file_array files, %w(
         sub_directory/even_more
         sub_directory/file_in_sub_directory
-      ]
+      )
 
       expect(distance_calculation.traversals.map(&:distance)).to match_array [
-        3 + 2, #files then directories
-        3 + 2, #directories then files
+        3 + 2, # files then directories
+        3 + 2, # directories then files
       ]
     end
   end
-
 
   describe "#traversals" do
     let(:a) { t("another_top_level_file") }
@@ -122,7 +120,7 @@ describe Delfos::FileTree::DistanceCalculation do
 
     it do
       expect(distance_calculation.traversals.map(&:class)).to eq [
-        Delfos::FileTree::Relation
+        Delfos::FileTree::Relation,
       ]
     end
 
@@ -134,12 +132,10 @@ describe Delfos::FileTree::DistanceCalculation do
         expect(distance_calculation.traversals.map(&:class)).to eq [
           Delfos::FileTree::Relation,
           Delfos::FileTree::Relation,
-          Delfos::FileTree::ChildFile
+          Delfos::FileTree::ChildFile,
         ]
       end
     end
-
-
   end
 
   describe "#sum_traversals" do
@@ -171,4 +167,3 @@ describe Delfos::FileTree::DistanceCalculation do
     end
   end
 end
-

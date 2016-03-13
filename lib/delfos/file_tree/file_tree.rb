@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "distance_calculation"
 
 module Delfos
@@ -24,11 +25,11 @@ module Delfos
       private
 
       def instantiate_sub_tree(type)
-        glob.select(&type).map{|d| self.class.new(d.to_s) }
+        glob.select(&type).map { |d| self.class.new(d.to_s) }
       end
 
       def glob
-        Dir.glob(path + "/*").map{|f| Pathname.new(f)}
+        Dir.glob(path + "/*").map { |f| Pathname.new(f) }
       end
     end
   end

@@ -1,10 +1,12 @@
+# frozen_string_literal: true
 module Delfos
   module FileTree
     class Relation
       attr_reader :start_path, :finish_path
 
       def initialize(start_path, finish_path)
-        @start_path, @finish_path = start_path, finish_path
+        @start_path = start_path
+        @finish_path = finish_path
       end
 
       def other_files
@@ -16,12 +18,10 @@ module Delfos
       end
 
       def distance
-        if start_path.file? && finish_path.file?
-          return traversed_files.length
-        end
+        return traversed_files.length if start_path.file? && finish_path.file?
 
         if start_path.directory? && finish_path.directory?
-          return  traversed_directories.length
+          return traversed_directories.length
         end
 
         traversed_files.length + traversed_directories.length
@@ -35,17 +35,16 @@ module Delfos
         start_at_end = (start_path.file? && finish_path.directory?)
 
         subset_to_traverse(collection: other_files,
-                           start: start_path, 
+                           start: start_path,
                            finish: finish_path,
                            start_at_end: start_at_end)
       end
-
 
       def traversed_directories
         start_at_end = (start_path.file? && finish_path.directory?) || (start_path.directory? && finish_path.file?)
 
         subset_to_traverse(collection: other_directories,
-                           start: start_path, 
+                           start: start_path,
                            finish: finish_path,
                            start_at_end: start_at_end)
       end
@@ -70,10 +69,10 @@ module Delfos
       end
 
       def index_from(collection, value, reverse: false, start_at_end: false)
-        index  = collection.index value
+        index = collection.index value
 
         if index.nil?
-          index =  start_at_end && !reverse ?  collection.length - 1 : 0
+          index = start_at_end && !reverse ? collection.length - 1 : 0
         end
 
         index
@@ -86,7 +85,6 @@ module Delfos
           @path = path
         end
 
-
         def files
           all.select(&:file?)
         end
@@ -98,12 +96,12 @@ module Delfos
         private
 
         def all
-          Dir.glob(path.dirname + "*").map{|f| Pathname.new(f)}
+          Dir.glob(path.dirname + "*").map { |f| Pathname.new(f) }
         end
       end
     end
 
-    class ChildFile        < Relation
+    class ChildFile < Relation
       def other_files
         RelatedPaths.new(start_path + "*").files
       end
