@@ -16,9 +16,9 @@ module Delfos
 
     def setup
       return if bail?
-      record_method_adding(klass, original_method, class_method: class_method)
-      class_method = class_method()
+      record_method_adding!
       original_method = original_method()
+      class_method = class_method()
 
       method_defining_method.call(name) do |*args, **keyword_args, &block|
         ::Delfos::MethodLogging.log(
@@ -57,7 +57,7 @@ module Delfos
     end
 
     def original_method
-      class_method ? klass.singleton_method(name) : klass.instance_method(name)
+      @original_methods ||= class_method ? klass.singleton_method(name) : klass.instance_method(name)
     end
 
     def method_defining_method
@@ -76,12 +76,19 @@ module Delfos
       @added_methods ||= {}
     end
 
-    def record_method_adding(klass, meth, class_method:)
-      return true if method_has_been_added?(klass, meth, class_method: class_method)
+    def record_method_adding!
+      return true if method_has_been_added?(klass, original_method, class_method: class_method)
 
-      type = class_method ? "class_method" : "instance_method"
       self.class.added_methods[klass] ||= {}
-      self.class.added_methods[klass]["#{type}_#{meth.name}"] = meth.source_location
+      self.class.added_methods[klass][key] = original_method.source_location
+    end
+
+    def key
+      "#{type}_#{original_method.name}"
+    end
+
+    def type 
+      class_method ? "class_method" : "instance_method"
     end
   end
 end
