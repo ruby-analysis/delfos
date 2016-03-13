@@ -26,7 +26,7 @@ module Delfos
           args, keyword_args, block,
           class_method, caller.dup, binding.dup,
           original_method
-        )
+                                   )
 
         method_to_call = class_method ? original_method : original_method.bind(self)
 
