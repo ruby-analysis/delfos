@@ -1,0 +1,125 @@
+.tree-holder {
+  > .nav-block {
+    margin: 11px 0;
+  }
+
+  .file-finder {
+    width: 50%;
+    .file-finder-input {
+      width: 95%;
+      display: inline-block;
+    }
+  }
+
+  .tree-table {
+    margin-bottom: 0;
+
+    tr {
+      > td, > th {
+        line-height: 26px;
+      }
+
+      &:hover {
+        td {
+          background: $row-hover;
+        }
+        cursor: pointer;
+      }
+      &.selected {
+        td {
+          background: $gray-dark;
+          border-top: 1px solid $border-gray-dark;
+          border-bottom: 1px solid $border-gray-dark;
+        }
+      }
+    }
+  }
+
+  .tree-item {
+    .tree-item-file-name {
+      max-width: 320px;
+      vertical-align: middle;
+
+      i, a {
+        color: $gl-link-color;
+      }
+
+      img {
+        position: relative;
+        top:-1px;
+      }
+    }
+
+    .tree_commit {
+      max-width: 320px;
+    }
+
+    .tree_time_ago {
+      min-width: 135px;
+    }
+  }
+
+  .tree_author {
+    padding-right: 8px;
+
+    .commit-author-name {
+      color: $gl-gray;
+    }
+  }
+
+  .tree_commit {
+    color: $gl-gray;
+
+    .tree-commit-link {
+      color: $gl-gray;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.tree-ref-holder {
+  float: left;
+  margin-right: 15px;
+}
+
+.blob-commit-info {
+  list-style: none;
+  padding: $gl-padding;
+  background: $background-color;
+  border: 1px solid $border-color;
+  border-bottom: none;
+  margin: 0;
+
+  .commit {
+    padding: 0;
+
+    .commit-row-title {
+      .commit-row-message {
+        font-weight: normal;
+      }
+    }
+  }
+}
+
+#modal-remove-blob > .modal-dialog { width: 850px; }
+
+.blob-upload-dropzone-previews {
+  text-align: center;
+  border: 2px;
+  border-style: dashed;
+  border-color: $border-color;
+  min-height: 200px;
+}
+
+.upload-link {
+  font-weight: normal;
+  color: $md-link-color;
+}
+
+.tree-controls {
+  float: right;
+  margin-top: 11px;
+}

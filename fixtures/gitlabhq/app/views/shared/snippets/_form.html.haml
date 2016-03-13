@@ -1,0 +1,42 @@
+.snippet-form-holder
+  = form_for @snippet, url: url, html: { class: "form-horizontal snippet-form js-requires-input" } do |f|
+    - if @snippet.errors.any?
+      .alert.alert-danger
+        %ul
+          - @snippet.errors.full_messages.each do |msg|
+            %li= msg
+
+    .form-group
+      = f.label :title, class: 'control-label'
+      .col-sm-10
+        = f.text_field :title, class: 'form-control', required: true, autofocus: true
+
+    = render 'shared/visibility_level', f: f, visibility_level: visibility_level, can_change_visibility_level: true, form_model: @snippet
+
+    .file-editor
+      .form-group
+        = f.label :file_name, "File", class: 'control-label'
+        .col-sm-10
+          .file-holder.snippet
+            .file-title
+              = f.text_field :file_name, placeholder: "Optionally name this file to add code highlighting, e.g. example.rb for Ruby.", class: 'form-control snippet-file-name'
+            .file-content.code
+              %pre#editor= @snippet.content
+              = f.hidden_field :content, class: 'snippet-file-content'
+
+    .form-actions
+      - if @snippet.new_record?
+        = f.submit 'Create snippet', class: "btn-create btn"
+      - else
+        = f.submit 'Save changes', class: "btn-save btn"
+
+      - if @snippet.project_id
+        = link_to "Cancel", namespace_project_snippets_path(@project.namespace, @project), class: "btn btn-cancel"
+      - else
+        = link_to "Cancel", snippets_path(@project), class: "btn btn-cancel"
+
+:javascript
+  var editor = ace.edit("editor");
+  $(".snippet-form-holder form").submit(function(){
+    $(".snippet-file-content").val(editor.getValue());
+  });

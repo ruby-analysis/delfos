@@ -1,0 +1,48 @@
+- page_title "Contributors", "Graphs"
+= render "header_title"
+= render 'head'
+
+.gray-content-block.append-bottom-default
+  .tree-ref-holder
+    = render 'shared/ref_switcher', destination: 'graphs'
+  %ul.breadcrumb.repo-breadcrumb
+    = commits_breadcrumbs
+
+.loading-graph
+  .center
+    %h3.page-title
+      %i.fa.fa-spinner.fa-spin
+      Building repository graph.
+    %p.slead Please wait a moment, this page will automatically refresh when ready.
+
+.stat-graph.hide
+  .header.clearfix
+    %h3#date_header.page-title
+    %p.light
+      Commits to #{@ref}, excluding merge commits. Limited by 6,000 commits
+    %input#brush_change{:type => "hidden"}
+  .graphs
+    #contributors-master
+    #contributors.clearfix
+      %ol.contributors-list.clearfix
+
+
+
+:javascript
+  $.ajax({
+    type: "GET",
+    url: location.href,
+    dataType: "json",
+    success: function (data) {
+      var graph = new ContributorsStatGraph();
+      graph.init(data);
+
+      $("#brush_change").change(function(){
+        graph.change_date_header();
+        graph.redraw_authors();
+      });
+
+      $(".stat-graph").fadeIn();
+      $(".loading-graph").hide();
+    }
+  });

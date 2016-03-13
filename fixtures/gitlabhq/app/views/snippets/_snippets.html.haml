@@ -1,0 +1,7 @@
+%ul.content-list
+  = render partial: 'shared/snippets/snippet', collection: @snippets
+  - if @snippets.empty?
+    %li
+      .nothing-here-block Nothing here.
+
+= paginate @snippets, theme: 'gitlab'

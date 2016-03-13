@@ -1,0 +1,7 @@
+- page_title "New Snippets"
+= render "header_title"
+
+%h3.page-title
+  New Snippet
+%hr
+= render "shared/snippets/form", url: namespace_project_snippets_path(@project.namespace, @project, @snippet), visibility_level: default_snippet_visibility

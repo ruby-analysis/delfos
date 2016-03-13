@@ -1,0 +1,3 @@
+$('aside.right-sidebar')[0].outerHTML = "#{escape_javascript(render 'shared/issuable/sidebar', issuable: @merge_request)}";
+$('aside.right-sidebar').effect('highlight');
+new IssuableContext();

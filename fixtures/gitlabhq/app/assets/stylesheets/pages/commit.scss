@@ -1,0 +1,111 @@
+.commit-title{
+  display: block;
+}
+
+.commit-author, .commit-committer{
+  display: block;
+  color: #999;
+  font-weight: normal;
+  font-style: italic;
+}
+
+.commit-author strong, .commit-committer strong{
+  font-weight: bold;
+  font-style: normal;
+}
+
+.commit-description {
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.commit-info-row {
+  margin-bottom: 10px;
+  .avatar {
+    @extend .avatar-inline;
+  }
+  .commit-committer-link,
+  .commit-author-link {
+    color: #444;
+    font-weight: bold;
+  }
+}
+
+.commit-box {
+  border-top: 1px solid $border-color;
+
+  .commit-title {
+    margin: 0;
+    font-size: 23px;
+    color: #313236;
+  }
+
+  .commit-description {
+    margin-top: 15px;
+  }
+}
+
+.file-stats {
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 10px 0;
+
+    li {
+      padding: 3px 0px;
+      line-height: 20px;
+    }
+  }
+  .new-file {
+    a {
+      color: $gl-text-green;
+    }
+  }
+  .renamed-file {
+    a {
+      color: $gl-text-orange;
+    }
+  }
+  .deleted-file {
+    a {
+      color: $gl-text-red;
+    }
+  }
+  .edit-file{
+    a {
+      color: $gl-text-color;
+    }
+  }
+}
+
+/*
+ * Commit message textarea for web editor and
+ * custom merge request message
+ */
+.commit-message-container {
+  background-color: $body-bg;
+  position: relative;
+  font-family: $monospace_font;
+  $left: 12px;
+  overflow: hidden; // See https://gitlab.com/gitlab-org/gitlab-ce/issues/13987
+  .max-width-marker {
+    width: 72ch;
+    color: rgba(0, 0, 0, 0.0);
+    font-family: inherit;
+    left: $left;
+    height: 100%;
+    border-right: 1px solid mix($input-border, white);
+    position: absolute;
+    z-index: 1;
+  }
+  > textarea {
+    background-color: rgba(0, 0, 0, 0.0);
+    font-family: inherit;
+    padding-left: $left;
+    position: relative;
+    z-index: 2;
+  }
+}

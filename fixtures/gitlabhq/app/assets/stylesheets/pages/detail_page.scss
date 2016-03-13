@@ -1,0 +1,40 @@
+.detail-page-header {
+  padding: 11px 0;
+  border-bottom: 1px solid $border-color;
+  color: #5c5d5e;
+  font-size: 16px;
+  line-height: 34px;
+
+  .author {
+    color: #5c5d5e;
+  }
+
+  .identifier {
+    color: #5c5d5e;
+  }
+
+  .issue_created_ago, .author_link {
+    white-space: nowrap;
+  }
+
+  .issue-meta {
+    display: inline-block;
+    line-height: 20px;
+  }
+}
+
+.detail-page-description {
+  .title {
+    margin: 0;
+    font-size: 23px;
+    color: #313236;
+  }
+
+  .description {
+    margin-top: 6px;
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+}

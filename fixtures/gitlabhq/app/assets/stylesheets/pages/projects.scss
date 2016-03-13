@@ -1,0 +1,487 @@
+.alert_holder {
+  margin: -16px;
+
+  .alert-link {
+    font-weight: normal;
+  }
+}
+.no-ssh-key-message, .project-limit-message {
+  background-color: #f28d35;
+  margin-bottom: 16px;
+}
+.new_project,
+.edit_project {
+  fieldset.features {
+    .control-label {
+      font-weight: normal;
+    }
+  }
+}
+
+.project-name-holder {
+  .help-inline {
+    vertical-align: top;
+    padding: 7px;
+  }
+}
+
+.project-home-panel {
+  padding-bottom: 40px;
+  border-bottom: 1px solid $border-color;
+
+  .cover-controls {
+    .project-settings-dropdown {
+      margin-left: 10px;
+      display: inline-block;
+    }
+  }
+
+  .project-identicon-holder {
+    margin-bottom: 16px;
+
+    .avatar, .identicon {
+      margin: 0 auto;
+      float: none;
+    }
+
+    .identicon {
+      @include border-radius(50%);
+    }
+  }
+
+  .notifications-btn {
+    margin-top: -28px;
+
+    .fa-bell {
+      margin-right: 6px;
+    }
+
+    .fa-angle-down {
+      margin-left: 6px;
+    }
+  }
+
+  .project-home-desc {
+    h1 {
+      color: #313236;
+      margin: 0;
+      margin-bottom: 6px;
+      font-size: 23px;
+      font-weight: normal;
+    }
+
+    .visibility-icon {
+      display: inline-block;
+      margin-left: 5px;
+      font-size: 18px;
+      color: $gray;
+    }
+
+    p {
+      padding: 0 $gl-padding;
+      color: #5c5d5e;
+    }
+  }
+
+  .project-repo-buttons {
+    margin-top: 20px;
+    margin-bottom: 0px;
+
+    .count-buttons {
+      display: block;
+      margin-bottom: 20px;
+    }
+
+    .clone-row {
+      .split-repo-buttons,
+      .project-clone-holder {
+        display: inline-block;
+      }
+
+      .split-repo-buttons {
+        margin: 0 12px;
+      }
+    }
+
+    .btn {
+      @include btn-gray;
+      text-transform: none;
+    }
+
+    .count-with-arrow {
+      display: inline-block;
+      position: relative;
+      margin-left: 4px;
+
+      .arrow {
+        &:before {
+          content: '';
+          display: inline-block;
+          position: absolute;
+          width: 0;
+          height: 0;
+          border-color: transparent;
+          border-style: solid;
+          top: 50%;
+          left: 0;
+          margin-top: -6px;
+          border-width: 7px 5px 7px 0;
+          border-right-color: #dce0e5;
+        }
+
+        &:after {
+          content: '';
+          position: absolute;
+          width: 0;
+          height: 0;
+          border-color: transparent;
+          border-style: solid;
+          top: 50%;
+          left: 1px;
+          margin-top: -9px;
+          border-width: 10px 7px 10px 0;
+          border-right-color: #FFF;
+        }
+      }
+      .count {
+        @include btn-gray;
+        display: inline-block;
+        background: white;
+        border-radius: 2px;
+        border-width: 1px;
+        border-style: solid;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 13px;
+        padding: $gl-vert-padding $gl-padding;
+        letter-spacing: .4px;
+        padding: 10px 14px;
+        text-align: center;
+        vertical-align: middle;
+        touch-action: manipulation;
+        cursor: pointer;
+        background-image: none;
+        white-space: nowrap;
+        margin: 0 11px 0px 4px;
+
+        &:hover {
+          background: #FFF;
+        }
+      }
+    }
+  }
+}
+
+.split-one {
+  display: inline-table;
+  margin-right: 12px;
+
+  a {
+    margin: -1px !important;
+  }
+}
+
+.project-visibility-level-holder {
+  .radio {
+    margin-bottom: 10px;
+
+    i {
+      margin: 2px 0;
+      font-size: 20px;
+    }
+
+    .option-title {
+      font-weight: normal;
+      display: inline-block;
+      color: #313236;
+    }
+
+    .option-descr {
+      margin-left: 29px;
+      color: #54565b;
+    }
+  }
+}
+
+.save-project-loader {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  color: #555;
+}
+
+.project_member_row form {
+  margin: 0px;
+}
+
+.transfer-project .select2-container {
+  min-width: 200px;
+}
+
+.deploy-project-label {
+  margin: 1px;
+}
+
+.vs-public {
+  color: $gl-primary;
+}
+
+.vs-internal {
+  color: $gl-warning;
+}
+
+.vs-private {
+  color: $gl-success;
+}
+
+.breadcrumb.repo-breadcrumb {
+  padding: 0;
+  background: transparent;
+  border: none;
+  line-height: 42px;
+  margin: 0;
+
+  > li + li:before {
+    padding: 0 3px;
+    color: #999;
+  }
+}
+
+.last-push-widget {
+  margin-top: -1px;
+}
+
+.fork-namespaces {
+  .fork-thumbnail {
+    text-align: center;
+    margin-bottom: $gl-padding;
+
+    .caption {
+      padding: $gl-padding 0;
+      min-height: 30px;
+    }
+
+    img {
+      @include border-radius(50%);
+      max-width: 100px;
+    }
+  }
+}
+
+table.table.protected-branches-list tr.no-border {
+  th, td {
+    border: 0;
+  }
+}
+
+.project-import .btn {
+  float: left;
+  margin-right: 10px;
+}
+
+.project-stats {
+  text-align: center;
+  margin-top: $gl-padding;
+  margin-bottom: 0;
+  padding-top: 10px;
+  padding-bottom: 4px;
+
+  ul.nav {
+    display:inline-block;
+  }
+
+  .nav li {
+    display:inline;
+  }
+
+  .nav > li > a {
+    @include btn-default;
+    @include btn-gray;
+
+    background-color: transparent;
+    border: 1px solid #f7f8fa;
+    margin-left: 12px;
+  }
+
+  li {
+    display:inline;
+  }
+
+  a {
+    float:left;
+    font-size: 17px;
+  }
+
+  li.missing a {
+    color: #5a6069;
+    border: 1px dashed #dce0e5;
+
+    &:hover {
+      background-color: #f0f2f5;
+    }
+  }
+}
+
+pre.light-well {
+  border-color: #f1f1f1;
+}
+
+.git-empty {
+  margin: 0 7px 0 7px;
+
+  h5 {
+    color: #5c5d5e;
+  }
+
+  .light-well {
+    @include border-radius (2px);
+
+    color: #5b6169;
+    font-size: 13px;
+    line-height: 1.6em;
+  }
+}
+
+.project-footer {
+  margin-top: 20px;
+
+  .btn-remove {
+    @include btn-middle;
+    @include btn-red;
+
+    float: left !important;
+  }
+}
+
+/*
+ * Projects list rendered on dashboard and user page
+ */
+
+.projects-list {
+  @include basic-list;
+
+  .project-row {
+    border-color: $table-border-color;
+
+    &.no-description {
+      .project {
+        line-height: 40px;
+      }
+    }
+
+    .project-full-name {
+      @include str-truncated;
+    }
+
+    .controls {
+      line-height: 40px;
+
+      a:hover {
+        text-decoration: none;
+      }
+
+      > span {
+        margin-left: 10px;
+      }
+    }
+  }
+
+  .bottom {
+    padding-top: $gl-padding;
+    padding-bottom: 0;
+  }
+}
+
+.panel .projects-list li {
+  padding: 10px 15px;
+  margin: 0;
+}
+
+.project-show-activity {
+  .activity-filter-block {
+    margin-top: -1px;
+  }
+}
+
+.project-last-commit {
+  .ci-status {
+    margin-right: 16px;
+  }
+
+  .commit-row-message {
+    color: $gl-gray;
+  }
+
+  .commit_short_id {
+    margin-right: 5px;
+    color: $gl-link-color;
+    font-weight: 600;
+  }
+
+  .commit-author-link {
+    margin-left: 7px;
+    text-decoration: none;
+    .avatar {
+      float: none;
+      margin-right: 4px;
+    }
+
+    .commit-author-name {
+      font-weight: 600;
+    }
+  }
+}
+
+.project-show-readme .readme-holder {
+  padding: $gl-padding 0;
+  border-top: 0;
+
+  .edit-project-readme {
+    z-index: 100;
+    position: relative;
+  }
+}
+
+.git-clone-holder {
+  width: 498px;
+
+  .btn-clipboard {
+    border: 1px solid $border-color;
+    padding: 6px $gl-padding;
+  }
+
+  .project-home-dropdown + & {
+    margin-right: 45px;
+  }
+
+  .clone-options {
+    display: table-cell;
+    a.btn {
+      width: 100%;
+    }
+  }
+
+  .form-control {
+    @extend .monospace;
+    background: #FFF;
+    font-size: 14px;
+    margin-left: -1px;
+    cursor: auto;
+    width: 101%;
+  }
+}
+
+.cannot-be-merged,
+.cannot-be-merged:hover {
+  color: #E62958;
+  margin-top: 2px;
+}
+
+.private-forks-notice .private-fork-icon {
+  i:nth-child(1) {
+    color: #2AA056;
+  }
+
+  i:nth-child(2) {
+    color: #FFFFFF;
+  }
+}

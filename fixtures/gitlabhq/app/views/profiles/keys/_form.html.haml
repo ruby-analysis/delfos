@@ -1,0 +1,17 @@
+%div
+  = form_for [:profile, @key], html: { class: 'js-requires-input' } do |f|
+    - if @key.errors.any?
+      .alert.alert-danger
+        %ul
+          - @key.errors.full_messages.each do |msg|
+            %li= msg
+
+    .form-group
+      = f.label :key, class: 'label-light'
+      = f.text_area :key, class: "form-control", rows: 8, required: true
+    .form-group
+      = f.label :title, class: 'label-light'
+      = f.text_field :title, class: "form-control", required: true
+
+    .prepend-top-default
+      = f.submit 'Add key', class: "btn btn-create"

@@ -1,0 +1,180 @@
+.commits-compare-switch{
+  @include btn-default;
+  @include btn-white;
+  background: image-url("switch_icon.png") no-repeat center center;
+  text-indent: -9999px;
+  float: left;
+  margin-right: 9px;
+}
+
+.lists-separator {
+  margin: 10px 0;
+  border-color: #DDD;
+}
+
+.commits-row {
+  ul {
+    margin: 0;
+
+    li.commit {
+      padding: 8px 0;
+    }
+  }
+
+  .commits-row-date {
+    font-size: 15px;
+    line-height: 20px;
+    margin-bottom: 5px;
+  }
+}
+
+li.commit {
+  list-style: none;
+
+  .commit-row-title {
+    font-size: $list-font-size;
+    line-height: 20px;
+    margin-bottom: 2px;
+
+    .btn-clipboard {
+      margin-top: -1px;
+    }
+
+    .notes_count {
+      float: right;
+      margin-right: 10px;
+    }
+
+    .commit_short_id {
+      min-width: 65px;
+      font-family: $monospace_font;
+    }
+
+    .str-truncated {
+      max-width: 70%;
+    }
+
+    .commit-row-message {
+      color: $gl-link-color;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .text-expander {
+      background: #eee;
+      color: #555;
+      padding: 0 5px;
+      cursor: pointer;
+      margin-left: 4px;
+      &:hover {
+        background-color: #ddd;
+      }
+    }
+  }
+
+  .commit-row-description {
+    font-size: 14px;
+    border-left: 1px solid #EEE;
+    padding: 10px 15px;
+    margin: 5px 0 10px 5px;
+    background: #f9f9f9;
+    display: none;
+
+    pre {
+      border: none;
+      background: inherit;
+      padding: 0;
+      margin: 0;
+    }
+  }
+
+  .commit-row-info {
+    color: $gl-gray;
+    line-height: 24px;
+    font-size: 13px;
+
+    a {
+      color: $gl-gray;
+    }
+
+    .committed_ago {
+      display: inline-block;
+    }
+  }
+
+  &.inline-commit {
+    .commit-row-title {
+      font-size: 13px;
+    }
+
+    .committed_ago {
+      float: right;
+      @extend .cgray;
+    }
+  }
+}
+
+.branch-commit {
+  color: $gl-gray;
+  .commit-id, .commit-row-message {
+    color: $gl-gray;
+  }
+}
+
+.divergence-graph {
+  padding: 12px 12px 0 0;
+  float: right;
+
+  .graph-side {
+    position: relative;
+    width: 80px;
+    height: 22px;
+    padding: 5px 0 13px;
+    float: left;
+
+    .bar {
+      position: absolute;
+      height: 4px;
+      background-color: #ccc;
+    }
+
+    .bar-behind {
+      right: 0;
+      border-radius: 3px 0 0 3px;
+    }
+
+    .bar-ahead {
+      left: 0;
+      border-radius: 0 3px 3px 0;
+    }
+
+    .count {
+      padding-top: 6px;
+      padding-bottom: 0px;
+      font-size: 12px;
+      color: #333;
+      display: block;
+    }
+
+    .count-behind {
+      padding-right: 4px;
+      text-align: right;
+    }
+
+    .count-ahead {
+      padding-left: 4px;
+      text-align: left;
+    }
+  }
+
+  .graph-separator {
+    position: relative;
+    width: 1px;
+    height: 18px;
+    margin: 5px 0 0;
+    float: left;
+    background-color: #ccc;
+  }
+}

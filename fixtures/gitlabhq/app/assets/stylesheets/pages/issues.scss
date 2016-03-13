@@ -1,0 +1,143 @@
+.issues-list {
+  .issue {
+    padding: 10px $gl-padding;
+    position: relative;
+
+    .issue-title {
+      margin-bottom: 2px;
+    }
+
+    .issue-check {
+      float: left;
+      padding-right: 8px;
+      margin-bottom: 10px;
+      min-width: 15px;
+    }
+
+    .issue-labels {
+      display: inline-block;
+    }
+
+    .issue-no-comments {
+      opacity: 0.5;
+    }
+  }
+}
+
+.check-all-holder {
+  line-height: 36px;
+  float: left;
+  margin-right: 15px;
+}
+
+.issues_content {
+  .title {
+    height: 40px;
+  }
+
+  form {
+    margin: 0;
+  }
+}
+
+.issue-search-form {
+  margin: 0;
+  height: 24px;
+}
+
+form.edit-issue {
+  margin: 0;
+}
+
+.merge-requests-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.merge-request-id {
+  display: inline-block;
+  width: 3em;
+}
+
+.merge-request-status {
+  color: $gl-gray;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.merge-request,
+.issue {
+  &.today {
+    background: #EFE;
+    border-color: #CEC;
+  }
+
+  &.closed {
+    background: #F9F9F9;
+    border-color: #E5E5E5;
+  }
+
+  &.merged {
+    background: #F9F9F9;
+    border-color: #E5E5E5;
+  }
+}
+
+@media (max-width: $screen-xs-max) {
+  .issue-btn-group {
+    width: 100%;
+    margin-top: 5px;
+
+    .btn-group {
+      width: 100%;
+
+      ul {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    .btn {
+      width: 100%;
+
+      &:first-child:not(:last-child) {
+
+      }
+
+      &:not(:first-child):not(:last-child) {
+        margin-top: 10px;
+      }
+
+      &:last-child:not(:first-child) {
+        margin-top: 10px;
+      }
+    }
+  }
+
+  .issue {
+    &:hover  .issue-actions {
+      display: none !important;
+    }
+
+    .issue-updated-at {
+      display: none;
+    }
+  }
+}
+
+.issue-form .select2-container {
+  width: 250px !important;
+}
+
+.issue-closed-by-widget {
+  color: $secondary-text;
+  margin-left: 52px;
+}
+
+.editor-details {
+  display: block;
+  
+  @media (min-width: $screen-sm-min) {
+    display: inline-block;
+  }
+}

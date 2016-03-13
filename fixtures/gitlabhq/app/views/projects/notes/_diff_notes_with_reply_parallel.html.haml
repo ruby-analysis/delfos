@@ -1,0 +1,33 @@
+- note1 = notes_left.present? ? notes_left.first : nil
+- note2 = notes_right.present? ? notes_right.first : nil
+
+%tr.notes_holder
+  - if note1
+    %td.notes_line.old
+      %span.btn.disabled
+        %i.fa.fa-comment
+        = notes_left.count
+    %td.notes_content.parallel.old
+      %ul.notes{ data: { discussion_id: note1.discussion_id } }
+        = render notes_left
+
+      .discussion-reply-holder
+        = link_to_reply_diff(note1, 'old')
+  - else
+    %td.notes_line.old= ""
+    %td.notes_content.parallel.old= ""
+
+  - if note2
+    %td.notes_line.new
+      %span.btn.disabled
+        %i.fa.fa-comment
+        = notes_right.count
+    %td.notes_content.parallel.new
+      %ul.notes{ data: { discussion_id: note2.discussion_id } }
+        = render notes_right
+
+      .discussion-reply-holder
+        = link_to_reply_diff(note2, 'new')
+  - else
+    %td.notes_line.new= ""
+    %td.notes_content.parallel.new= ""

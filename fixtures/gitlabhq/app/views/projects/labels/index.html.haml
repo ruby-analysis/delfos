@@ -1,0 +1,23 @@
+- page_title "Labels"
+= render "header_title"
+
+.top-area
+  .nav-text
+    Labels can be applied to issues and merge requests.
+  .nav-controls
+    - if can? current_user, :admin_label, @project
+      = link_to new_namespace_project_label_path(@project.namespace, @project), class: "btn btn-new" do
+        = icon('plus')
+        New label
+
+.labels
+  - if @labels.present?
+    %ul.content-list.manage-labels-list
+      = render @labels
+    = paginate @labels, theme: 'gitlab'
+  - else
+    .nothing-here-block
+      - if can? current_user, :admin_label, @project
+        Create first label or #{link_to 'generate', generate_namespace_project_labels_path(@project.namespace, @project), method: :post} default set of labels
+      - else
+        No labels created
