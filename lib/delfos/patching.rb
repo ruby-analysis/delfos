@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module Delfos
   class Patching
-    def self.setup_method_call_logging(klass, name, private_methods, class_method:)
+    def self.perform(klass, name, private_methods, class_method:)
       new(klass, name, private_methods, class_method).setup
     end
 
@@ -16,13 +16,13 @@ module Delfos
 
     def setup
       return if bail?
+
       record_method_adding!
       original_method = original_method()
       class_method = class_method()
 
       method_defining_method.call(name) do |*args, **keyword_args, &block|
-        ::Delfos::MethodLogging.log(
-          self,
+        ::Delfos::MethodLogging.log(self,
           args, keyword_args, block,
           class_method, caller.dup, binding.dup,
           original_method
@@ -41,7 +41,7 @@ module Delfos
     private
 
     def bail?
-      already_added? || is_private_method? || exclude?
+      method_has_been_added? || is_private_method? || exclude?
     end
 
     def is_private_method?
@@ -52,10 +52,6 @@ module Delfos
       ::Delfos::MethodLogging.exclude_from_logging?(original_method)
     end
 
-    def already_added?
-      method_has_been_added?(klass, name, class_method: class_method)
-    end
-
     def original_method
       @original_methods ||= class_method ? klass.singleton_method(name) : klass.instance_method(name)
     end
@@ -64,12 +60,11 @@ module Delfos
       class_method ? klass.method(:define_singleton_method) : klass.method(:define_method)
     end
 
-    def method_has_been_added?(klass, name, class_method:)
+    def method_has_been_added?
       return false unless self.class.added_methods[self]
       return false unless self.class.added_methods[self][klass]
 
-      type = class_method ? "class_method" : "instance_method"
-      self.class.added_methods[klass]["#{type}_#{name}"]
+      self.class.added_methods[klass][key]
     end
 
     def self.added_methods
@@ -77,14 +72,14 @@ module Delfos
     end
 
     def record_method_adding!
-      return true if method_has_been_added?(klass, original_method, class_method: class_method)
+      return true if method_has_been_added?
 
       self.class.added_methods[klass] ||= {}
       self.class.added_methods[klass][key] = original_method.source_location
     end
 
     def key
-      "#{type}_#{original_method.name}"
+      "#{type}_#{name}"
     end
 
     def type
