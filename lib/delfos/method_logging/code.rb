@@ -5,7 +5,8 @@ module Delfos
   module MethodLogging
     class Code
       extend Forwardable
-      delegate [:object, :method_type, :method_name, :line_number] => :code_location
+      delegate [:object, :method_type, :method_name, :line_number, :method_definition_file,
+                :method_definition_line ] => :code_location
 
       attr_reader :code_location
 
@@ -69,7 +70,7 @@ module Delfos
       def initialize(object, method_name, method_type, file, line_number)
         @object = object
         @method_name = method_name
-        @method_type = method_type
+        @method_type = method_type ? "ClassMethod" : "InstanceMethod"
         @file = file
         @line_number = line_number
       end
@@ -97,6 +98,14 @@ module Delfos
         new(object, method_name.to_s, class_method, file, line_number.to_i)
       end
 
+      def method_definition_file
+        method_definition[0]
+      end
+
+      def method_definition_line
+        method_definition[1]
+      end
+
       def self.from_method(object, called_method, class_method)
         file, line_number = called_method.source_location
 
@@ -105,6 +114,12 @@ module Delfos
 
       def klass
         klass_for(object)
+      end
+
+      private
+
+      def method_definition
+        @method_definition ||= object.method(method_name).source_location
       end
     end
   end

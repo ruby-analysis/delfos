@@ -8,40 +8,72 @@ module Delfos
     module Informer
       class << self
         def debug(args, caller_code, called_code)
-          puts "*" * 80
-          puts "
-            args               #{args.args}
-            keyword_args       #{args.keyword_args}
-
-            caller_klass       #{caller_code.klass}
-            caller_file        #{caller_code.file}
-            caller_line_number #{caller_code.line_number}
-            caller_method      #{caller_code.method_name}
-            caller_method_type #{called_code.method_type}
-
-            called_klass       #{called_code.klass}
-            called_file        #{called_code.file}
-            called_line_number #{called_code.line_number}
-            called_method      #{called_code.method_name}
-            called_method_type #{called_code.method_type}
-          "
-
           execute_query(args, caller_code, called_code)
         end
 
-        def query_for(_args, caller_code, called_code)
-          <<-QUERY
-            MERGE (k1:#{caller_code.klass})
-            MERGE (k1)-[:OWNS]->(m1:#{caller_code.method_type}{name: "#{caller_code.method_name}"})
-            MERGE (m1)<-[:CALLED_BY]-(mc:MethodCall{file: "#{caller_code.file}", line_number: "#{caller_code.line_number}"})
+        def query_for(args, caller_code, called_code)
+           query_variables.assign(caller_code.klass, "k")
+           query_variables.assign(called_code.klass, "k")
 
-            MERGE (mc)-[:CALLS]->(m2:#{called_code.method_type}{name: "#{called_code.method_name}"})
-            MERGE (k2:#{called_code.klass})
-            MERGE (k2)-[:OWNS]->(m2)
+           (args.args + args.keyword_args).uniq.each do |k|
+             query_variables.assign(k, "k")
+           end
+
+           klasses_query = query_variables.map do |klass, name|
+             "MERGE (#{name}:#{klass})"
+           end.join("\n")
+
+          <<-QUERY
+            #{klasses_query}
+
+            MERGE (#{query_variable(caller_code.klass)}) - [:OWNS]      ->  (m1:#{caller_code.method_type}{name: "#{caller_code.method_name}"})
+
+            MERGE (m1) <- [:CALLED_BY] -  (mc:MethodCall{file: "#{caller_code.file}", line_number: "#{caller_code.line_number}"})
+
+            MERGE (mc) - [:CALLS]     ->  (m2:#{called_code.method_type}{name: "#{called_code.method_name}"})
+            MERGE (#{query_variable(called_code.klass)})-[:OWNS]->(m2)
+
+            #{args_query args}
+
+            SET m1.file = "#{caller_code.method_definition_file}"
+            SET m1.line_number = "#{caller_code.method_definition_line}"
 
             SET m2.file = "#{called_code.file}"
             SET m2.line_number = "#{called_code.line_number}"
           QUERY
+        end
+
+        def query_variable(k)
+          query_variables[k.to_s]
+        end
+
+        def query_variables
+           @query_variables ||= QueryVariables.new
+        end
+
+        class QueryVariables < Hash
+          def initialize(*args)
+            super(*args)
+            @counters = Hash.new(1)
+          end
+
+          def assign(klass, prefix)
+            klass = klass.to_s
+            val = self[klass]
+            return val if val
+
+            "#{prefix}#{@counters[prefix]}".tap do |v|
+              self[klass] = v
+              @counters[prefix] += 1
+            end
+          end
+        end
+
+        def args_query(args)
+          (args.args + args.keyword_args).map do |k|
+            name = query_variable(k)
+            "MERGE (mc) - [:ARG] -> (#{name})"
+          end.join("\n")
         end
 
         def execute_query(*args)

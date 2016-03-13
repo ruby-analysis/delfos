@@ -1,9 +1,12 @@
 # frozen_string_literal: true
-if BasicObject.respond_to? :_delfos_setup_method_call_logging!
-  BasicObject.instance_eval do
-    undef _delfos_setup_method_call_logging
-    undef _delfos_method_has_been_added?
-    undef _delfos_added_methods
-    undef _delfos_record_method_adding
+class BasicObject
+  def self.method_added(*args)
+    nil
+  end
+
+  def self.singleton_method_added(*_args)
+    nil
   end
 end
+
+
