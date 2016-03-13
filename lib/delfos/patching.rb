@@ -1,16 +1,15 @@
 # frozen_string_literal: true
 module Delfos
   class Patching
+    def self.setup_method_call_logging(klass, name, private_methods, class_method:)
+      new(klass, name, private_methods, class_method).setup
+    end
+
+    attr_reader :klass, :name, :private_methods, :class_method
+
     def initialize(klass, name, private_methods, class_method)
       @klass, @name, @private_methods, @class_method =
         klass, name, private_methods, class_method
-    end
-    attr_reader :klass, :name, :private_methods, :class_method
-
-
-
-    def self.setup_method_call_logging(klass, name, private_methods, class_method:)
-      new(klass, name, private_methods, class_method).setup
     end
 
     def setup
