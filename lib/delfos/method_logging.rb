@@ -51,7 +51,7 @@ module Delfos
         file, _line_number = method.source_location
         return true unless file
 
-        exclude_file_from_logging?(file)
+        exclude_file_from_logging?(File.expand_path(file))
       end
 
       def include_file_in_logging?(file)

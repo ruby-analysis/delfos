@@ -118,8 +118,12 @@ module Delfos
 
       private
 
+      def method_key
+        "#{method_type}_#{method_name}"
+      end
+
       def method_definition
-        @method_definition ||= object.method(method_name).source_location
+        @method_definition ||= (Delfos::Patching.added_methods[klass][method_key]) || object.method(method_name).source_location
       end
     end
   end

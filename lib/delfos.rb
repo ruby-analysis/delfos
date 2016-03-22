@@ -8,6 +8,10 @@ module Delfos
       raise "Delfos.setup! has not been called" unless neo4j_config && logger
     end
 
+    def reset_db!
+      Delfos::Neo4j
+    end
+
     def reset!
       @application_directories = []
       @neo4j_config = nil
@@ -24,9 +28,15 @@ module Delfos
       end
     end
 
+    class DefaultLogger
+      def self.debug(*args)
+        STDOUT.puts(*args.map(&:inspect))
+      end
+    end
+
     def setup!(
       connection_type: :server_db,
-      logger: STDOUT,
+      logger: DefaultLogger,
       host:"http://localhost:7474",
       auth: { basic_auth: { username: "neo4j", password: "password" } },
       application_directories: nil)

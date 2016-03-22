@@ -30,7 +30,7 @@ module Delfos
 
             MERGE (m1) <- [:CALLED_BY] -  (mc:MethodCall{file: "#{caller_code.file}", line_number: "#{caller_code.line_number}"})
 
-            MERGE (mc) - [:CALLS]     ->  (m2:#{called_code.method_type}{name: "#{called_code.method_name}"})
+            MERGE (mc)  - [:CALLS]     -> (m2:#{called_code.method_type}{name: "#{called_code.method_name}"})
             MERGE (#{query_variable(called_code.klass)})-[:OWNS]->(m2)
 
             #{args_query args}

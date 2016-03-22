@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require_relative "this"
+
 class EfferentCoupling
   def lots_of_coupling
     This.send_message
