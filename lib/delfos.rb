@@ -35,15 +35,9 @@ module Delfos
       end
     end
 
-    class DefaultLogger
-      def self.debug(*args)
-        STDOUT.puts(*args.map(&:inspect))
-      end
-    end
-
     def setup!(
       connection_type: :server_db,
-      logger: DefaultLogger,
+      logger: Delfos::Neo4j::Informer.new,
       host:"http://localhost:7474",
       auth: { basic_auth: { username: "neo4j", password: "password" } },
       application_directories: nil)
