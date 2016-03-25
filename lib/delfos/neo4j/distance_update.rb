@@ -20,16 +20,13 @@ module Delfos
           start  = determine_full_path r.caller.props[:file]
           finish = determine_full_path r.called.props[:file]
 
-          traversals = Delfos::FileTree::DistanceCalculation.new(start, finish).traversals
-          distance = traversals.map(&:distance).inject(:+)
-          possible_distance = traversals.map(&:possible_length).inject(:+)
-
+          calc = Delfos::FileTree::DistanceCalculation.new(start, finish)
 
           ::Neo4j::Session.query <<-QUERY
             START caller = node(#{r.caller.neo_id}),
                   called = node(#{r.called.neo_id})
 
-             MERGE caller - [:EFFERENT_COUPLING{distance:#{distance}, possible_distance: #{possible_distance}}] -> called
+             MERGE caller - [:EFFERENT_COUPLING{distance:#{calc.sum_traversals}, possible_distance: #{calc.sum_possible_traversals}}] -> called
           QUERY
         end
       end

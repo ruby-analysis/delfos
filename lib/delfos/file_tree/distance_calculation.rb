@@ -52,53 +52,6 @@ module Delfos
         path_b.dirname == path
       end
 
-      def traversal_path
-        result = [path_a]
-        return [path_a, path_b] if path_a.dirname == path_b.dirname
-
-        traversal = calculate_traversal_path
-        current_path = path_a
-
-        traversal.descend do |p|
-          current_path = full(path_a, p)
-          result.push(current_path)
-        end
-
-        remove_traversals_from_files_to_parents_then_back_down_to_sub_directories result
-      end
-
-      def remove_traversals_from_files_to_parents_then_back_down_to_sub_directories(input)
-        in_parent = false
-        last = input.first
-        result = []
-
-        input.each do |i|
-          if in_parent
-            in_parent = false
-
-            if result[-2].dirname == i.dirname
-              result.pop
-              last = i
-              result.push i
-            end
-          else
-            in_parent = ((last + "..") == i)
-            result.push i
-            last = i
-          end
-        end
-
-        result
-      end
-
-      def full(start, traversal)
-        start.realpath + Pathname.new(traversal)
-      end
-
-      def calculate_traversal_path
-        path_b.relative_path_from(path_a)
-      end
-
       def top_ancestor
         common_directory_path(path_a, path_b)
       end
@@ -116,6 +69,77 @@ module Delfos
                join(separator)
 
         Pathname.new(path)
+      end
+
+      def traversal_path
+        TraversalPathCalculator.new(path_a, path_b).path
+      end
+
+      class TraversalPathCalculator < Struct.new(:path_a, :path_b)
+        def path
+          result = [path_a]
+          return [path_a, path_b] if path_a.dirname == path_b.dirname
+
+          traversal = path_b.relative_path_from(path_a)
+          current_path = path_a
+
+          traversal.descend do |p|
+            current_path = full(path_a, p)
+            result.push(current_path)
+          end
+
+          remove_superfluous_traversals(result)
+        end
+
+        def full(start, traversal)
+          start.realpath + Pathname.new(traversal)
+        end
+
+        def remove_superfluous_traversals(input)
+          SuperfluousRemoval.new(input).trim
+        end
+
+        class SuperfluousRemoval < Array
+          def initialize(traversals)
+            super()
+            @in_parent = false
+            @traversals = traversals
+          end
+
+          def trim
+            @traversals.each { |i| process(i) }
+            self
+          end
+
+          def process(i)
+            if @in_parent
+              @in_parent = false
+              remove_parent(i)
+            else
+              add_item(i)
+            end
+          end
+
+          private
+
+          def add_item(i)
+            @in_parent = ((last && last + "..") == i)
+            push i
+          end
+
+          def remove_parent(i)
+            remove_dir(i) if same_dir?(i)
+          end
+
+          def same_dir?(i)
+            self[-2] && self[-2].dirname == i.dirname
+          end
+
+          def remove_dir(i)
+            pop
+            push i
+          end
+        end
       end
     end
   end
