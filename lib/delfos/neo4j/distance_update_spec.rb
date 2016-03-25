@@ -5,12 +5,12 @@ require "neo4j"
 
 describe Delfos::Neo4j::DistanceUpdate do
   def preload_graph!
+    Delfos.wipe_db!
     Delfos.reset!
     dirs = [File.expand_path("./fixtures/ruby/")]
-    Delfos.setup! application_directories: dirs, logger: Delfos::Neo4j::Informer
+    Delfos.setup! application_directories: dirs, logger: Delfos::Neo4j::Informer.new
 
     load "fixtures/ruby/efferent_coupling.rb"
-    byebug
     EfferentCoupling.new.lots_of_coupling
   end
 
@@ -43,8 +43,8 @@ describe Delfos::Neo4j::DistanceUpdate do
   it do
     props = @result.map(&:caller).map(&:props).uniq
     prop = props.first
-    expect(prop[:file]).to match %r{lib/delfos/patching.rb}
-    expect(prop).to include({name: "lots_of_coupling", line_number: "24"})
+    expect(prop[:file]).to match %r{fixtures/ruby/efferent_coupling\.rb}
+    expect(prop).to include({name: "lots_of_coupling", line_number: "5"})
   end
 
   it do
@@ -62,9 +62,9 @@ describe Delfos::Neo4j::DistanceUpdate do
       caller_props = @result.map(&:caller).map(&:props).flatten.uniq
 
       expect(caller_props).to eq [
-        {:file        => "/Users/markburns/code/delfos/lib/delfos/patching.rb",
+        {:file        => "fixtures/ruby/efferent_coupling.rb",
          :name        => "lots_of_coupling",
-         :line_number => "24"}
+         :line_number => "5"}
       ]
     end
   end

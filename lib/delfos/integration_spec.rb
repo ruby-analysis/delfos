@@ -5,7 +5,7 @@ describe "integration" do
     require "delfos/neo4j/informer"
 
     Delfos.setup!(
-      logger: Delfos::Neo4j::Informer,
+      logger: Delfos::Neo4j::Informer.new,
       application_directories: [Pathname.new(File.expand_path(__FILE__)) + "../../../fixtures/"],
     )
 

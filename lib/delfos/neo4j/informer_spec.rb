@@ -10,6 +10,10 @@ describe Delfos::Neo4j::Informer do
 
   let(:args) { double args: [B], keyword_args: [C, D] }
 
+  before do
+    Delfos.wipe_db!
+  end
+
   let(:caller_code) do
     double klass: A,
 
@@ -30,10 +34,14 @@ describe Delfos::Neo4j::Informer do
   end
 
   describe "#args_query" do
+    before do
+      subject.assign_query_variables(args, caller_code, called_code)
+    end
+
     it do
-      result = described_class.args_query(args)
+      result = subject.args_query(args)
       expect(result).to eq <<-QUERY.gsub(/^\s+/, "").chomp
-        MERGE (mc) - [:ARG] -> (k2)
+        MERGE (mc) - [:ARG] -> (k3)
         MERGE (mc) - [:ARG] -> (k4)
         MERGE (mc) - [:ARG] -> (k5)
       QUERY
@@ -41,25 +49,21 @@ describe Delfos::Neo4j::Informer do
   end
 
   it do
-    query = described_class.query_for(args, caller_code, called_code)
+    query = subject.query_for(args, caller_code, called_code)
 
     expected = <<-QUERY
       MERGE (k1:A)
-      MERGE (k2:B)
-      MERGE (k3:E)
+      MERGE (k2:E)
+      MERGE (k3:B)
       MERGE (k4:C)
       MERGE (k5:D)
-
-      MERGE (k1)  - [:OWNS]      -> (m1:ClassMethod{name: "method_a"})
-      MERGE (m1) <- [:CALLED_BY] -  (mc:MethodCall{file: "a.rb", line_number: "4"})
-      MERGE (mc)  - [:CALLS]     -> (m2:InstanceMethod{name: "method_e"})
-
-      MERGE (k3)-[:OWNS]->(m2)
-
-      MERGE (mc) - [:ARG] -> (k2)
+      MERGE (k1) - [:OWNS] -> (m1:ClassMethod{name: "method_a"})
+      MERGE (m1) <- [:CALLED_BY] - (mc:MethodCall{file: "a.rb", line_number: "4"})
+      MERGE (mc) - [:CALLS] -> (m2:InstanceMethod{name: "method_e"})
+      MERGE (k2)-[:OWNS]->(m2)
+      MERGE (mc) - [:ARG] -> (k3)
       MERGE (mc) - [:ARG] -> (k4)
       MERGE (mc) - [:ARG] -> (k5)
-
       SET m1.file = "a.rb"
       SET m1.line_number = "2"
       SET m2.file = "e.rb"

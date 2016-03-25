@@ -5,25 +5,27 @@ require "neo4j/session"
 
 module Delfos
   module Neo4j
-    module Informer
-      class << self
-        def debug(args, caller_code, called_code)
-          execute_query(args, caller_code, called_code)
-        end
+    class Informer
+      def debug(args, caller_code, called_code)
+        execute_query(args, caller_code, called_code)
+      end
 
-        def query_for(args, caller_code, called_code)
-          query_variables.assign(caller_code.klass, "k")
-          query_variables.assign(called_code.klass, "k")
+      def execute_query(*args)
+        Delfos.check_setup!
+        self.class.create_session!
+        query = query_for(*args)
 
-          (args.args + args.keyword_args).uniq.each do |k|
-            query_variables.assign(k, "k")
-          end
+        ::Neo4j::Session.query(query)
+      end
 
-          klasses_query = query_variables.map do |klass, name|
-            "MERGE (#{name}:#{klass})"
-          end.join("\n")
+      def query_for(args, caller_code, called_code)
+        assign_query_variables(args, caller_code, called_code)
 
-          <<-QUERY
+        klasses_query = query_variables.map do |klass, name|
+          "MERGE (#{name}:#{klass})"
+        end.join("\n")
+
+        <<-QUERY
             #{klasses_query}
 
             MERGE (#{query_variable(caller_code.klass)}) - [:OWNS]      ->  (m1:#{caller_code.method_type}{name: "#{caller_code.method_name}"})
@@ -40,55 +42,55 @@ module Delfos
 
             SET m2.file = "#{called_code.file}"
             SET m2.line_number = "#{called_code.line_number}"
-          QUERY
+        QUERY
+      end
+
+      def assign_query_variables(args, caller_code, called_code)
+        query_variables.assign(caller_code.klass, "k")
+        query_variables.assign(called_code.klass, "k")
+
+        (args.args + args.keyword_args).uniq.each do |k|
+          query_variables.assign(k, "k")
+        end
+      end
+
+      def query_variable(k)
+        query_variables[k.to_s]
+      end
+
+      def query_variables
+        @query_variables ||= QueryVariables.new
+      end
+
+      class QueryVariables < Hash
+        def initialize(*args)
+          super(*args)
+          @counters = Hash.new(1)
         end
 
-        def query_variable(k)
-          query_variables[k.to_s]
-        end
+        def assign(klass, prefix)
+          klass = klass.to_s
+          val = self[klass]
+          return val if val
 
-        def query_variables
-          @query_variables ||= QueryVariables.new
-        end
-
-        class QueryVariables < Hash
-          def initialize(*args)
-            super(*args)
-            @counters = Hash.new(1)
+          "#{prefix}#{@counters[prefix]}".tap do |v|
+            self[klass] = v
+            @counters[prefix] += 1
           end
-
-          def assign(klass, prefix)
-            klass = klass.to_s
-            val = self[klass]
-            return val if val
-
-            "#{prefix}#{@counters[prefix]}".tap do |v|
-              self[klass] = v
-              @counters[prefix] += 1
-            end
-          end
         end
+      end
 
-        def args_query(args)
-          (args.args + args.keyword_args).map do |k|
-            name = query_variable(k)
-            "MERGE (mc) - [:ARG] -> (#{name})"
-          end.join("\n")
-        end
+      def args_query(args)
+        (args.args + args.keyword_args).map do |k|
+          name = query_variable(k)
+          "MERGE (mc) - [:ARG] -> (#{name})"
+        end.join("\n")
+      end
 
-        def execute_query(*args)
-          Delfos.check_setup!
-          create_session!
-          query = query_for(*args)
 
-          ::Neo4j::Session.query(query)
-        end
 
-        private
-
-        def create_session!
-          @create_session ||= ::Neo4j::Session.open(*Delfos.neo4j_config)
-        end
+      def self.create_session!
+        @create_session ||= ::Neo4j::Session.open(*Delfos.neo4j_config)
       end
     end
   end

@@ -2,16 +2,12 @@
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 
 require "byebug"
+require "delfos"
+require "neo4j"
 
 RSpec.configure do |c|
   c.before(:suite) do
-    Delfos.setup!(application_directories: [])
-    session = ::Neo4j::Session.open(*Delfos.neo4j_config)
-
-    ::Neo4j::Session.query <<-QUERY
-      MATCH (m)-[rel]->(n)
-      DELETE m,rel,n
-    QUERY
+    Delfos.wipe_db!
   end
 
   c.before(:each) do

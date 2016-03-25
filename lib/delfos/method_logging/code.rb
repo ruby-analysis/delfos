@@ -14,14 +14,14 @@ module Delfos
         @code_location = code_location
       end
 
-      def self.from(stack, caller_binding, class_method)
-        location = CodeLocation.from(stack, caller_binding, class_method)
+      def self.from_caller(stack, caller_binding)
+        location = CodeLocation.from_caller(stack, caller_binding)
         return unless location
         new location
       end
 
-      def self.from_method(object, called_method, class_method)
-        location = CodeLocation.from_method(object, called_method, class_method)
+      def self.from_called(object, called_method, class_method)
+        location = CodeLocation.from_called(object, called_method, class_method)
         return unless location
         new location
       end
@@ -65,37 +65,64 @@ module Delfos
     class CodeLocation
       include KlassDetermination
 
-      attr_reader :object, :method_name, :method_type, :file, :line_number
+      class << self
+        def from_caller(stack, caller_binding)
+          current = stack.detect do |s|
+            file = s.split(":")[0]
+            Delfos::MethodLogging.include_file_in_logging?(file)
+          end
 
-      def initialize(object, method_name, method_type, file, line_number)
-        @object = object
-        @method_name = method_name
-        @method_type = method_type ? "ClassMethod" : "InstanceMethod"
-        @file = file
-        @line_number = line_number
-      end
 
-      def self.from(stack, caller_binding, class_method)
-        current = stack.detect do |s|
-          file = s.split(":")[0]
-          Delfos::MethodLogging.include_file_in_logging?(file)
+          return unless current
+
+          stack_index = stack.index { |c| c == current }
+
+          object = caller_binding.of_caller(stack_index + STACK_OFFSET).eval("self")
+          class_method = object.kind_of? Module
+
+          file, line_number, rest = current.split(":")
+          method_name = rest[/`.*'$/]
+          method_name = begin
+                          method_name.delete("`").delete("'")
+                        rescue
+                          nil
+                        end
+
+          new(object, method_name.to_s, class_method, file, line_number.to_i)
         end
 
-        return unless current
+        def from_called(object, called_method, class_method)
+          file, line_number = called_method.source_location
 
-        stack_index = stack.index { |c| c == current }
+          new(object, called_method.name.to_s, class_method, file, line_number)
+        end
 
-        object = caller_binding.of_caller(stack_index + STACK_OFFSET).eval("self")
+        def method_type_from(class_method)
+          class_method ? "ClassMethod" : "InstanceMethod"
+        end
 
-        file, line_number, rest = current.split(":")
-        method_name = rest[/`.*'$/]
-        method_name = begin
-                        method_name.delete("`").delete("'")
-                      rescue
-                        nil
-                      end
+        def method_definition_for(klass, class_method, method_name)
+          key = key_from(class_method, method_name)
 
-        new(object, method_name.to_s, class_method, file, line_number.to_i)
+          Delfos::Patching.added_methods[klass][key]
+        end
+
+        private
+
+        def key_from(class_method, name)
+          "#{method_type_from(class_method)}_#{name}"
+        end
+      end
+
+      attr_reader :object, :method_name, :class_method, :method_type, :file, :line_number
+
+      def initialize(object, method_name, class_method, file, line_number)
+        @object = object
+        @method_name = method_name
+        @class_method = class_method
+        @method_type = self.class.method_type_from class_method 
+        @file = file
+        @line_number = line_number
       end
 
       def method_definition_file
@@ -104,12 +131,6 @@ module Delfos
 
       def method_definition_line
         method_definition[1]
-      end
-
-      def self.from_method(object, called_method, class_method)
-        file, line_number = called_method.source_location
-
-        new(object, called_method.name.to_s, class_method, file, line_number)
       end
 
       def klass
@@ -123,7 +144,7 @@ module Delfos
       end
 
       def method_definition
-        @method_definition ||= (Delfos::Patching.added_methods[klass][method_key]) || object.method(method_name).source_location
+        @method_definition ||= self.class.method_definition_for(klass, class_method, method_name)
       end
     end
   end

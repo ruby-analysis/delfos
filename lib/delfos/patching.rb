@@ -83,7 +83,7 @@ module Delfos
     end
 
     def type
-      class_method ? "class_method" : "instance_method"
+      class_method ? "ClassMethod" : "InstanceMethod"
     end
   end
 end

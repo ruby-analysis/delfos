@@ -8,9 +8,16 @@ module Delfos
       raise "Delfos.setup! has not been called" unless neo4j_config && logger
     end
 
-    def reset_db!
-      Delfos::Neo4j
+    def wipe_db!
+      Delfos.setup!(application_directories: [])
+      session = ::Neo4j::Session.open(*Delfos.neo4j_config)
+
+      ::Neo4j::Session.query <<-QUERY
+        MATCH (m)-[rel]->(n)
+        DELETE m,rel,n
+      QUERY
     end
+
 
     def reset!
       @application_directories = []

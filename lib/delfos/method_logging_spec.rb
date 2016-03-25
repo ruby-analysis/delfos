@@ -115,7 +115,7 @@ describe Delfos::MethodLogging::CodeLocation do
 
       SomeObject.new.some_method do |o, caller_binding|
         object = o
-        result = described_class.from(caller, caller_binding, false)
+        result = described_class.from_caller(caller, caller_binding)
       end
 
       # sanity check
