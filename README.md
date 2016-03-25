@@ -1,5 +1,11 @@
 # Delfos
 
+[![Build Status](http://img.shields.io/travis/markburns/delfos.svg?style=flat-square)](https://travis-ci.org/markburns/delfos)
+[![Dependency Status](http://img.shields.io/gemnasium/markburns/delfos.svg?style=flat-square)](https://gemnasium.com/markburns/delfos)
+[![Code Climate](http://img.shields.io/codeclimate/github/markburns/delfos.svg?style=flat-square)](https://codeclimate.com/github/markburns/delfos)
+[![Gem Version](http://img.shields.io/gem/v/delfos.svg?style=flat-square)](https://rubygems.org/gems/delfos)
+
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -27,13 +33,6 @@ Delfos.setup!(
   auth: { basic_auth: { username: "neo4j", password: "password" } },
 )
 ```
-
-
-
-[![Build Status](http://img.shields.io/travis/markburns/delfos.svg?style=flat-square)](https://travis-ci.org/markburns/delfos)
-[![Dependency Status](http://img.shields.io/gemnasium/markburns/delfos.svg?style=flat-square)](https://gemnasium.com/markburns/delfos)
-[![Code Climate](http://img.shields.io/codeclimate/github/markburns/delfos.svg?style=flat-square)](https://codeclimate.com/github/markburns/delfos)
-[![Gem Version](http://img.shields.io/gem/v/delfos.svg?style=flat-square)](https://rubygems.org/gems/delfos)
 
 ##A `SOLID CASE` for application architecture
 
