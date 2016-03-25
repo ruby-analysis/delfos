@@ -1,5 +1,35 @@
 # Delfos
 
+## Installation
+
+Add this line to your application's Gemfile:
+
+```ruby
+gem 'delfos'
+```
+
+##Usage
+
+```ruby
+#in config/environments/development.rb
+#or config/environments/test.rb
+
+require "delfos"
+
+directories = [File.expand_path(Rails.root + "/app"), File.expand_path(Rails.root + "/lib")]
+
+Delfos.setup!(
+  application_directories: directories,
+
+  #optional neo4j setup
+  logger: Delfos::Neo4j::Informer.new,
+  host: "http://localhost:7474",
+  auth: { basic_auth: { username: "neo4j", password: "password" } },
+)
+```
+
+
+
 [![Build Status](http://img.shields.io/travis/markburns/delfos.svg?style=flat-square)](https://travis-ci.org/markburns/delfos)
 [![Dependency Status](http://img.shields.io/gemnasium/markburns/delfos.svg?style=flat-square)](https://gemnasium.com/markburns/delfos)
 [![Code Climate](http://img.shields.io/codeclimate/github/markburns/delfos.svg?style=flat-square)](https://codeclimate.com/github/markburns/delfos)
@@ -66,11 +96,11 @@ In less technical terms I want to be able to answer the following questions:
 
 
 #Hypothesis
-I think that Rails is great, but I think that most large Rails apps built by 
+I think that Rails is great, but I think that most large Rails apps built by
 successful founded startups are likely to have considerable technical debt.
 
 Often developers at startups are at the beginning of their careers and may cut
-corners in order to get to market. 
+corners in order to get to market.
 
 Rails helps you quickly build applications but doesn't provide much of a
 helping hand for scaling the complexity of the codebase up.
@@ -80,8 +110,8 @@ or when used, rarely seen them used properly.
 
 So lots of developers tackle the complexity by introducing more design patterns like
 `jobs`, `services`, `decorators`, `presenters`, `forms`, etc.
-This helps with object complexity and size, but doesn't help with code organization 
-obeying the `CRP` and `CCP`. 
+This helps with object complexity and size, but doesn't help with code organization
+obeying the `CRP` and `CCP`.
 
 Technical terms, but basically they mean keep related things together. Things
 that change together should be located together.
@@ -94,7 +124,7 @@ one place.
 But as the application grows and you have more and more design patterns it starts to
 feel less like the concepts change together.
 
-Does your `BurgerPresenter` belong with the `RestaurantPresenter`, 
+Does your `BurgerPresenter` belong with the `RestaurantPresenter`,
 and `EmployeePresenter` and `ManagerPresenter`?
 
 Or does it belongs with the `Burger`, `BurgerTopping`, `BurgerCreationService` and `BurgerSerializer`?
@@ -231,12 +261,4 @@ for each term
 
 add sum of terms in a file, gives an incoherence value
 
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'delfos'
-```
 
