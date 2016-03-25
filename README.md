@@ -20,19 +20,34 @@ gem 'delfos'
 #in config/environments/development.rb
 #or config/environments/test.rb
 
-require "delfos"
+require "delfos/rails"
+#Delfos is very slow, so we recommend running manually or perhaps on a CI build
+Delfos.setup!(enabled: ENV["DELFOS"])
 
-directories = [File.expand_path(Rails.root + "/app"), File.expand_path(Rails.root + "/lib")]
+# Any code defined in the app or lib directories executed after this point will
+# automatically have coupling information recorded.
 
-Delfos.setup!(
-  application_directories: directories,
-
-  #optional neo4j setup
-  logger: Delfos::Neo4j::Informer.new,
-  host: "http://localhost:7474",
-  auth: { basic_auth: { username: "neo4j", password: "password" } },
-)
+# You could click around the app or run integration tests
 ```
+
+Upload the results to code climate
+
+```
+rake delfos:code_climate
+```
+
+By default the results are stored in `tmp/delfos/code_climate.json`
+
+
+Example delfos script to run locally or on a CI server
+
+```
+#!/usr/bin/env bash
+DELFOS=true ./bin/rake
+./bin/rake delfos:code_climate
+```
+
+
 
 ##A `SOLID CASE` for application architecture
 
