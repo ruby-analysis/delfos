@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require "delfos/version"
 require "delfos/method_logging"
+require "delfos/neo4j/informer"
 
 module Delfos
   class << self
