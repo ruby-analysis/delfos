@@ -16,7 +16,9 @@ module Delfos
 
     def setup
       return if ensure_method_recorded!
-      original, class_method, performer = original_method(), class_method(), method(:perform_call)
+      original = original_method
+      class_method = class_method()
+      performer = method(:perform_call)
 
       method_defining_method.call(name) do |*args, **keyword_args, &block|
         MethodLogging.log(self, args, keyword_args, block, class_method, caller.dup, binding.dup, original)

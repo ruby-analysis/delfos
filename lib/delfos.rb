@@ -19,7 +19,6 @@ module Delfos
       QUERY
     end
 
-
     def reset!
       @application_directories = []
       @neo4j_config = nil

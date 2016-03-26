@@ -34,6 +34,7 @@ module Delfos
           #{set_query(caller_code, called_code)}
         QUERY
       end
+
       def assign_query_variables(args, caller_code, called_code)
         query_variables.assign(caller_code.klass, "k")
         query_variables.assign(called_code.klass, "k")
@@ -41,7 +42,6 @@ module Delfos
         (args.args + args.keyword_args).uniq.each do |k|
           query_variables.assign(k, "k")
         end
-
       end
 
       def merge_query(caller_code, called_code)
@@ -64,7 +64,6 @@ module Delfos
           SET m2.line_number = "#{called_code.line_number}"
         QUERY
       end
-
 
       def query_variable(k)
         query_variables[k.to_s]
@@ -98,8 +97,6 @@ module Delfos
           "MERGE (mc) - [:ARG] -> (#{name})"
         end.join("\n")
       end
-
-
 
       def self.create_session!
         @create_session ||= ::Neo4j::Session.open(*Delfos.neo4j_config)

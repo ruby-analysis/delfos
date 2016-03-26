@@ -123,7 +123,7 @@ describe Delfos::MethodLogging::CodeLocation do
       expect(caller_result.object).to eq object
 
       unless ENV["CI"]
-        #TODO find out why this fails on CI
+        # TODO: find out why this fails on CI
         expect(caller_result.method_name).to eq "call"
       end
       expect(caller_result.file).to eq __FILE__

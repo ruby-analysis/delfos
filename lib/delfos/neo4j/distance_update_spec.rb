@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "distance_update"
 require_relative "informer"
 require_relative "../../delfos"
@@ -20,7 +21,7 @@ describe Delfos::Neo4j::DistanceUpdate do
     described_class.new.perform
 
     query = <<-QUERY
-      MATCH 
+      MATCH
         (klass)        - [:OWNS]      -> (caller),
         (caller)      <- [:CALLED_BY] -  (method_call),
         (method_call)  - [:CALLS]     -> (called),
@@ -30,7 +31,6 @@ describe Delfos::Neo4j::DistanceUpdate do
 
       RETURN klass, caller, method_call, called, called_klass
     QUERY
-
 
     @result = ::Neo4j::Session.query(query)
   end
@@ -46,7 +46,7 @@ describe Delfos::Neo4j::DistanceUpdate do
   end
 
   describe "caller" do
-    it "returns the caller"do
+    it "returns the caller" do
       props = @result.map(&:caller).map(&:props).uniq
       expect(props.length).to eq 1
     end
@@ -55,9 +55,9 @@ describe Delfos::Neo4j::DistanceUpdate do
       caller_props = @result.map(&:caller).map(&:props).flatten.uniq
 
       expect(caller_props).to eq [
-        {:file        => "fixtures/ruby/efferent_coupling.rb",
-         :name        => "lots_of_coupling",
-         :line_number => "5"}
+        { file: "fixtures/ruby/efferent_coupling.rb",
+          name: "lots_of_coupling",
+          line_number: "5" },
       ]
     end
   end
@@ -66,9 +66,9 @@ describe Delfos::Neo4j::DistanceUpdate do
     called_props = @result.map(&:called).map(&:props).flatten.uniq
 
     expect(called_props).to eq [
-      {:file => "ruby/this.rb", :name => "send_message",     :line_number => "2"},
-      {:file => "ruby/this.rb", :name => "found_in_here",    :line_number => "9"},
-      {:file => "ruby/this.rb", :name => "for_good_measure", :line_number => "13"}
+      { file: "ruby/this.rb", name: "send_message",     line_number: "2" },
+      { file: "ruby/this.rb", name: "found_in_here",    line_number: "9" },
+      { file: "ruby/this.rb", name: "for_good_measure", line_number: "13" },
     ]
   end
 end

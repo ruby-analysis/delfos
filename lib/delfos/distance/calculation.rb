@@ -59,9 +59,10 @@ module Delfos
 
       class TraversalPathCalculator
         attr_reader :path_a, :path_b
-        
+
         def initialize(path_a, path_b)
-           @path_a, @path_b = path_a, path_b
+          @path_a = path_a
+          @path_b = path_b
         end
 
         def path

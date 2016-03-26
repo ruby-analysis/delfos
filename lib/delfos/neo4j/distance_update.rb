@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "../distance/calculation"
 
 module Delfos
@@ -53,7 +54,7 @@ module Delfos
 
       def determine_full_path(f)
         f = Pathname.new File.expand_path f
-        return f if File.exists?(f)
+        return f if File.exist?(f)
 
         Delfos.application_directories.map do |d|
           path = Pathname.new(d + f.to_s.gsub(%r{[^/]*/}, "/"))

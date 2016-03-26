@@ -72,7 +72,7 @@ module Delfos
 
           object = object_from(stack, current, caller_binding)
 
-          class_method = object.kind_of? Module
+          class_method = object.is_a? Module
 
           file, line_number, method_name = method_details_from(current)
 
@@ -114,7 +114,7 @@ module Delfos
           current.split(":")
           file, line_number, rest = current.split(":")
           method_name = rest[/`.*'$/]
-          method_name.gsub!("`", "").gsub!("'", "")
+          method_name.delete!("`").delete!("'")
 
           [file, line_number.to_i, method_name]
         end
@@ -130,7 +130,7 @@ module Delfos
         @object = object
         @method_name = method_name
         @class_method = class_method
-        @method_type = self.class.method_type_from class_method 
+        @method_type = self.class.method_type_from class_method
         @file = file
         @line_number = line_number
       end
