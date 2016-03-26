@@ -77,7 +77,7 @@ module Delfos
 
       class TraversalPathCalculator < Struct.new(:path_a, :path_b)
         def path
-          result = [path_a]
+          result = Result.new([path_a])
           return [path_a, path_b] if path_a.dirname == path_b.dirname
 
           traversal = path_b.relative_path_from(path_a)
@@ -85,30 +85,20 @@ module Delfos
 
           traversal.descend do |p|
             current_path = full(path_a, p)
-            result.push(current_path)
+            result.process(current_path)
           end
 
-          remove_superfluous_traversals(result)
+          result
         end
 
         def full(start, traversal)
           start.realpath + Pathname.new(traversal)
         end
 
-        def remove_superfluous_traversals(input)
-          SuperfluousRemoval.new(input).trim
-        end
-
-        class SuperfluousRemoval < Array
-          def initialize(traversals)
-            super()
+        class Result < Array
+          def initialize(*args)
+            super
             @in_parent = false
-            @traversals = traversals
-          end
-
-          def trim
-            @traversals.each { |i| process(i) }
-            self
           end
 
           def process(i)
@@ -128,16 +118,11 @@ module Delfos
           end
 
           def remove_parent(i)
-            remove_dir(i) if same_dir?(i)
+            pop && push(i) if same_dir?(i)
           end
 
           def same_dir?(i)
             self[-2] && self[-2].dirname == i.dirname
-          end
-
-          def remove_dir(i)
-            pop
-            push i
           end
         end
       end

@@ -32,55 +32,6 @@ describe Delfos::FileTree::DistanceCalculation do
     end
   end
 
-  describe "#remove_traversals_from_files_to_parents_then_back_down_to_sub_directories" do
-    let(:a) { t("some_file") }
-    let(:b) { t("sub_directory/file_in_sub_directory") }
-    let(:distance_calculation) { described_class::TraversalPathCalculator.new(a, b) }
-
-    it do
-      result = distance_calculation.remove_superfluous_traversals [
-        expand_fixture_path("some_file"),
-        expand_fixture_path(""),
-        expand_fixture_path("/sub_directory"),
-      ]
-
-      expect(result).to eq [
-        expand_fixture_path("some_file"),
-        expand_fixture_path("/sub_directory"),
-      ]
-    end
-
-    it do
-      result = distance_calculation.remove_superfluous_traversals [
-        expand_fixture_path("another_sub_directory/another_file"),
-        expand_fixture_path("another_sub_directory"),
-        expand_fixture_path("another_sub_directory/yet_another_file"),
-        expand_fixture_path("another_sub_directory"),
-        expand_fixture_path("."),
-        expand_fixture_path("sub_directory"),
-      ]
-
-      expect(result).to eq [
-        expand_fixture_path("another_sub_directory/another_file"),
-        expand_fixture_path("another_sub_directory/yet_another_file"),
-        expand_fixture_path("another_sub_directory"),
-        expand_fixture_path("sub_directory"),
-      ]
-    end
-
-    it do
-      result = distance_calculation.remove_superfluous_traversals [
-        expand_fixture_path(""),
-        expand_fixture_path("/sub_directory"),
-      ]
-
-      expect(result).to eq [
-        expand_fixture_path(""),
-        expand_fixture_path("/sub_directory"),
-      ]
-    end
-  end
-
   describe "#traversals" do
     let(:a) { t("some_file") }
     let(:b) { t("sub_directory/file_in_sub_directory") }
