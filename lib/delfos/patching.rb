@@ -5,6 +5,10 @@ module Delfos
       new(klass, name, private_methods, class_method).setup
     end
 
+    def self.added_methods
+      @added_methods ||= {}
+    end
+
     attr_reader :klass, :name, :private_methods, :class_method
 
     def initialize(klass, name, private_methods, class_method)
@@ -38,7 +42,7 @@ module Delfos
       end
     end
 
-    def is_private_method?
+    def private_method?
       private_methods.include?(name.to_sym)
     end
 
@@ -61,10 +65,6 @@ module Delfos
       self.class.added_methods[klass][key]
     end
 
-    def self.added_methods
-      @added_methods ||= {}
-    end
-
     def ensure_method_recorded!
       return true if bail?
 
@@ -75,7 +75,7 @@ module Delfos
     end
 
     def bail?
-      method_has_been_added? || is_private_method? || exclude?
+      method_has_been_added? || private_method? || exclude?
     end
 
     def key

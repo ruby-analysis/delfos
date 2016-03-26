@@ -11,7 +11,7 @@ module Delfos
 
     def wipe_db!
       Delfos.setup!(application_directories: [])
-      session = ::Neo4j::Session.open(*Delfos.neo4j_config)
+      ::Neo4j::Session.open(*Delfos.neo4j_config)
 
       ::Neo4j::Session.query <<-QUERY
         MATCH (m)-[rel]->(n)

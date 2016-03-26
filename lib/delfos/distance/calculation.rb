@@ -31,11 +31,11 @@ module Delfos
       end
 
       def sum_traversals
-        traversals.inject(0) { |sum, i| sum + i.distance }
+        traversals.inject(0) { |a, e| a + e.distance }
       end
 
       def sum_possible_traversals
-        traversals.inject(0) { |sum, i| sum + i.possible_length }
+        traversals.inject(0) { |a, e| a + e.possible_length }
       end
 
       def sibling_directories(path)
@@ -66,7 +66,7 @@ module Delfos
         end
 
         def path
-          return [path_a, path_b] if path_a.dirname == path_b.dirname
+          return [path_a, path_b] if same_directory?
 
           current_path = path_a
 
@@ -76,6 +76,10 @@ module Delfos
           end
 
           result
+        end
+
+        def same_directory?
+          path_a.dirname == path_b.dirname
         end
 
         def result
