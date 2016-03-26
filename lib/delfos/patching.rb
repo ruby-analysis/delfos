@@ -25,10 +25,7 @@ module Delfos
       performer = method(:perform_call)
 
       method_defining_method.call(name) do |*args, **keyword_args, &block|
-        MethodLogging.log(called_object: self, args: args, keyword_args: keyword_args,
-                          block: block, class_method: class_method,
-                          stack: caller.dup, caller_binding: binding.dup,
-                          called_method: original)
+        MethodLogging.log(self, args, keyword_args, block, class_method, caller.dup, binding.dup, original)
 
         method_to_call = class_method ? original : original.bind(self)
         performer.call(method_to_call, args, keyword_args, block)

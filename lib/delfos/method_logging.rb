@@ -24,11 +24,11 @@ module Delfos
         raise Delfos::ApplicationDirectoriesNotDefined unless Delfos.application_directories
       end
 
-      def log(called_object:,
-        args:, keyword_args:, block:,
-        class_method:,
-        stack:, caller_binding:,
-        called_method:)
+      def log(called_object,
+        args, keyword_args, _block,
+        class_method,
+        stack, caller_binding,
+        called_method)
         check_setup!
 
         caller_code = Code.from_caller(stack, caller_binding)

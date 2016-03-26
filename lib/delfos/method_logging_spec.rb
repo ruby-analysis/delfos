@@ -42,11 +42,11 @@ describe Delfos::MethodLogging do
         stack = caller.dup
 
         Delfos::MethodLogging.log(
-          called_object: self,
-          args: args, keyword_args: keyword_args, block: block,
-          class_method: false,
-          stack: stack, caller_binding: caller_binding,
-          called_method: method(__method__))
+          self,
+          args, keyword_args, block,
+          class_method = false,
+          stack, caller_binding,
+          method(__method__))
       end
     end
 
