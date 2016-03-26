@@ -60,30 +60,23 @@ module Delfos
     # where we call this `caller_binding.of_caller(stack_index + STACK_OFFSET).eval('self')`
     # is to be extracted into another method we will get a failing test and have to increment
     # the value
-    STACK_OFFSET = 4
+    STACK_OFFSET = 5
 
     class CodeLocation
       include KlassDetermination
 
       class << self
         def from_caller(stack, caller_binding)
-          current = stack.detect do |s|
-            file = s.split(":")[0]
-            Delfos::MethodLogging.include_file_in_logging?(file)
-          end
-
+          current = current_from(stack)
           return unless current
 
-          stack_index = stack.index { |c| c == current }
+          object = object_from(stack, current, caller_binding)
 
-          object = caller_binding.of_caller(stack_index + STACK_OFFSET).eval("self")
           class_method = object.kind_of? Module
 
-          file, line_number, rest = current.split(":")
-          method_name = rest[/`.*'$/]
-          method_name = method_name.gsub("`", "").gsub("'", "")
+          file, line_number, method_name = method_details_from(current)
 
-          new(object, method_name.to_s, class_method, file, line_number.to_i)
+          new(object, method_name.to_s, class_method, file, line_number)
         end
 
         def from_called(object, called_method, class_method)
@@ -103,6 +96,28 @@ module Delfos
         end
 
         private
+
+        def current_from(stack)
+          stack.detect do |s|
+            file = s.split(":")[0]
+            Delfos::MethodLogging.include_file_in_logging?(file)
+          end
+        end
+
+        def object_from(stack, current, caller_binding)
+          stack_index = stack.index { |c| c == current }
+
+          caller_binding.of_caller(stack_index + STACK_OFFSET).eval("self")
+        end
+
+        def method_details_from(current)
+          current.split(":")
+          file, line_number, rest = current.split(":")
+          method_name = rest[/`.*'$/]
+          method_name.gsub!("`", "").gsub!("'", "")
+
+          [file, line_number.to_i, method_name]
+        end
 
         def key_from(class_method, name)
           "#{method_type_from(class_method)}_#{name}"
