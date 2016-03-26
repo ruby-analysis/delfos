@@ -11,7 +11,7 @@ ratings:
   - "lib/**"
   - "**.rb"
 exclude_paths:
-- "*_spec.rb"
+- "**/*_spec.rb"
 - "fixtures/**/*"
 - "**/vendor/**/*"
 
