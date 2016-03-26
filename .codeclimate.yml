@@ -1,6 +1,4 @@
 engines:
-  reek:
-    enabled: true
   rubocop:
     enabled: true
   duplication:
