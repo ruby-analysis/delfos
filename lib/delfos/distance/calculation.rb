@@ -57,12 +57,16 @@ module Delfos
         TraversalPathCalculator.new(path_a, path_b).path
       end
 
-      class TraversalPathCalculator < Struct.new(:path_a, :path_b)
+      class TraversalPathCalculator
+        attr_reader :path_a, :path_b
+        
+        def initialize(path_a, path_b)
+           @path_a, @path_b = path_a, path_b
+        end
+
         def path
-          result = Result.new([path_a])
           return [path_a, path_b] if path_a.dirname == path_b.dirname
 
-          traversal = path_b.relative_path_from(path_a)
           current_path = path_a
 
           traversal.descend do |p|
@@ -71,6 +75,14 @@ module Delfos
           end
 
           result
+        end
+
+        def result
+          @result ||= Result.new([path_a])
+        end
+
+        def traversal
+          path_b.relative_path_from(path_a)
         end
 
         def full(start, traversal)
@@ -100,10 +112,10 @@ module Delfos
           end
 
           def remove_parent(i)
-            if same_dir?(i)
-              pop
-              push(i)
-            end
+            return unless same_dir?(i)
+
+            pop
+            push(i)
           end
 
           def same_dir?(i)

@@ -11,6 +11,7 @@ ratings:
   - "lib/**"
   - "**.rb"
 exclude_paths:
+- "delfos.gemspec"
 - "**/*_spec.rb"
 - "fixtures/**/*"
 - "**/vendor/**/*"

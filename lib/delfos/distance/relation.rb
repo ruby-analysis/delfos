@@ -18,11 +18,8 @@ module Delfos
       end
 
       def distance
-        return traversed_files.length if start_path.file? && finish_path.file?
-
-        if start_path.directory? && finish_path.directory?
-          return traversed_directories.length
-        end
+        return traversed_files.length       if both_files?
+        return traversed_directories.length if both_directories?
 
         traversed_files.length + traversed_directories.length
       end
@@ -56,6 +53,14 @@ module Delfos
       end
 
       private
+
+      def both_files?
+        start_path.file? && finish_path.file?
+      end
+
+      def both_directories?
+        start_path.directory? && finish_path.directory?
+      end
 
       def indexes_from(collection, start, finish, start_at_end)
         start_index  = index_from(collection, start,  start_at_end: start_at_end)

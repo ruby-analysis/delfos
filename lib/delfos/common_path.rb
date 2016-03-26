@@ -26,18 +26,21 @@ module Delfos
       private
 
       def path_from(dir1, dir2, path_a, path_b)
-        common_path = dir1.
-                      zip(dir2).
-                      take_while { |dn1, dn2| dn1 == dn2 }.
-                      map(&:first).
-                      join(SEPARATOR)
-
+        common_path = common_path(dir1, dir2)
         common_path, path_a, path_b = append_trailing_slashes!(common_path, path_a, path_b)
 
         if (common_path.to_s.length <= path_a.to_s.length) ||
            (common_path.to_s.length <= path_b.to_s.length)
           Pathname.new(common_path)
         end
+      end
+
+      def common_path(dir1, dir2)
+        dir1.
+          zip(dir2).
+          take_while { |dn1, dn2| dn1 == dn2 }.
+          map(&:first).
+          join(SEPARATOR)
       end
 
       def append_trailing_slashes!(*paths)
