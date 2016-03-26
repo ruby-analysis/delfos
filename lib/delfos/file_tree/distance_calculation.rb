@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require_relative "traversal_calculator"
+require_relative "relation"
 
 module Delfos
   module FileTree
@@ -13,20 +13,21 @@ module Delfos
 
       attr_reader :traversal_a, :traversal_b
 
-      def traversals_for(a, b)
-        TraversalCalculator.new.traversals_for(a, b)
-      end
-
       def traversals
         result = []
         path = traversal_path
 
         path.each_cons(2) do |start, finish|
-          klass = traversals_for(start, finish)
+          klass = klass_for(start, finish)
           result.push(klass.new(start, finish))
         end
 
         result
+      end
+
+      def klass_for(a, b)
+        return ChildFile if b + ".." == a
+        Relation
       end
 
       def sum_traversals
@@ -50,25 +51,6 @@ module Delfos
         return false if path.directory?
 
         path_b.dirname == path
-      end
-
-      def top_ancestor
-        common_directory_path(path_a, path_b)
-      end
-
-      def common_directory_path(path_a, path_b)
-        separator = "/"
-        dirs = [path_a.to_s, path_b.to_s]
-
-        dir1, dir2 = dirs.minmax.map { |dir| dir.split(separator) }
-
-        path = dir1.
-               zip(dir2).
-               take_while { |dn1, dn2| dn1 == dn2 }.
-               map(&:first).
-               join(separator)
-
-        Pathname.new(path)
       end
 
       def traversal_path
@@ -118,7 +100,10 @@ module Delfos
           end
 
           def remove_parent(i)
-            pop && push(i) if same_dir?(i)
+            if same_dir?(i)
+              pop
+              push(i)
+            end
           end
 
           def same_dir?(i)

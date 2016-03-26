@@ -107,15 +107,4 @@ describe Delfos::FileTree::DistanceCalculation do
       expect(distance_calculation.sum_possible_traversals).to eq 4 + 3
     end
   end
-
-  describe "#top_ancestor" do
-    let(:a) { t("some_file") }
-    let(:b) { t("sub_directory/file_in_sub_directory") }
-
-    it do
-      result = distance_calculation.top_ancestor
-
-      expect(result).to eq fixture_path
-    end
-  end
 end
