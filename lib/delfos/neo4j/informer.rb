@@ -26,25 +26,14 @@ module Delfos
         end.join("\n")
 
         <<-QUERY
-            #{klasses_query}
+          #{klasses_query}
 
-            MERGE (#{query_variable(caller_code.klass)}) - [:OWNS]      ->  (m1:#{caller_code.method_type}{name: "#{caller_code.method_name}"})
+          #{merge_query(caller_code, called_code)}
+          #{args_query args}
 
-            MERGE (m1) <- [:CALLED_BY] -  (mc:MethodCall{file: "#{caller_code.file}", line_number: "#{caller_code.line_number}"})
-
-            MERGE (mc)  - [:CALLS]     -> (m2:#{called_code.method_type}{name: "#{called_code.method_name}"})
-            MERGE (#{query_variable(called_code.klass)})-[:OWNS]->(m2)
-
-            #{args_query args}
-
-            SET m1.file = "#{caller_code.method_definition_file}"
-            SET m1.line_number = "#{caller_code.method_definition_line}"
-
-            SET m2.file = "#{called_code.file}"
-            SET m2.line_number = "#{called_code.line_number}"
+          #{set_query(caller_code, called_code)}
         QUERY
       end
-
       def assign_query_variables(args, caller_code, called_code)
         query_variables.assign(caller_code.klass, "k")
         query_variables.assign(called_code.klass, "k")
@@ -52,7 +41,30 @@ module Delfos
         (args.args + args.keyword_args).uniq.each do |k|
           query_variables.assign(k, "k")
         end
+
       end
+
+      def merge_query(caller_code, called_code)
+        <<-MERGE_QUERY
+          MERGE (#{query_variable(caller_code.klass)}) - [:OWNS]      ->  (m1:#{caller_code.method_type}{name: "#{caller_code.method_name}"})
+
+          MERGE (m1) <- [:CALLED_BY] -  (mc:MethodCall{file: "#{caller_code.file}", line_number: "#{caller_code.line_number}"})
+
+          MERGE (mc)  - [:CALLS]     -> (m2:#{called_code.method_type}{name: "#{called_code.method_name}"})
+          MERGE (#{query_variable(called_code.klass)})-[:OWNS]->(m2)
+        MERGE_QUERY
+      end
+
+      def set_query(caller_code, called_code)
+        <<-QUERY
+          SET m1.file = "#{caller_code.method_definition_file}"
+          SET m1.line_number = "#{caller_code.method_definition_line}"
+
+          SET m2.file = "#{called_code.file}"
+          SET m2.line_number = "#{called_code.line_number}"
+        QUERY
+      end
+
 
       def query_variable(k)
         query_variables[k.to_s]
