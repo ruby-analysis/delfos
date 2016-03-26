@@ -72,7 +72,6 @@ module Delfos
             Delfos::MethodLogging.include_file_in_logging?(file)
           end
 
-
           return unless current
 
           stack_index = stack.index { |c| c == current }
@@ -82,11 +81,7 @@ module Delfos
 
           file, line_number, rest = current.split(":")
           method_name = rest[/`.*'$/]
-          method_name = begin
-                          method_name.delete("`").delete("'")
-                        rescue
-                          nil
-                        end
+          method_name = method_name.gsub("`", "").gsub("'", "")
 
           new(object, method_name.to_s, class_method, file, line_number.to_i)
         end

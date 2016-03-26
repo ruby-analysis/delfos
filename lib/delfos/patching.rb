@@ -15,18 +15,13 @@ module Delfos
     end
 
     def setup
-      return if bail?
-
-      record_method_adding!
-      original_method = original_method()
-      class_method = class_method()
-      performer = method(:perform_call)
+      return if ensure_method_recorded!
+      original, class_method, performer = original_method(), class_method(), method(:perform_call)
 
       method_defining_method.call(name) do |*args, **keyword_args, &block|
-        MethodLogging.log(self, args, keyword_args, block,
-          class_method, caller.dup, binding.dup, original_method)
+        MethodLogging.log(self, args, keyword_args, block, class_method, caller.dup, binding.dup, original)
 
-        method_to_call = class_method ? original_method : original_method.bind(self)
+        method_to_call = class_method ? original : original.bind(self)
         performer.call(method_to_call, args, keyword_args, block)
       end
     end
@@ -39,10 +34,6 @@ module Delfos
       else
         method_to_call.call(*args, **keyword_args, &block)
       end
-    end
-
-    def bail?
-      method_has_been_added? || is_private_method? || exclude?
     end
 
     def is_private_method?
@@ -72,11 +63,17 @@ module Delfos
       @added_methods ||= {}
     end
 
-    def record_method_adding!
-      return true if method_has_been_added?
+    def ensure_method_recorded!
+      return true if bail?
 
       self.class.added_methods[klass] ||= {}
       self.class.added_methods[klass][key] = original_method.source_location
+
+      false
+    end
+
+    def bail?
+      method_has_been_added? || is_private_method? || exclude?
     end
 
     def key
