@@ -20,9 +20,11 @@ gem 'delfos'
 #in config/environments/development.rb
 #or config/environments/test.rb
 
-require "delfos/rails"
-#Delfos is very slow, so we recommend running manually or perhaps on a CI build
-Delfos.setup!(enabled: ENV["DELFOS"])
+#Delfos is very slow, so we recommend only setting up when required
+if ENV["delfos"]
+  require "delfos/rails"
+  Delfos.setup!
+end
 
 # Any code defined in the app or lib directories executed after this point will
 # automatically have coupling information recorded.
@@ -30,13 +32,13 @@ Delfos.setup!(enabled: ENV["DELFOS"])
 # You could click around the app or run integration tests
 ```
 
-Upload the results to code climate
+Generate and upload the results to code climate
 
 ```
-rake delfos:code_climate
+rake delfos:analysis delfos:code_climate
 ```
 
-By default the results are stored in `tmp/delfos/code_climate.json`
+By default the results are stored in `tmp/delfos/results.json`
 
 
 Example delfos script to run locally or on a CI server
