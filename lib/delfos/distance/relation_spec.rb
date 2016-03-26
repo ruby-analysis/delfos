@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require_relative "relation"
 
-describe Delfos::FileTree::Relation do
+describe Delfos::Distance::Relation do
   describe "#others" do
     let(:relation) { described_class.new(path, anything) }
 
@@ -75,7 +75,7 @@ describe Delfos::FileTree::Relation do
   #      yet_another_file
 end
 
-describe Delfos::FileTree::Relation do
+describe Delfos::Distance::Relation do
   let(:instance) { described_class.new(a, b) }
   let(:a) { t("sub_directory/file_in_sub_directory") }
   let(:b) { t("sub_directory") }

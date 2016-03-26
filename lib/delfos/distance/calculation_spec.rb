@@ -1,8 +1,7 @@
 # frozen_string_literal: true
-require_relative "file_tree"
-require_relative "distance_calculation"
+require_relative "calculation"
 
-describe Delfos::FileTree::DistanceCalculation do
+describe Delfos::Distance::Calculation do
   let(:distance_calculation) { described_class.new(a, b) }
 
   describe "#traversal_path" do
@@ -38,8 +37,8 @@ describe Delfos::FileTree::DistanceCalculation do
 
     it do
       expect(distance_calculation.traversals.map(&:class)).to eq [
-        Delfos::FileTree::Relation,
-        Delfos::FileTree::ChildFile,
+        Delfos::Distance::Relation,
+        Delfos::Distance::ChildFile,
       ]
 
       files = distance_calculation.traversals.first.traversed_files
@@ -72,7 +71,7 @@ describe Delfos::FileTree::DistanceCalculation do
 
     it do
       expect(distance_calculation.traversals.map(&:class)).to eq [
-        Delfos::FileTree::Relation,
+        Delfos::Distance::Relation,
       ]
     end
 
@@ -82,9 +81,9 @@ describe Delfos::FileTree::DistanceCalculation do
 
       it do
         expect(distance_calculation.traversals.map(&:class)).to eq [
-          Delfos::FileTree::Relation,
-          Delfos::FileTree::Relation,
-          Delfos::FileTree::ChildFile,
+          Delfos::Distance::Relation,
+          Delfos::Distance::Relation,
+          Delfos::Distance::ChildFile,
         ]
       end
     end

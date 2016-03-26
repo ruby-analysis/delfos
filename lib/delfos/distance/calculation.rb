@@ -2,8 +2,8 @@
 require_relative "relation"
 
 module Delfos
-  module FileTree
-    class DistanceCalculation
+  module Distance
+    class Calculation
       attr_reader :path_a, :path_b
 
       def initialize(path_a, path_b)

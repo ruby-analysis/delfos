@@ -1,4 +1,4 @@
-require_relative "../file_tree/distance_calculation"
+require_relative "../distance/calculation"
 
 module Delfos
   module Neo4j
@@ -20,7 +20,7 @@ module Delfos
           start  = determine_full_path r.caller.props[:file]
           finish = determine_full_path r.called.props[:file]
 
-          calc = Delfos::FileTree::DistanceCalculation.new(start, finish)
+          calc = Delfos::Distance::Calculation.new(start, finish)
 
           ::Neo4j::Session.query <<-QUERY
             START caller = node(#{r.caller.neo_id}),
