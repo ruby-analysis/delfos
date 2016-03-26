@@ -20,25 +20,26 @@ module Delfos
       record_method_adding!
       original_method = original_method()
       class_method = class_method()
+      performer = method(:perform_call)
 
       method_defining_method.call(name) do |*args, **keyword_args, &block|
-        ::Delfos::MethodLogging.log(self,
-          args, keyword_args, block,
-          class_method, caller.dup, binding.dup,
-          original_method
-                                   )
+        MethodLogging.log(self, args, keyword_args, block,
+          class_method, caller.dup, binding.dup, original_method)
 
         method_to_call = class_method ? original_method : original_method.bind(self)
-
-        if keyword_args.empty?
-          method_to_call.call(*args, &block)
-        else
-          method_to_call.call(*args, **keyword_args, &block)
-        end
+        performer.call(method_to_call, args, keyword_args, block)
       end
     end
 
     private
+
+    def perform_call(method_to_call, args, keyword_args, block)
+      if keyword_args.empty?
+        method_to_call.call(*args, &block)
+      else
+        method_to_call.call(*args, **keyword_args, &block)
+      end
+    end
 
     def bail?
       method_has_been_added? || is_private_method? || exclude?
