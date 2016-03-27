@@ -15,7 +15,7 @@ module Delfos
       end
 
       def self.from_caller(stack, caller_binding)
-        location = CodeLocation.from_caller(stack, caller_binding)
+        location = CallerParsing.new(stack, caller_binding).perform
         return unless location
         new location
       end
@@ -60,10 +60,6 @@ module Delfos
       include KlassDetermination
 
       class << self
-        def from_caller(stack, caller_binding)
-          CallerParsing.new(stack, caller_binding).perform
-        end
-
         def from_called(object, called_method, class_method)
           file, line_number = called_method.source_location
 
@@ -127,7 +123,7 @@ module Delfos
       # where we call this `caller_binding.of_caller(stack_index + STACK_OFFSET).eval('self')`
       # is to be extracted into another method we will get a failing test and have to increment
       # the value
-      STACK_OFFSET = 6
+      STACK_OFFSET = 5
 
       attr_reader :stack, :caller_binding
 
