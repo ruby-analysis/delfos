@@ -137,10 +137,9 @@ module Delfos
       end
 
       def perform
-        current, file, line_number, method_name = parse(stack, caller_binding)
+        file, line_number, method_name = method_details
         return unless current && file && line_number && method_name
 
-        object = object_from(stack, current, caller_binding)
         class_method = object.is_a? Module
 
         CodeLocation.new(object, method_name.to_s, class_method, file, line_number)
@@ -148,29 +147,23 @@ module Delfos
 
       private
 
-      def parse(stack, caller_binding)
-        current = current_from(stack)
-        file, line_number, method_name = method_details_from(current)
-
-        [current, file, line_number, method_name]
-      end
-
-      def current_from(stack)
+      def current
         stack.detect do |s|
           file = s.split(":")[0]
           Delfos::MethodLogging.include_file_in_logging?(file)
         end
       end
 
-      def object_from(stack, current, caller_binding)
-        stack_index = stack.index { |c| c == current }
-
+      def object
         caller_binding.of_caller(stack_index + STACK_OFFSET).eval("self")
       end
 
-      def method_details_from(current)
+      def stack_index
+        stack.index { |c| c == current }
+      end
+
+      def method_details
         return unless current
-        current.split(":")
         file, line_number, rest = current.split(":")
         method_name = rest[/`.*'$/]
         return unless method_name && file && line_number
