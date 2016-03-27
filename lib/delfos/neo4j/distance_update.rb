@@ -20,6 +20,16 @@ module Delfos
         update(result)
       end
 
+      def determine_full_path(f)
+        f = Pathname.new f
+        return f.realpath if File.exist?(f)
+
+        Delfos.application_directories.map do |d|
+          path = Pathname.new(d + f.to_s.gsub(%r{[^/]*/}, ""))
+          path if path.exist?
+        end.compact.first
+      end
+
       private
 
       def update(result)
@@ -52,15 +62,6 @@ module Delfos
         REL
       end
 
-      def determine_full_path(f)
-        f = Pathname.new File.expand_path f
-        return f if File.exist?(f)
-
-        Delfos.application_directories.map do |d|
-          path = Pathname.new(d + f.to_s.gsub(%r{[^/]*/}, "/"))
-          path if path.exist?
-        end.compact.first
-      end
     end
   end
 end

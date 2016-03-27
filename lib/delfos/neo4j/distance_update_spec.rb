@@ -71,4 +71,16 @@ describe Delfos::Neo4j::DistanceUpdate do
       { file: "ruby/this.rb", name: "for_good_measure", line_number: "13" },
     ]
   end
+
+  describe "#determine_full_path" do
+    before do
+      Delfos.setup! application_directories: ["fixtures/ruby"]
+    end
+
+    it do
+      result = subject.determine_full_path("/ruby/this.rb")
+
+      expect(result.to_s).to eq File.expand_path("fixtures/ruby/this.rb").to_s
+    end
+  end
 end
