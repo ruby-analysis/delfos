@@ -8,8 +8,8 @@ describe Delfos::Neo4j::DistanceUpdate do
   def preload_graph!
     Delfos.wipe_db!
     Delfos.reset!
-    dirs = [File.expand_path("./fixtures/ruby/")]
-    Delfos.setup! application_directories: dirs, logger: Delfos::Neo4j::Informer.new
+    dirs = ["fixtures/ruby/"]
+    Delfos.setup! application_directories: dirs
 
     load "fixtures/ruby/efferent_coupling.rb"
     EfferentCoupling.new.lots_of_coupling

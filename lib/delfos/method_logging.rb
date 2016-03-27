@@ -43,7 +43,7 @@ module Delfos
 
       def include_any_path_in_logging?(paths)
         paths.inject(false) do |result, path|
-          result || Delfos::MethodLogging.include_file_in_logging?(path)
+          result || include_file_in_logging?(path)
         end
       end
 

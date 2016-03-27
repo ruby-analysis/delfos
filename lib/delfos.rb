@@ -42,7 +42,7 @@ module Delfos
       auth: { basic_auth: { username: "neo4j", password: "password" } },
       application_directories: nil)
 
-      @application_directories = application_directories
+      @application_directories = application_directories.map{|f| Pathname.new(File.expand_path(f.to_s))}
       @logger = logger
 
       @neo4j_config = [connection_type, host, auth]

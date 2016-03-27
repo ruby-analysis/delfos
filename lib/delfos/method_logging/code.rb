@@ -67,14 +67,11 @@ module Delfos
 
       class << self
         def from_caller(stack, caller_binding)
-          current = current_from(stack)
-          return unless current
+          current, file, line_number, method_name = parse(stack, caller_binding)
+          return unless current && file && line_number && method_name
 
           object = object_from(stack, current, caller_binding)
-
           class_method = object.is_a? Module
-
-          file, line_number, method_name = method_details_from(current)
 
           new(object, method_name.to_s, class_method, file, line_number)
         end
@@ -92,10 +89,17 @@ module Delfos
         def method_definition_for(klass, class_method, method_name)
           key = key_from(class_method, method_name)
 
-          Delfos::Patching.added_methods[klass][key]
+          Delfos::Patching.method_definition_for(klass,key)
         end
 
         private
+
+        def parse(stack, caller_binding)
+          current = current_from(stack)
+          file, line_number, method_name = method_details_from(current)
+
+          [current, file, line_number, method_name]
+        end
 
         def current_from(stack)
           stack.detect do |s|
@@ -111,9 +115,12 @@ module Delfos
         end
 
         def method_details_from(current)
+          return unless current
           current.split(":")
           file, line_number, rest = current.split(":")
           method_name = rest[/`.*'$/]
+          return unless method_name && file && line_number
+
           method_name.delete!("`").delete!("'")
 
           [file, line_number.to_i, method_name]
