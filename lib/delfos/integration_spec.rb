@@ -5,12 +5,11 @@ describe "integration" do
     require "delfos/neo4j/informer"
 
     Delfos.setup!(
-      logger: Delfos::Neo4j::Informer.new,
-      application_directories: [Pathname.new(File.expand_path(__FILE__)) + "../../../fixtures/"],
+      application_directories: ["fixtures"],
     )
 
-    load "./fixtures/a.rb"
-    load "./fixtures/b.rb"
+    load "fixtures/a.rb"
+    load "fixtures/b.rb"
   end
 
   it do

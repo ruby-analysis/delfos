@@ -84,7 +84,7 @@ describe Delfos::MethodLogging do
   end
 end
 
-describe Delfos::MethodLogging::CodeLocation do
+describe Delfos::MethodLogging do
   class SomeObject
     def some_method(&block)
       another_method(block, binding)
@@ -100,7 +100,7 @@ describe Delfos::MethodLogging::CodeLocation do
     end
   end
 
-  describe ".from" do
+  describe ".log" do
     before do
       path = Pathname.new(__FILE__) + ".."
 
@@ -115,7 +115,7 @@ describe Delfos::MethodLogging::CodeLocation do
 
       SomeObject.new.some_method do |o, caller_binding|
         object = o
-        caller_result = described_class.from_caller(caller, caller_binding)
+        caller_result = Delfos::MethodLogging::Code.from_caller(caller, caller_binding)
       end
 
       # sanity check
@@ -126,7 +126,8 @@ describe Delfos::MethodLogging::CodeLocation do
         # TODO: find out why this fails on CI
         expect(caller_result.method_name).to eq "call"
       end
-      expect(caller_result.file).to eq __FILE__
+
+      expect(caller_result.file).to eq "delfos/method_logging_spec.rb"
       expect(caller_result.line_number).to eq $line_number
     end
   end

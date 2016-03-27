@@ -9,6 +9,11 @@ module Delfos
       @added_methods ||= {}
     end
 
+    def self.method_definition_for(klass, key)
+      klass_hash = added_methods[klass] || {}
+      klass_hash[key]
+    end
+
     attr_reader :klass, :name, :private_methods, :class_method
 
     def initialize(klass, name, private_methods, class_method)

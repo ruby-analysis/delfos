@@ -61,6 +61,7 @@ module Delfos
     # is to be extracted into another method we will get a failing test and have to increment
     # the value
     STACK_OFFSET = 5
+    
 
     class CodeLocation
       include KlassDetermination
@@ -161,7 +162,7 @@ module Delfos
       end
 
       def method_definition
-        @method_definition ||= self.class.method_definition_for(klass, class_method, method_name)
+        (@method_definition ||= self.class.method_definition_for(klass, class_method, method_name)) || {}
       end
     end
   end
