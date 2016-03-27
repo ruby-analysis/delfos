@@ -55,26 +55,13 @@ module Delfos
       end
     end
 
-    # This magic number is determined based on the specific implementation now
-    # E.g. if the line
-    # where we call this `caller_binding.of_caller(stack_index + STACK_OFFSET).eval('self')`
-    # is to be extracted into another method we will get a failing test and have to increment
-    # the value
-    STACK_OFFSET = 5
-    
 
     class CodeLocation
       include KlassDetermination
 
       class << self
         def from_caller(stack, caller_binding)
-          current, file, line_number, method_name = parse(stack, caller_binding)
-          return unless current && file && line_number && method_name
-
-          object = object_from(stack, current, caller_binding)
-          class_method = object.is_a? Module
-
-          new(object, method_name.to_s, class_method, file, line_number)
+          CallerParsing.new(stack, caller_binding).perform
         end
 
         def from_called(object, called_method, class_method)
@@ -94,38 +81,6 @@ module Delfos
         end
 
         private
-
-        def parse(stack, caller_binding)
-          current = current_from(stack)
-          file, line_number, method_name = method_details_from(current)
-
-          [current, file, line_number, method_name]
-        end
-
-        def current_from(stack)
-          stack.detect do |s|
-            file = s.split(":")[0]
-            Delfos::MethodLogging.include_file_in_logging?(file)
-          end
-        end
-
-        def object_from(stack, current, caller_binding)
-          stack_index = stack.index { |c| c == current }
-
-          caller_binding.of_caller(stack_index + STACK_OFFSET).eval("self")
-        end
-
-        def method_details_from(current)
-          return unless current
-          current.split(":")
-          file, line_number, rest = current.split(":")
-          method_name = rest[/`.*'$/]
-          return unless method_name && file && line_number
-
-          method_name.delete!("`").delete!("'")
-
-          [file, line_number.to_i, method_name]
-        end
 
         def key_from(class_method, name)
           "#{method_type_from(class_method)}_#{name}"
@@ -163,6 +118,66 @@ module Delfos
 
       def method_definition
         (@method_definition ||= self.class.method_definition_for(klass, class_method, method_name)) || {}
+      end
+    end
+
+    class CallerParsing
+      # This magic number is determined based on the specific implementation now
+      # E.g. if the line
+      # where we call this `caller_binding.of_caller(stack_index + STACK_OFFSET).eval('self')`
+      # is to be extracted into another method we will get a failing test and have to increment
+      # the value
+      STACK_OFFSET = 6
+
+      attr_reader :stack, :caller_binding
+
+      def initialize(stack, caller_binding)
+        @stack = stack
+        @caller_binding = caller_binding
+      end
+
+      def perform
+        current, file, line_number, method_name = parse(stack, caller_binding)
+        return unless current && file && line_number && method_name
+
+        object = object_from(stack, current, caller_binding)
+        class_method = object.is_a? Module
+
+        CodeLocation.new(object, method_name.to_s, class_method, file, line_number)
+      end
+
+      private
+
+      def parse(stack, caller_binding)
+        current = current_from(stack)
+        file, line_number, method_name = method_details_from(current)
+
+        [current, file, line_number, method_name]
+      end
+
+      def current_from(stack)
+        stack.detect do |s|
+          file = s.split(":")[0]
+          Delfos::MethodLogging.include_file_in_logging?(file)
+        end
+      end
+
+      def object_from(stack, current, caller_binding)
+        stack_index = stack.index { |c| c == current }
+
+        caller_binding.of_caller(stack_index + STACK_OFFSET).eval("self")
+      end
+
+      def method_details_from(current)
+        return unless current
+        current.split(":")
+        file, line_number, rest = current.split(":")
+        method_name = rest[/`.*'$/]
+        return unless method_name && file && line_number
+
+        method_name.delete!("`").delete!("'")
+
+        [file, line_number.to_i, method_name]
       end
     end
   end
