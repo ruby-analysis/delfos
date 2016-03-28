@@ -29,10 +29,13 @@ module Delfos
         common_path = common_path(dir1, dir2)
         common_path, path_a, path_b = append_trailing_slashes!(common_path, path_a, path_b)
 
-        if (common_path.to_s.length <= path_a.to_s.length) ||
-           (common_path.to_s.length <= path_b.to_s.length)
+        if valid_length?(common_path, path_a, path_b)
           Pathname.new(common_path)
         end
+      end
+
+      def valid_length?(common_path, path_a, path_b)
+        (common_path.to_s.length <= path_a.to_s.length) || (common_path.to_s.length <= path_b.to_s.length)
       end
 
       def common_path(dir1, dir2)
