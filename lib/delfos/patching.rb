@@ -73,8 +73,8 @@ module Delfos
     def ensure_method_recorded!
       return true if bail?
 
-      self.class.added_methods[klass] ||= {}
-      self.class.added_methods[klass][key] = original_method.source_location
+      self.class.added_methods[klass.to_s] ||= {}
+      self.class.added_methods[klass.to_s][key] = original_method.source_location
 
       false
     end

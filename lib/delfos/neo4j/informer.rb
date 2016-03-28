@@ -55,6 +55,13 @@ module Delfos
         MERGE_QUERY
       end
 
+      def args_query(args)
+        (args.args + args.keyword_args).map do |k|
+          name = query_variable(k)
+          "MERGE (mc) - [:ARG] -> (#{name})"
+        end.join("\n")
+      end
+
       def set_query(caller_code, called_code)
         <<-QUERY
           SET m1.file = "#{caller_code.method_definition_file}"
@@ -91,12 +98,6 @@ module Delfos
         end
       end
 
-      def args_query(args)
-        (args.args + args.keyword_args).map do |k|
-          name = query_variable(k)
-          "MERGE (mc) - [:ARG] -> (#{name})"
-        end.join("\n")
-      end
 
       def self.create_session!
         @create_session ||= ::Neo4j::Session.open(*Delfos.neo4j_config)

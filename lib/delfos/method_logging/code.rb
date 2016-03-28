@@ -3,31 +3,51 @@ require_relative "klass_determination"
 
 module Delfos
   module MethodLogging
-    class Code
-      extend Forwardable
-      delegate [:object, :method_type, :method_name, :line_number, :method_definition_file,
-                :method_definition_line] => :code_location
+    class CodeLocation
+      include KlassDetermination
 
-      attr_reader :code_location
+      class << self
+        def from_caller(stack, caller_binding)
+          CallerParsing.new(stack, caller_binding).perform
+        end
 
-      def initialize(code_location)
-        @code_location = code_location
+        def from_called(object, called_method, class_method)
+          file, line_number = called_method.source_location
+          return unless file && line_number
+
+          new(object, called_method.name.to_s, class_method, file, line_number)
+        end
+
+        def method_type_from(class_method)
+          class_method ? "ClassMethod" : "InstanceMethod"
+        end
+
+        def method_definition_for(klass, class_method, method_name)
+          key = key_from(class_method, method_name)
+
+          Delfos::Patching.method_definition_for(klass.to_s,key)
+        end
+
+        private
+
+        def key_from(class_method, name)
+          "#{method_type_from(class_method)}_#{name}"
+        end
       end
 
-      def self.from_caller(stack, caller_binding)
-        location = CallerParsing.new(stack, caller_binding).perform
-        return unless location
-        new location
-      end
+      attr_reader :object, :method_name, :class_method, :method_type, :file, :line_number
 
-      def self.from_called(object, called_method, class_method)
-        location = CodeLocation.from_called(object, called_method, class_method)
-        return unless location
-        new location
+      def initialize(object, method_name, class_method, file, line_number)
+        @object = object
+        @method_name = method_name
+        @class_method = class_method
+        @method_type = self.class.method_type_from class_method
+        @file = file
+        @line_number = line_number
       end
 
       def file
-        file = code_location.file.to_s
+        file = @file.to_s
 
         if file
           Delfos.application_directories.map do |d|
@@ -50,48 +70,8 @@ module Delfos
       end
 
       def klass
-        name = code_location.klass.name || "__AnonymousClass"
+        name = klass_for(object).name || "__AnonymousClass"
         name.tr ":", "_"
-      end
-    end
-
-
-    class CodeLocation
-      include KlassDetermination
-
-      class << self
-        def from_called(object, called_method, class_method)
-          file, line_number = called_method.source_location
-
-          new(object, called_method.name.to_s, class_method, file, line_number)
-        end
-
-        def method_type_from(class_method)
-          class_method ? "ClassMethod" : "InstanceMethod"
-        end
-
-        def method_definition_for(klass, class_method, method_name)
-          key = key_from(class_method, method_name)
-
-          Delfos::Patching.method_definition_for(klass,key)
-        end
-
-        private
-
-        def key_from(class_method, name)
-          "#{method_type_from(class_method)}_#{name}"
-        end
-      end
-
-      attr_reader :object, :method_name, :class_method, :method_type, :file, :line_number
-
-      def initialize(object, method_name, class_method, file, line_number)
-        @object = object
-        @method_name = method_name
-        @class_method = class_method
-        @method_type = self.class.method_type_from class_method
-        @file = file
-        @line_number = line_number
       end
 
       def method_definition_file
@@ -100,10 +80,6 @@ module Delfos
 
       def method_definition_line
         method_definition[1]
-      end
-
-      def klass
-        klass_for(object)
       end
 
       private
@@ -136,12 +112,14 @@ module Delfos
         file, line_number, method_name = method_details
         return unless current && file && line_number && method_name
 
-        class_method = object.is_a? Module
-
         CodeLocation.new(object, method_name.to_s, class_method, file, line_number)
       end
 
       private
+
+      def class_method
+        object.is_a? Module
+      end
 
       def current
         stack.detect do |s|
@@ -151,7 +129,7 @@ module Delfos
       end
 
       def object
-        caller_binding.of_caller(stack_index + STACK_OFFSET).eval("self")
+        @object ||= caller_binding.of_caller(stack_index + STACK_OFFSET).receiver
       end
 
       def stack_index

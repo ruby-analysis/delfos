@@ -31,12 +31,12 @@ module Delfos
         called_method)
         check_setup!
 
-        caller_code = Code.from_caller(stack, caller_binding)
+        caller_code = CodeLocation.from_caller(stack, caller_binding)
         return unless caller_code
 
         args = Args.new(args.dup, keyword_args.dup)
 
-        called_code = Code.from_called(called_object, called_method, class_method)
+        called_code = CodeLocation.from_called(called_object, called_method, class_method)
 
         Delfos.logger.debug(args, caller_code, called_code)
       end

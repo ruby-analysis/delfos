@@ -24,8 +24,8 @@ describe Delfos::MethodLogging do
       expect(Delfos::Patching).
         to receive(:added_methods).
         and_return(
-          A => { instance_method_some_method: [a_path, 4] },
-          B => { instance_method_another_method: [b_path, 2] }).
+          "A" => { instance_method_some_method: [a_path, 4] },
+          "B" => { instance_method_another_method: [b_path, 2] }).
         at_least(:once)
 
       Delfos.logger = logger
@@ -115,7 +115,7 @@ describe Delfos::MethodLogging do
 
       SomeObject.new.some_method do |o, caller_binding|
         object = o
-        caller_result = Delfos::MethodLogging::Code.from_caller(caller, caller_binding)
+        caller_result = Delfos::MethodLogging::CodeLocation.from_caller(caller, caller_binding)
       end
 
       # sanity check

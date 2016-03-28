@@ -46,7 +46,7 @@ module Delfos
       end
 
       def method_sources(klass)
-        (Delfos::Patching.added_methods[klass] || {}).values.map(&:first)
+        (Delfos::Patching.added_methods[klass.to_s] || {}).values.map(&:first)
       end
     end
   end
