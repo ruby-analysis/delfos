@@ -14,7 +14,7 @@ describe Delfos::Neo4j::Informer do
     Delfos.wipe_db!
   end
 
-  let(:caller_code) do
+  let(:call_site) do
     double klass: A,
 
            file: "a.rb",
@@ -35,7 +35,7 @@ describe Delfos::Neo4j::Informer do
 
   describe "#args_query" do
     before do
-      subject.assign_query_variables(args, caller_code, called_code)
+      subject.assign_query_variables(args, call_site, called_code)
     end
 
     it do
@@ -49,7 +49,7 @@ describe Delfos::Neo4j::Informer do
   end
 
   it do
-    query = subject.query_for(args, caller_code, called_code)
+    query = subject.query_for(args, call_site, called_code)
 
     expected = <<-QUERY
       MERGE (k1:A)

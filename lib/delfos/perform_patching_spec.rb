@@ -20,8 +20,8 @@ describe "patching #{BasicObject}" do
     expect(B).to receive(:new).and_return b
     a.some_method(b, 2, c: b, b: "some string")
 
-    expect(logger).to have_received(:debug) do |args, caller_code, called_code|
-      expect(caller_code.object).to eq(a)
+    expect(logger).to have_received(:debug) do |args, call_site, called_code|
+      expect(call_site.object).to eq(a)
       expect(called_code.object).to eq(b)
       expect(args.args).to eq [A, B]
       expect(args.keyword_args).to eq([B])

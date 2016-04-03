@@ -66,14 +66,14 @@ describe Delfos::MethodLogging do
       caller_object = CallerObject.new
       caller_object.caller_method(called_object, args, keyword_args, block, class_method)
 
-      expect(logger).to have_received(:debug) do |args, caller_code, called_code|
+      expect(logger).to have_received(:debug) do |args, call_site, called_code|
         expect(args.args).to eq [A, B]
         expect(args.keyword_args).to eq [A, B]
 
-        expect(caller_code.file).to eq "delfos/method_logging_spec.rb"
-        expect(caller_code.line_number).to eq $caller_line
-        expect(caller_code.method_name).to eq "caller_method"
-        expect(caller_code.object).to eq caller_object
+        expect(call_site.file).to eq "delfos/method_logging_spec.rb"
+        expect(call_site.line_number).to eq $caller_line
+        expect(call_site.method_name).to eq "caller_method"
+        expect(call_site.object).to eq caller_object
 
         expect(called_code.file).to eq "delfos/method_logging_spec.rb"
         expect(called_code.line_number).to eq $called_line

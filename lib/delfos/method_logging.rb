@@ -31,14 +31,14 @@ module Delfos
         called_method)
         check_setup!
 
-        caller_code = CodeLocation.from_caller(stack, caller_binding)
-        return unless caller_code
+        call_site = CodeLocation.from_caller(stack, caller_binding)
+        return unless call_site
 
         args = Args.new(args.dup, keyword_args.dup)
 
         called_code = CodeLocation.from_called(called_object, called_method, class_method)
 
-        Delfos.logger.debug(args, caller_code, called_code)
+        Delfos.logger.debug(args, call_site, called_code)
       end
 
       def include_any_path_in_logging?(paths)
