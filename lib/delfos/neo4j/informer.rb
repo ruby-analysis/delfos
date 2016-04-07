@@ -15,6 +15,8 @@ module Delfos
         self.class.create_session!
         query = query_for(*args)
 
+        #::Neo4j::Session.query(code_execution_query)
+
         ::Neo4j::Session.query(query)
       end
 
@@ -79,6 +81,11 @@ module Delfos
       def query_variables
         @query_variables ||= QueryVariables.new
       end
+
+      def code_execution_query
+        Delfos::Patching.method_chain
+      end
+
 
       class QueryVariables < Hash
         def initialize(*args)

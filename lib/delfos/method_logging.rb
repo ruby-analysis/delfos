@@ -34,6 +34,8 @@ module Delfos
         call_site = CodeLocation.from_call_site(stack, call_site_binding)
         return unless call_site
 
+        Delfos::ExecutionChain.push(call_site)
+
         args = Args.new(args.dup, keyword_args.dup)
 
         called_code = CodeLocation.from_called(called_object, called_method, class_method)

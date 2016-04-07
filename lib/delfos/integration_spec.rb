@@ -25,8 +25,11 @@ describe "integration" do
       MATCH cs-[:ARG]->(a)
       MATCH cs-[:ARG]->(b)
 
+      MATCH (e:Execution) - [:STEP{number: 1}] -> (im1)
+      MATCH (e)           - [:STEP{number: 2}] -> (cs)
+      MATCH (e)           - [:STEP{number: 3}] -> (im2)
 
-      RETURN count(a),count(b),count(cs),count(im1),count(im2)
+      RETURN count(a),count(b),count(cs),count(e),count(im1),count(im2)
     QUERY
 
     expect(result.first["count(a)"]).to eq 1
@@ -34,5 +37,6 @@ describe "integration" do
     expect(result.first["count(im1)"]).to eq 1
     expect(result.first["count(cs)"]).to eq 1
     expect(result.first["count(im2)"]).to eq 1
+    expect(result.first["count(e)"]).to eq 1
   end
 end

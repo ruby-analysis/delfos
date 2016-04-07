@@ -33,7 +33,9 @@ module Delfos
         MethodLogging.log(self, args, keyword_args, block, class_method, caller.dup, binding.dup, original)
 
         method_to_call = class_method ? original : original.bind(self)
-        performer.call(method_to_call, args, keyword_args, block)
+        result = performer.call(method_to_call, args, keyword_args, block)
+        Delfos::ExecutionChain.pop
+        result
       end
     end
 
