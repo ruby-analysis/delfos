@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-require_relative "code"
+require_relative "code_location"
+
 describe Delfos::MethodLogging::CodeLocation do
   describe "#file" do
     let(:code_location) { described_class.new(anything, anything, anything, filename, anything) }

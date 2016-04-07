@@ -7,8 +7,8 @@ module Delfos
       include KlassDetermination
 
       class << self
-        def from_caller(stack, caller_binding)
-          CallerParsing.new(stack, caller_binding).perform
+        def from_call_site(stack, call_site_binding)
+          CallSiteParsing.new(stack, call_site_binding).perform
         end
 
         def from_called(object, called_method, class_method)
@@ -93,19 +93,19 @@ module Delfos
       end
     end
 
-    class CallerParsing
+    class CallSiteParsing
       # This magic number is determined based on the specific implementation now
       # E.g. if the line
-      # where we call this `caller_binding.of_caller(stack_index + STACK_OFFSET).eval('self')`
+      # where we call this `call_site_binding.of_caller(stack_index + STACK_OFFSET).eval('self')`
       # is to be extracted into another method we will get a failing test and have to increment
       # the value
       STACK_OFFSET = 5
 
-      attr_reader :stack, :caller_binding
+      attr_reader :stack, :call_site_binding
 
-      def initialize(stack, caller_binding)
+      def initialize(stack, call_site_binding)
         @stack = stack
-        @caller_binding = caller_binding
+        @call_site_binding = call_site_binding
       end
 
       def perform
@@ -129,7 +129,7 @@ module Delfos
       end
 
       def object
-        @object ||= caller_binding.of_caller(stack_index + STACK_OFFSET).receiver
+        @object ||= call_site_binding.of_caller(stack_index + STACK_OFFSET).receiver
       end
 
       def stack_index

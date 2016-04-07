@@ -38,23 +38,23 @@ describe Delfos::MethodLogging do
       # This method represents a method with the meta programming hooks added for the logging
       def called_method(args, keyword_args, block)
         $called_line = __LINE__ - 1
-        caller_binding = binding
+        call_site_binding = binding
         stack = caller.dup
 
         Delfos::MethodLogging.log(
           self,
           args, keyword_args, block,
           class_method = false,
-          stack, caller_binding,
+          stack, call_site_binding,
           method(__method__))
       end
     end
 
-    class CallerObject
-      def caller_method(called_object, args, keyword_args, block, _called_method)
+    class CallSiteObject
+      def call_site_method(called_object, args, keyword_args, block, _called_method)
         called_object = CalledObject.new
 
-        $caller_line = __LINE__ + 1
+        $call_site_line = __LINE__ + 1
         called_object.called_method(args, keyword_args, block)
       end
     end
@@ -63,17 +63,17 @@ describe Delfos::MethodLogging do
       called_object = CalledObject.new
       expect(CalledObject).to receive(:new).and_return called_object
 
-      caller_object = CallerObject.new
-      caller_object.caller_method(called_object, args, keyword_args, block, class_method)
+      call_site_object = CallSiteObject.new
+      call_site_object.call_site_method(called_object, args, keyword_args, block, class_method)
 
       expect(logger).to have_received(:debug) do |args, call_site, called_code|
         expect(args.args).to eq [A, B]
         expect(args.keyword_args).to eq [A, B]
 
         expect(call_site.file).to eq "delfos/method_logging_spec.rb"
-        expect(call_site.line_number).to eq $caller_line
-        expect(call_site.method_name).to eq "caller_method"
-        expect(call_site.object).to eq caller_object
+        expect(call_site.line_number).to eq $call_site_line
+        expect(call_site.method_name).to eq "call_site_method"
+        expect(call_site.object).to eq call_site_object
 
         expect(called_code.file).to eq "delfos/method_logging_spec.rb"
         expect(called_code.line_number).to eq $called_line
@@ -90,13 +90,13 @@ describe Delfos::MethodLogging do
       another_method(block, binding)
     end
 
-    def another_method(block, caller_binding)
-      a_third_method(block, caller_binding)
+    def another_method(block, call_site_binding)
+      a_third_method(block, call_site_binding)
     end
 
-    def a_third_method(block, caller_binding)
+    def a_third_method(block, call_site_binding)
       $line_number = __LINE__ + 1
-      block.call self, caller_binding
+      block.call self, call_site_binding
     end
   end
 
@@ -110,25 +110,22 @@ describe Delfos::MethodLogging do
     end
 
     it do
-      caller_result = nil
+      call_site_result = nil
       object = nil
 
-      SomeObject.new.some_method do |o, caller_binding|
+      SomeObject.new.some_method do |o, call_site_binding|
         object = o
-        caller_result = Delfos::MethodLogging::CodeLocation.from_caller(caller, caller_binding)
+        call_site_result = Delfos::MethodLogging::CodeLocation.from_call_site(caller, call_site_binding)
       end
 
       # sanity check
-      expect(caller_result.object).to be_a SomeObject
-      expect(caller_result.object).to eq object
+      expect(call_site_result.object).to be_a SomeObject
+      expect(call_site_result.object).to eq object
 
-      unless ENV["CI"]
-        # TODO: find out why this fails on CI
-        expect(caller_result.method_name).to eq "call"
-      end
+      expect(call_site_result.method_name).to eq "a_third_method"
 
-      expect(caller_result.file).to eq "delfos/method_logging_spec.rb"
-      expect(caller_result.line_number).to eq $line_number
+      expect(call_site_result.file).to eq "delfos/method_logging_spec.rb"
+      expect(call_site_result.line_number).to eq $line_number
     end
   end
 end

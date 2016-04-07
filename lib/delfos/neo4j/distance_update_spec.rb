@@ -22,14 +22,14 @@ describe Delfos::Neo4j::DistanceUpdate do
 
     query = <<-QUERY
       MATCH
-        (klass)        - [:OWNS]      -> (caller),
-        (caller)      <- [:CALLED_BY] -  (method_call),
+        (klass)        - [:OWNS]      -> (call_site),
+        (call_site)      <- [:CALLED_BY] -  (method_call),
         (method_call)  - [:CALLS]     -> (called),
         (called_klass) - [:OWNS]      -> (called)
 
-        , (caller)  -   [:EFFERENT_COUPLING] -> (called)
+        , (call_site)  -   [:EFFERENT_COUPLING] -> (called)
 
-      RETURN klass, caller, method_call, called, called_klass
+      RETURN klass, call_site, method_call, called, called_klass
     QUERY
 
     @result = ::Neo4j::Session.query(query)
@@ -42,19 +42,19 @@ describe Delfos::Neo4j::DistanceUpdate do
 
   it "records the called classes" do
     called_klasses = @result.map(&:called_klass).map(&:labels).flatten.uniq
-    expect(called_klasses).to eq [:This, :That, :SomeOther, :SoMuchCoupling, :HereIsSomeMore]
+    expect(called_klasses).to match_array [:This, :That, :SomeOther, :SoMuchCoupling, :HereIsSomeMore]
   end
 
-  describe "caller" do
-    it "returns the caller" do
-      props = @result.map(&:caller).map(&:props).uniq
+  describe "call_site" do
+    it "returns the call_site" do
+      props = @result.map(&:call_site).map(&:props).uniq
       expect(props.length).to eq 1
     end
 
-    it "records the caller details" do
-      caller_props = @result.map(&:caller).map(&:props).flatten.uniq
+    it "records the call_site details" do
+      call_site_props = @result.map(&:call_site).map(&:props).flatten.uniq
 
-      expect(caller_props).to eq [
+      expect(call_site_props).to eq [
         { file: "fixtures/ruby/efferent_coupling.rb",
           name: "lots_of_coupling",
           line_number: "5" },
@@ -65,7 +65,7 @@ describe Delfos::Neo4j::DistanceUpdate do
   it "records the called method details" do
     called_props = @result.map(&:called).map(&:props).flatten.uniq
 
-    expect(called_props).to eq [
+    expect(called_props).to match_array [
       { file: "ruby/this.rb", name: "send_message",     line_number: "2" },
       { file: "ruby/this.rb", name: "found_in_here",    line_number: "9" },
       { file: "ruby/this.rb", name: "for_good_measure", line_number: "13" },

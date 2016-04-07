@@ -7,12 +7,12 @@ module Delfos
       def perform
         query = <<-QUERY
           MATCH
-            (klass)         -  [:OWNS]      -> (caller),
-            (caller)       <-  [:CALLED_BY] -  (method_call),
+            (klass)         -  [:OWNS]      -> (call_site),
+            (call_site)    <-  [:CALLED_BY] -  (method_call),
             (method_call)   -  [:CALLS]     -> (called),
             (called_klass)  -  [:OWNS]      -> (called)
 
-          RETURN klass, caller, method_call, called, called_klass
+          RETURN klass, call_site, method_call, called, called_klass
         QUERY
 
         result = ::Neo4j::Session.query(query)
@@ -34,7 +34,7 @@ module Delfos
 
       def update(result)
         result.each do |r|
-          start  = determine_full_path r.caller.props[:file]
+          start  = determine_full_path r.call_site.props[:file]
           finish = determine_full_path r.called.props[:file]
 
           calc = Delfos::Distance::Calculation.new(start, finish)
@@ -45,10 +45,10 @@ module Delfos
 
       def perform_query(calc, r)
         ::Neo4j::Session.query <<-QUERY
-          START caller = node(#{r.caller.neo_id}),
+          START call_site = node(#{r.call_site.neo_id}),
                 called = node(#{r.called.neo_id})
 
-           MERGE (caller) - #{rel_for(calc)} -> (called)
+           MERGE (call_site) - #{rel_for(calc)} -> (called)
         QUERY
       end
 
