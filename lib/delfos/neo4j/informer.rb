@@ -48,9 +48,9 @@ module Delfos
         <<-MERGE_QUERY
           MERGE (#{query_variable(call_site.klass)}) - [:OWNS]      ->  (m1:#{call_site.method_type}{name: "#{call_site.method_name}"})
 
-          MERGE (m1) <- [:CALLED_BY] -  (mc:MethodCall{file: "#{call_site.file}", line_number: "#{call_site.line_number}"})
+          MERGE (m1) - [:CONTAINS] -> (cs:CallSite{file: "#{call_site.file}", line_number: "#{call_site.line_number}"})
 
-          MERGE (mc)  - [:CALLS]     -> (m2:#{called_code.method_type}{name: "#{called_code.method_name}"})
+          MERGE (cs)  - [:CALLS]     -> (m2:#{called_code.method_type}{name: "#{called_code.method_name}"})
           MERGE (#{query_variable(called_code.klass)})-[:OWNS]->(m2)
         MERGE_QUERY
       end
@@ -58,7 +58,7 @@ module Delfos
       def args_query(args)
         (args.args + args.keyword_args).map do |k|
           name = query_variable(k)
-          "MERGE (mc) - [:ARG] -> (#{name})"
+          "MERGE (cs) - [:ARG] -> (#{name})"
         end.join("\n")
       end
 

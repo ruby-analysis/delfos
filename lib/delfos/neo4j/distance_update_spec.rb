@@ -22,14 +22,13 @@ describe Delfos::Neo4j::DistanceUpdate do
 
     query = <<-QUERY
       MATCH
-        (klass)        - [:OWNS]      -> (call_site),
-        (call_site)      <- [:CALLED_BY] -  (method_call),
-        (method_call)  - [:CALLS]     -> (called),
-        (called_klass) - [:OWNS]      -> (called)
+        (klass)        - [:OWNS]              -> (method),
+        (method )      - [:CONTAINS]          -  (call_site),
+        (call_site)    - [:CALLS]             -> (called),
+        (called_klass) - [:OWNS]              -> (called),
+        (call_site)    - [:EFFERENT_COUPLING] -> (called)
 
-        , (call_site)  -   [:EFFERENT_COUPLING] -> (called)
-
-      RETURN klass, call_site, method_call, called, called_klass
+      RETURN klass, method, call_site, called, called_klass
     QUERY
 
     @result = ::Neo4j::Session.query(query)
@@ -47,17 +46,21 @@ describe Delfos::Neo4j::DistanceUpdate do
 
   describe "call_site" do
     it "returns the call_site" do
-      props = @result.map(&:call_site).map(&:props).uniq
-      expect(props.length).to eq 1
+      props = @result.map(&:call_site).map(&:props)
+      expect(props.length).to eq 7
     end
 
     it "records the call_site details" do
       call_site_props = @result.map(&:call_site).map(&:props).flatten.uniq
 
       expect(call_site_props).to eq [
-        { file: "fixtures/ruby/efferent_coupling.rb",
-          name: "lots_of_coupling",
-          line_number: "5" },
+        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>"6"},
+        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>"7"},
+        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>"8"},
+        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>"9"},
+        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>"10"},
+        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>"11"},
+        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>"12"}
       ]
     end
   end

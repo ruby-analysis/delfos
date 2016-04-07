@@ -41,9 +41,9 @@ describe Delfos::Neo4j::Informer do
     it do
       result = subject.args_query(args)
       expect(result).to eq <<-QUERY.gsub(/^\s+/, "").chomp
-        MERGE (mc) - [:ARG] -> (k3)
-        MERGE (mc) - [:ARG] -> (k4)
-        MERGE (mc) - [:ARG] -> (k5)
+        MERGE (cs) - [:ARG] -> (k3)
+        MERGE (cs) - [:ARG] -> (k4)
+        MERGE (cs) - [:ARG] -> (k5)
       QUERY
     end
   end
@@ -58,12 +58,12 @@ describe Delfos::Neo4j::Informer do
       MERGE (k4:C)
       MERGE (k5:D)
       MERGE (k1) - [:OWNS] -> (m1:ClassMethod{name: "method_a"})
-      MERGE (m1) <- [:CALLED_BY] - (mc:MethodCall{file: "a.rb", line_number: "4"})
-      MERGE (mc) - [:CALLS] -> (m2:InstanceMethod{name: "method_e"})
+      MERGE (m1) - [:CONTAINS] -> (cs:CallSite{file: "a.rb", line_number: "4"})
+      MERGE (cs) - [:CALLS] -> (m2:InstanceMethod{name: "method_e"})
       MERGE (k2)-[:OWNS]->(m2)
-      MERGE (mc) - [:ARG] -> (k3)
-      MERGE (mc) - [:ARG] -> (k4)
-      MERGE (mc) - [:ARG] -> (k5)
+      MERGE (cs) - [:ARG] -> (k3)
+      MERGE (cs) - [:ARG] -> (k4)
+      MERGE (cs) - [:ARG] -> (k5)
       SET m1.file = "a.rb"
       SET m1.line_number = "2"
       SET m2.file = "e.rb"

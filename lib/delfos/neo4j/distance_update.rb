@@ -7,12 +7,12 @@ module Delfos
       def perform
         query = <<-QUERY
           MATCH
-            (klass)         -  [:OWNS]      -> (call_site),
-            (call_site)    <-  [:CALLED_BY] -  (method_call),
-            (method_call)   -  [:CALLS]     -> (called),
-            (called_klass)  -  [:OWNS]      -> (called)
+            (klass)        -  [:OWNS]     -> (method),
+            (method)       -  [:CONTAINS] -> (call_site),
+            (call_site)    -  [:CALLS]    -> (called),
+            (called_klass) -  [:OWNS]     -> (called)
 
-          RETURN klass, call_site, method_call, called, called_klass
+          RETURN klass, call_site, method, called, called_klass
         QUERY
 
         result = ::Neo4j::Session.query(query)
@@ -46,7 +46,7 @@ module Delfos
       def perform_query(calc, r)
         ::Neo4j::Session.query <<-QUERY
           START call_site = node(#{r.call_site.neo_id}),
-                called = node(#{r.called.neo_id})
+                called    = node(#{r.called.neo_id})
 
            MERGE (call_site) - #{rel_for(calc)} -> (called)
         QUERY
