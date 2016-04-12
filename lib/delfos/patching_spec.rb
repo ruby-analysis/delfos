@@ -1,6 +1,15 @@
 require_relative "patching"
+require_relative "patching_unstubbing_spec_helper"
+
+#HACK this is awful
+Delfos::Patching.extend Unstubbing::ClassMethods
+Delfos::Patching.prepend Unstubbing::InstanceMethods
 
 describe Delfos::Patching do
+  after(:each) do
+    described_class.unstub_all!
+  end
+
   class SomeAnonymousClass
     def some_public_method
       some_private_method
@@ -14,10 +23,6 @@ describe Delfos::Patching do
   end
 
   describe ".perform" do
-    after do
-      described_class.unstub_all!
-    end
-
     context "with a class with a private method" do
       let(:klass) { SomeAnonymousClass }
       let(:some_anonymous_instance) { klass.new }
