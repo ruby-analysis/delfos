@@ -10,7 +10,11 @@ module Delfos
     end
 
     def self.method_definition_for(klass, key)
-      klass_hash = added_methods[klass] || {}
+      super_klass = eval(klass).ancestors.detect do |k|
+        added_methods[k.to_s]
+      end
+
+      klass_hash = added_methods[super_klass.to_s] || {}
       klass_hash[key]
     end
 

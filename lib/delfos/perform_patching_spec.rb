@@ -17,14 +17,15 @@ describe "patching #{BasicObject}" do
   end
 
   it do
-    expect(B).to receive(:new).and_return b
-    a.some_method(b, 2, c: b, b: "some string")
+    expect(B).to receive(:new).and_return(b).at_least(:once)
 
-    expect(logger).to have_received(:debug) do |args, call_site, called_code|
+    expect(logger).to receive(:debug) do |args, call_site, called_code|
       expect(call_site.object).to eq(a)
       expect(called_code.object).to eq(b)
       expect(args.args).to eq [A, B]
       expect(args.keyword_args).to eq([B])
-    end
+    end.at_least(:once)
+
+    a.some_method(b, 2, c: b, b: "some string")
   end
 end

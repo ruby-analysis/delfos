@@ -8,29 +8,32 @@ describe Delfos::Neo4j::Informer do
   class D; end
   class E; end
 
-  let(:args) { double args: [B], keyword_args: [C, D] }
+  let(:args) { double "args", args: [B], keyword_args: [C, D] }
 
   before do
     Delfos.wipe_db!
   end
 
   let(:call_site) do
-    double klass: A,
-
-           file: "a.rb",
-           line_number: "4",
-           method_name: "method_a",
-           method_type: "ClassMethod",
-           method_definition_file: "a.rb",
-           method_definition_line: 2
+    double "CallSite",
+      klass: A,
+      file: "a.rb",
+      line_number: "4",
+      method_name: "method_a",
+      method_type: "ClassMethod",
+      method_definition_file: "a.rb",
+      method_definition_line: 2
   end
 
   let(:called_code) do
-    double klass: E,
-           file: "e.rb",
-           line_number: "2",
-           method_name: "method_e",
-           method_type: "InstanceMethod"
+    double "CalledCode",
+      klass: E,
+      file: "e.rb",
+      line_number: "2",
+      method_name: "method_e",
+      method_definition_file: "some/filename",
+      method_definition_line: 2,
+      method_type: "InstanceMethod"
   end
 
   describe "#args_query" do
@@ -57,17 +60,16 @@ describe Delfos::Neo4j::Informer do
       MERGE (k3:B)
       MERGE (k4:C)
       MERGE (k5:D)
-      MERGE (k1) - [:OWNS] -> (m1:ClassMethod{name: "method_a"})
-      MERGE (m1) - [:CONTAINS] -> (cs:CallSite{file: "a.rb", line_number: "4"})
-      MERGE (cs) - [:CALLS] -> (m2:InstanceMethod{name: "method_e"})
-      MERGE (k2)-[:OWNS]->(m2)
+
+      MERGE (k1) - [:OWNS] -> (m1:ClassMethod{name: "method_a", file: "a.rb", line_number: 2})
+
+      MERGE (m1) - [:CONTAINS] -> (cs:CallSite{file: "a.rb", line_number: 4})
+
+      MERGE (k2) - [:OWNS] -> (m2:InstanceMethod{name: "method_e", file: "some/filename", line_number: 2})
+      MERGE (cs) - [:CALLS] -> m2
       MERGE (cs) - [:ARG] -> (k3)
       MERGE (cs) - [:ARG] -> (k4)
       MERGE (cs) - [:ARG] -> (k5)
-      SET m1.file = "a.rb"
-      SET m1.line_number = "2"
-      SET m2.file = "e.rb"
-      SET m2.line_number = "2"
     QUERY
 
     expect(strip_whitespace(query)).to eq strip_whitespace(expected)

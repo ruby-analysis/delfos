@@ -6,6 +6,7 @@ require_relative "common_path"
 require_relative "method_logging/klass_determination"
 require_relative "method_logging/code_location"
 require_relative "method_logging/args"
+require_relative "execution_chain"
 
 module Delfos
   class << self
@@ -32,9 +33,9 @@ module Delfos
         check_setup!
 
         call_site = CodeLocation.from_call_site(stack, call_site_binding)
-        return unless call_site
-
         Delfos::ExecutionChain.push(call_site)
+
+        return unless call_site
 
         args = Args.new(args.dup, keyword_args.dup)
 

@@ -42,8 +42,9 @@ module Delfos
         @method_name = method_name
         @class_method = class_method
         @method_type = self.class.method_type_from class_method
+        @line_number = line_number.to_i
         @file = file
-        @line_number = line_number
+
       end
 
       def file
@@ -75,11 +76,11 @@ module Delfos
       end
 
       def method_definition_file
-        method_definition[0]
+        method_definition[0].to_s
       end
 
       def method_definition_line
-        method_definition[1]
+        method_definition[1].to_i
       end
 
       private

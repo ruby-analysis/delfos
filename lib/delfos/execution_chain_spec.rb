@@ -3,6 +3,7 @@ require_relative "execution_chain"
 describe Delfos::ExecutionChain do
   before do
     Delfos::ExecutionChain.reset!
+    allow(Delfos::Neo4j::ExecutionPersistence).to receive(:save!)
   end
 
   describe "#push(anything)" do
@@ -46,7 +47,7 @@ describe Delfos::ExecutionChain do
 
 
   describe "#pop" do
-      it "clears the call site list only on resetting" do
+    it "clears the call site list only on resetting" do
       subject.push(1)
       subject.push(2)
       subject.push(3)
@@ -75,7 +76,7 @@ describe Delfos::ExecutionChain do
       subject.push(anything)
       expect(subject.step_count).to eq 3
 
-      3.times { subject.pop }
+      2.times { subject.pop }
       expect(subject.stack_depth).to eq 0 #sanity check
       expect(subject.step_count).to eq 0 #step count is reset
     end
@@ -95,8 +96,7 @@ describe Delfos::ExecutionChain do
       expect(subject.stack_depth).to eq 0
 
       #stays at zero without going negative
-      subject.pop
-      expect(subject.stack_depth).to eq 0
+      expect{subject.pop}.to raise_error Delfos::ExecutionChain::PoppingEmptyStackError
     end
 
     it "increments the execution counter only when the stack depth increases from 0 to 1" do

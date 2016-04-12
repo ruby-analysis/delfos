@@ -54,24 +54,25 @@ describe Delfos::Neo4j::DistanceUpdate do
       call_site_props = @result.map(&:call_site).map(&:props).flatten.uniq
 
       expect(call_site_props).to eq [
-        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>"6"},
-        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>"7"},
-        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>"8"},
-        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>"9"},
-        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>"10"},
-        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>"11"},
-        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>"12"}
+        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>6},
+        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>7},
+        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>8},
+        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>9},
+        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>10},
+        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>11},
+        {:file=>"fixtures/ruby/efferent_coupling.rb", :line_number=>12}
       ]
     end
   end
 
   it "records the called method details" do
     called_props = @result.map(&:called).map(&:props).flatten.uniq
+    file_path = expand_fixture_path("ruby/this.rb").to_s
 
     expect(called_props).to match_array [
-      { file: "ruby/this.rb", name: "send_message",     line_number: "2" },
-      { file: "ruby/this.rb", name: "found_in_here",    line_number: "9" },
-      { file: "ruby/this.rb", name: "for_good_measure", line_number: "13" },
+      { file: file_path, name: "send_message",     line_number: 2 },
+      { file: file_path, name: "found_in_here",    line_number: 9 },
+      { file: file_path, name: "for_good_measure", line_number: 13 },
     ]
   end
 

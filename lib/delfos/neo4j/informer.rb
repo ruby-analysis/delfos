@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 require "delfos"
-require "neo4j"
-require "neo4j/session"
+require_relative "query_execution"
 
 module Delfos
   module Neo4j
@@ -11,13 +10,9 @@ module Delfos
       end
 
       def execute_query(*args)
-        Delfos.check_setup!
-        self.class.create_session!
         query = query_for(*args)
 
-        #::Neo4j::Session.query(code_execution_query)
-
-        ::Neo4j::Session.query(query)
+        QueryExecutor.execute(query)
       end
 
       def query_for(args, call_site, called_code)
@@ -32,8 +27,6 @@ module Delfos
 
           #{merge_query(call_site, called_code)}
           #{args_query args}
-
-          #{set_query(call_site, called_code)}
         QUERY
       end
 
@@ -48,13 +41,32 @@ module Delfos
 
       def merge_query(call_site, called_code)
         <<-MERGE_QUERY
-          MERGE (#{query_variable(call_site.klass)}) - [:OWNS]      ->  (m1:#{call_site.method_type}{name: "#{call_site.method_name}"})
+          #{method_definition call_site, "m1"}
 
-          MERGE (m1) - [:CONTAINS] -> (cs:CallSite{file: "#{call_site.file}", line_number: "#{call_site.line_number}"})
+          MERGE (m1) - [:CONTAINS] -> (cs:CallSite{file: "#{call_site.file}", line_number: #{call_site.line_number}})
 
-          MERGE (cs)  - [:CALLS]     -> (m2:#{called_code.method_type}{name: "#{called_code.method_name}"})
-          MERGE (#{query_variable(called_code.klass)})-[:OWNS]->(m2)
+          #{method_definition called_code, "m2"}
+
+          MERGE (cs)  - [:CALLS]     ->  m2
         MERGE_QUERY
+      end
+
+      def method_definition(code, id)
+        <<-METHOD
+          MERGE (#{query_variable(code.klass)}) - [:OWNS] -> #{method_node(code, id)}
+        METHOD
+      end
+
+      def method_node(code, id)
+        if code.method_definition_file.length > 0 && code.method_definition_line > 0
+          <<-NODE
+            (#{id}:#{code.method_type}{name: "#{code.method_name}", file: #{code.method_definition_file.inspect}, line_number: #{code.method_definition_line}})
+          NODE
+        else
+          <<-NODE
+            (#{id}:#{code.method_type}{name: "#{code.method_name}"})
+          NODE
+        end
       end
 
       def args_query(args)
@@ -62,16 +74,6 @@ module Delfos
           name = query_variable(k)
           "MERGE (cs) - [:ARG] -> (#{name})"
         end.join("\n")
-      end
-
-      def set_query(call_site, called_code)
-        <<-QUERY
-          SET m1.file = "#{call_site.method_definition_file}"
-          SET m1.line_number = "#{call_site.method_definition_line}"
-
-          SET m2.file = "#{called_code.file}"
-          SET m2.line_number = "#{called_code.line_number}"
-        QUERY
       end
 
       def query_variable(k)
@@ -85,7 +87,6 @@ module Delfos
       def code_execution_query
         Delfos::Patching.method_chain
       end
-
 
       class QueryVariables < Hash
         def initialize(*args)
@@ -103,11 +104,6 @@ module Delfos
             @counters[prefix] += 1
           end
         end
-      end
-
-
-      def self.create_session!
-        @create_session ||= ::Neo4j::Session.open(*Delfos.neo4j_config)
       end
     end
   end

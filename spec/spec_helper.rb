@@ -27,7 +27,7 @@ def expand_fixture_path(path = "")
 end
 
 def fixture_path
-  Pathname.new("./fixtures/tree").realpath
+  Pathname.new("./fixtures").realpath
 end
 
 def t(path)
