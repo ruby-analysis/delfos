@@ -32,22 +32,7 @@ end
 # You could click around the app or run integration tests
 ```
 
-Generate and upload the results to code climate
-
-```
-rake delfos:analysis delfos:code_climate
-```
-
 By default the results are stored in `tmp/delfos/results.json`
-
-
-Example delfos script to run locally or on a CI server
-
-```
-#!/usr/bin/env bash
-DELFOS=true ./bin/rake
-./bin/rake delfos:code_climate
-```
 
 
 
