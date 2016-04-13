@@ -6,11 +6,14 @@ Delfos::Patching.extend Unstubbing::ClassMethods
 Delfos::Patching.prepend Unstubbing::InstanceMethods
 
 describe Delfos::Patching do
-  after(:each) do
-    described_class.unstub_all!
-  end
 
-  class SomeAnonymousClass
+
+  class SomeRandomClass
+    $class_method_line_number = __LINE__ + 1
+    def self.some_class_method
+    end
+
+    $instance_method_line_number = __LINE__ + 1
     def some_public_method
       some_private_method
     end
@@ -22,24 +25,52 @@ describe Delfos::Patching do
     end
   end
 
+  class SomeSubClass
+  end
+
+
+  let(:klass) { SomeRandomClass }
+  let(:some_random_instance) { klass.new }
+
+  before do
+    allow_any_instance_of(described_class).to receive(:exclude?) do
+      klass != SomeRandomClass
+    end
+
+    allow(Delfos::MethodLogging).to receive(:log)
+    allow(Delfos::ExecutionChain).to receive(:pop)
+  end
+
+  describe ".added_methods" do
+    after(:each) do
+      described_class.unstub_all!
+    end
+    
+    it do
+      expect(described_class.added_methods).to eq({})
+
+      described_class.perform(klass, "some_public_method", klass.private_instance_methods, class_method: false)
+      described_class.perform(klass, "some_class_method",  klass.private_methods,          class_method: true)
+
+      expect(described_class.added_methods).to eq(
+        {
+          "SomeRandomClass"=>
+          {
+            "InstanceMethod_some_public_method" => [File.expand_path(__FILE__), $instance_method_line_number],
+            "ClassMethod_some_class_method"     => [File.expand_path(__FILE__), $class_method_line_number]
+          }
+        }
+      )
+    end
+  end
+
   describe ".perform" do
     context "with a class with a private method" do
-      let(:klass) { SomeAnonymousClass }
-      let(:some_anonymous_instance) { klass.new }
-
-      before do
-        allow_any_instance_of(described_class).to receive(:exclude?) do
-          klass != SomeAnonymousClass
-        end
-
-        allow(Delfos::ExecutionChain).to receive(:pop)
-      end
-
       it "includes public methods" do
         expect(Delfos::MethodLogging).to receive(:log)
         described_class.perform(klass, "some_public_method", klass.private_instance_methods, class_method: false)
 
-        some_anonymous_instance.some_public_method
+        some_random_instance.some_public_method
       end
 
       it "excludes private methods" do
@@ -47,18 +78,18 @@ describe Delfos::Patching do
 
         described_class.perform(klass, "some_private_method", klass.private_instance_methods, class_method: false)
 
-        some_anonymous_instance.send(:some_private_method)
+        some_random_instance.send(:some_private_method)
       end
 
       it "sends the correct args to the method logger" do
         expect(Delfos::MethodLogging).to receive(:log) do |object, args, keyword_args, block, class_method, stack, call_site_binding, original_method|
-          expect(object).to be_a SomeAnonymousClass
+          expect(object).to be_a SomeRandomClass
           expect(original_method.name).to eq :some_public_method
         end
 
         described_class.perform(klass, "some_public_method", klass.private_instance_methods, class_method: false)
 
-        some_anonymous_instance.some_public_method
+        some_random_instance.some_public_method
       end
     end
   end

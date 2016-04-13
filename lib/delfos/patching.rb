@@ -12,7 +12,7 @@ module Delfos
 
       def method_definition_for(klass, key)
         # Find method definitions defined in klass or its ancestors
-        super_klass = eval(klass).ancestors.detect do |k|
+        super_klass = klass.ancestors.detect do |k|
           added_methods[k.to_s]
         end
 
@@ -22,6 +22,13 @@ module Delfos
     end
 
     attr_reader :klass, :name, :private_methods, :class_method
+
+    def initialize(klass, name, private_methods, class_method)
+      @klass = klass
+      @name = name
+      @private_methods = private_methods
+      @class_method = class_method
+    end
 
     # Redefine the method (only once) at runtime to enabling logging to Neo4j
     def setup
@@ -40,12 +47,6 @@ module Delfos
       end
     end
 
-    def initialize(klass, name, private_methods, class_method)
-      @klass = klass
-      @name = name
-      @private_methods = private_methods
-      @class_method = class_method
-    end
 
     private
 
@@ -56,7 +57,6 @@ module Delfos
         method_to_call.call(*args, **keyword_args, &block)
       end
     end
-
 
     def original_method
       @original_method ||= class_method ? klass.singleton_method(name) : klass.instance_method(name)

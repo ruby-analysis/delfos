@@ -26,12 +26,10 @@ module Unstubbing
   module InstanceMethods
     def initialize(*args)
       super(*args)
-      self.class.add_instance_to_unstub!(self)
+      self.class.add_instance_to_unstub!(self) unless bail?
     end
 
-
-    # See `Delfos::Patching#setup` to understand how this method is the
-    # inverse of that one.
+    # This method is the inverse of `Delfos::Patching#setup`
     def unstub!
       original = original_method
       class_method = class_method()
@@ -39,8 +37,7 @@ module Unstubbing
 
       method_defining_method.call(name) do |*args, **keyword_args, &block|
         method_to_call = class_method ? original : original.bind(self)
-        result = performer.call(method_to_call, args, keyword_args, block)
-        result
+        performer.call(method_to_call, args, keyword_args, block)
       end
     end
   end

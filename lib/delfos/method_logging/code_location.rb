@@ -25,7 +25,7 @@ module Delfos
         def method_definition_for(klass, class_method, method_name)
           key = key_from(class_method, method_name)
 
-          Delfos::Patching.method_definition_for(klass.to_s,key)
+          Delfos::Patching.method_definition_for(klass, key)
         end
 
         private
@@ -71,7 +71,11 @@ module Delfos
       end
 
       def klass
-        name = klass_for(object).name || "__AnonymousClass"
+        klass_for(object)
+      end
+
+      def klass_name
+        name = klass.name || "__AnonymousClass"
         name.tr ":", "_"
       end
 
