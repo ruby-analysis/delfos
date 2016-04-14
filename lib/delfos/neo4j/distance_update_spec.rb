@@ -2,7 +2,7 @@
 require_relative "distance_update"
 require_relative "informer"
 require_relative "../../delfos"
-require "neo4j"
+require "neo4j-core"
 
 describe Delfos::Neo4j::DistanceUpdate do
   def preload_graph!

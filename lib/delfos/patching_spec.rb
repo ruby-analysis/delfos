@@ -45,7 +45,7 @@ describe Delfos::Patching do
     after(:each) do
       described_class.unstub_all!
     end
-    
+
     it do
       expect(described_class.added_methods).to eq({})
 
