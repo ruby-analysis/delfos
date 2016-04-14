@@ -3,7 +3,6 @@ $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 
 require "byebug"
 require "delfos"
-require "neo4j"
 
 RSpec.configure do |c|
   c.before(:suite) do
