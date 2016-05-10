@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 require_relative "../distance/calculation"
+require_relative "query_execution"
+require "json"
 
 module Delfos
   module Neo4j
@@ -12,12 +14,17 @@ module Delfos
             (call_site)    -  [:CALLS]    -> (called),
             (called_klass) -  [:OWNS]     -> (called)
 
-          RETURN klass, call_site, method, called, called_klass
+          RETURN
+            head(labels(klass)),
+            call_site, id(call_site),
+            method,
+            called, id(called),
+            head(labels(called_klass))
         QUERY
 
-        result = ::Neo4j::Session.query(query)
+        results = Delfos::Neo4j::QueryExecution.execute(query)
 
-        update(result)
+        update(results)
       end
 
       def determine_full_path(f)
@@ -32,21 +39,21 @@ module Delfos
 
       private
 
-      def update(result)
-        result.each do |r|
-          start  = determine_full_path r.call_site.props[:file]
-          finish = determine_full_path r.called.props[:file]
+      def update(results)
+        results.map do |klass, call_site, call_site_id, meth, called, called_id, called_klass|
+          start  = determine_full_path call_site["file"]
+          finish = determine_full_path called["file"]
 
           calc = Delfos::Distance::Calculation.new(start, finish)
 
-          perform_query(calc, r)
+          perform_query(calc, call_site_id, called_id)
         end
       end
 
-      def perform_query(calc, r)
-        ::Neo4j::Session.query <<-QUERY
-          START call_site = node(#{r.call_site.neo_id}),
-                called    = node(#{r.called.neo_id})
+      def perform_query(calc, call_site_id, called_id)
+        Delfos::Neo4j::QueryExecution.execute <<-QUERY
+          START call_site = node(#{call_site_id}),
+                called    = node(#{called_id})
 
            MERGE (call_site) - #{rel_for(calc)} -> (called)
         QUERY
@@ -61,7 +68,6 @@ module Delfos
            ]
         REL
       end
-
     end
   end
 end

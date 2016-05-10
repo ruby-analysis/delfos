@@ -17,7 +17,8 @@ describe "integration" do
     b = B.new
     a.some_method(1, "", a, something: b)
 
-    result = Neo4j::Session.query <<-QUERY
+    a_klass_count, b_klass_count, call_site_1_count, call_site_2_count,
+      instance_method_1_count, instance_method_2_count, execution_count = Delfos::Neo4j::QueryExecution.execute(<<-QUERY).first
       MATCH (a:A)-[r:OWNS]->(im1:InstanceMethod{name: "some_method"})
       MATCH (b:B)-[r2:OWNS]->(im2:InstanceMethod{name: "another_method"})
       MATCH (im1:InstanceMethod)-[:CONTAINS]->(cs1:CallSite)-[:CALLS]->(im2:InstanceMethod)
@@ -40,12 +41,12 @@ describe "integration" do
         count(e)
     QUERY
 
-    expect(result.first["count(a)"]).to eq 1
-    expect(result.first["count(b)"]).to eq 1
-    expect(result.first["count(im1)"]).to eq 1
-    expect(result.first["count(cs1)"]).to eq 1
-    expect(result.first["count(cs2)"]).to eq 1
-    expect(result.first["count(im2)"]).to eq 1
-    expect(result.first["count(e)"]).to eq 1
+    expect(a_klass_count).to eq 1
+    expect(b_klass_count).to eq 1
+    expect(call_site_1_count).to eq 1
+    expect(call_site_2_count).to eq 1
+    expect(instance_method_1_count).to eq 1
+    expect(instance_method_2_count).to eq 1
+    expect(execution_count).to eq 1
   end
 end

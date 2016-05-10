@@ -12,7 +12,7 @@ module Delfos
       def execute_query(*args)
         query = query_for(*args)
 
-        QueryExecutor.execute(query)
+        QueryExecution.execute(query)
       end
 
       def query_for(args, call_site, called_code)

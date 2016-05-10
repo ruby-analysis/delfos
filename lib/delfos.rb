@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require "delfos/version"
 require "delfos/method_logging"
+require "delfos/neo4j/query_execution"
 require "delfos/neo4j/informer"
 
 module Delfos
@@ -11,9 +12,7 @@ module Delfos
 
     def wipe_db!
       Delfos.setup!(application_directories: [])
-      ::Neo4j::Session.open(*Delfos.neo4j_config)
-
-      ::Neo4j::Session.query <<-QUERY
+      Delfos::Neo4j::QueryExecution.execute <<-QUERY
         MATCH (m)-[rel]->(n)
         DELETE m,rel,n
       QUERY

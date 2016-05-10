@@ -8,7 +8,7 @@ module Delfos
       end
 
       def save!
-        Neo4j::QueryExecutor.execute query
+        Neo4j::QueryExecution.execute query
       end
 
       private

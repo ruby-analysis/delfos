@@ -27,7 +27,6 @@ Gem::Specification.new do |spec|
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
-  spec.add_dependency "neo4j-core"
   spec.add_dependency "binding_of_caller"
 
   spec.add_development_dependency "what_weve_got_here_is_an_error_to_communicate"

@@ -22,7 +22,6 @@ gem 'delfos'
 
 #Delfos is very slow, so we recommend only setting up when required
 if ENV["delfos"]
-  require "delfos/rails"
   Delfos.setup!
 end
 
