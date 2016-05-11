@@ -29,11 +29,8 @@ module Delfos
 
     def remove_patching!
       load "delfos/remove_patching.rb"
-      begin
-        Delfos::Patching.instance_eval { @added_methods = nil }
-      rescue
-        nil
-      end
+
+      Delfos::Patching.instance_eval { @added_methods = nil }
     end
 
     def setup!(
