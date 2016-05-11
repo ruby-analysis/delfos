@@ -20,7 +20,9 @@ module Delfos
 
     def reset!
       @application_directories = []
-      @neo4j_config = nil
+      @neo4j_host = nil
+      @neo4j_username = nil
+      @neo4j_password = nil
       @logger = nil
       remove_patching!
     end
@@ -35,16 +37,18 @@ module Delfos
     end
 
     def setup!(
-      connection_type: :server_db,
       logger: Delfos::Neo4j::Informer.new,
-      host:"http://localhost:7474",
-      auth: { basic_auth: { username: "neo4j", password: "password" } },
+      neo4j_host: "http://localhost:7474",
+      neo4j_username: "neo4j",
+      neo4j_password: "password",
       application_directories: nil)
 
       @application_directories = application_directories.map{|f| Pathname.new(File.expand_path(f.to_s))}
       @logger = logger
 
-      @neo4j_config = [connection_type, host, auth]
+      @neo4j_host     = neo4j_host
+      @neo4j_username = neo4j_username
+      @neo4j_password = neo4j_password
 
       perform_patching!
     end
@@ -53,6 +57,6 @@ module Delfos
       load "delfos/perform_patching.rb"
     end
 
-    attr_reader :application_directories, :neo4j_config
+    attr_reader :application_directories, :neo4j_host, :neo4j_username, :neo4j_password
   end
 end

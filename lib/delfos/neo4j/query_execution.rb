@@ -25,7 +25,7 @@ module Delfos
 
         def request_for(query)
           Net::HTTP::Post.new(uri.request_uri).tap do |request|
-            request.basic_auth(username, password)
+            request.basic_auth(Delfos.neo4j_username, Delfos.neo4j_password)
             request.content_type = 'application/json'
 
             request.body = <<-BODY.gsub(/^\s+/, "").chomp
@@ -35,25 +35,7 @@ module Delfos
         end
 
         def uri
-          @uri ||= URI.parse "#{server_url}/db/data/transaction/commit"
-        end
-
-        def server_url
-          _, server_url, _ = Delfos.neo4j_config
-
-          server_url
-        end
-
-        def username
-          @username ||= options[:basic_auth][:username]
-        end
-
-        def password
-          @password ||= options[:basic_auth][:password]
-        end
-
-        def options
-          @options ||= Delfos.neo4j_config.last
+          @uri ||= URI.parse "#{Delfos.neo4j_host}/db/data/transaction/commit"
         end
       end
     end
