@@ -99,11 +99,9 @@ module Delfos
     end
 
     class CallSiteParsing
-      # This magic number is determined based on the specific implementation now
-      # E.g. if the line
-      # where we call this `call_site_binding.of_caller(stack_index + STACK_OFFSET).eval('self')`
-      # is to be extracted into another method we will get a failing test and have to increment
-      # the value
+      # This magic number is based on the implementation within this file.
+      # If the line with `call_site_binding.of_caller(stack_index + STACK_OFFSET).receiver`
+      # is moved up or down the call stack a test fails and we have to change `STACK_OFFSET`
       STACK_OFFSET = 5
 
       attr_reader :stack, :call_site_binding

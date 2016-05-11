@@ -6,8 +6,6 @@ Delfos::Patching.extend Unstubbing::ClassMethods
 Delfos::Patching.prepend Unstubbing::InstanceMethods
 
 describe Delfos::Patching do
-
-
   class SomeRandomClass
     $class_method_line_number = __LINE__ + 1
     def self.some_class_method
