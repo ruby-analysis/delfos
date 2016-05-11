@@ -24,13 +24,17 @@ module Delfos
         end
 
         def request_for(query)
+          build_request do
+            "{\"statements\": [{\"statement\": #{query.inspect} }]}"
+          end
+        end
+
+        def build_request
           Net::HTTP::Post.new(uri.request_uri).tap do |request|
             request.basic_auth(Delfos.neo4j_username, Delfos.neo4j_password)
             request.content_type = 'application/json'
 
-            request.body = <<-BODY.gsub(/^\s+/, "").chomp
-              {"statements": [ { "statement": #{query.inspect} }]}
-            BODY
+            request.body = yield
           end
         end
 
