@@ -40,6 +40,9 @@ describe Delfos::Patching do
   end
 
   describe ".added_methods" do
+    let(:method_a) { SomeRandomClass.instance_method :some_public_method }
+    let(:method_b) { SomeRandomClass.method :some_class_method  }
+
     after(:each) do
       described_class.unstub_all!
     end
@@ -50,15 +53,13 @@ describe Delfos::Patching do
       described_class.perform(klass, "some_public_method", klass.private_instance_methods, class_method: false)
       described_class.perform(klass, "some_class_method",  klass.private_methods,          class_method: true)
 
-      expect(described_class.added_methods).to eq(
-        {
-          "SomeRandomClass"=>
-          {
-            "InstanceMethod_some_public_method" => [File.expand_path(__FILE__), $instance_method_line_number],
-            "ClassMethod_some_class_method"     => [File.expand_path(__FILE__), $class_method_line_number]
-          }
-        }
-      )
+      result = described_class.added_methods
+
+      expect(result["SomeRandomClass"]["InstanceMethod_some_public_method"].source_location).
+        to eq [File.expand_path(__FILE__), $instance_method_line_number]
+
+      expect(result["SomeRandomClass"]["ClassMethod_some_class_method"].source_location).
+        to eq [File.expand_path(__FILE__), $class_method_line_number]
     end
   end
 

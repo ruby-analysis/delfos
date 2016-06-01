@@ -31,6 +31,15 @@ end
 
 RSpec.configure do |c|
   c.include DelfosSpecHelpers
+  c.expect_with :rspec do |c|
+    c.syntax = :expect
+  end
+
+  c.mock_with :rspec do |c|
+    c.syntax = :expect
+  end
+
+
 
   c.before(:suite) do
     Delfos.wipe_db!

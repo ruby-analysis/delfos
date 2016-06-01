@@ -40,7 +40,12 @@ module Delfos
       neo4j_password: "password",
       application_directories: nil)
 
-      @application_directories = application_directories.map{|f| Pathname.new(File.expand_path(f.to_s))}
+      @application_directories = if application_directories.is_a?(Proc)
+        application_directories
+      else
+        Array(application_directories).map{|f| Pathname.new(File.expand_path(f.to_s))}
+      end
+
       @logger = logger
 
       @neo4j_host     = neo4j_host

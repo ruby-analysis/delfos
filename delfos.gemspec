@@ -29,9 +29,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.add_dependency "binding_of_caller"
 
-  spec.add_development_dependency "what_weve_got_here_is_an_error_to_communicate"
   spec.add_development_dependency "bundler", "~> 1.11"
+  spec.add_development_dependency "pry-byebug"
   spec.add_development_dependency "byebug"
+  spec.add_development_dependency "activesupport", ">=4.0"
   spec.add_development_dependency "awesome_print"
   spec.add_development_dependency "rake", "~> 11.1.1"
   spec.add_development_dependency "rspec", "~> 3.4.0"

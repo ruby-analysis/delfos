@@ -9,9 +9,22 @@ module Delfos
     module QueryExecution
       class << self
         def execute(query, url=nil)
+          return unless query.length > 0
           result = response_for(query)
+
           result = JSON.parse result.body
-          result["results"].first["data"].map{|r| r["row"]}
+
+          results = result["results"]
+
+          if results
+            result = results.first
+            if result
+              data = result["data"]
+              if data
+                data .map{|r| r["row"]}
+              end
+            end
+          end
         end
 
         private

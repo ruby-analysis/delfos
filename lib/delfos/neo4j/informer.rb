@@ -95,7 +95,7 @@ module Delfos
         end
 
         def assign(klass, prefix)
-          klass = klass.to_s
+          klass = klass.to_s.gsub(/:/, "_")
           val = self[klass]
           return val if val
 

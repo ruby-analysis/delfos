@@ -9,8 +9,12 @@ class BasicObject
   end
 
   def self.singleton_method_added(name)
-    return if name == __method__
+    return if name == :method_added || name == __method__
 
     ::Delfos::Patching.perform(self, name, private_methods, class_method: true)
+  end
+
+  def self.inherited(sub_klass)
+    ::Delfos::Patching.notify_inheritance(self, sub_klass)
   end
 end

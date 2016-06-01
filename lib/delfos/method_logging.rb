@@ -64,7 +64,12 @@ module Delfos
       def exclude_file_from_logging?(file)
         check_setup!
         path = Pathname.new(File.expand_path file)
-        !CommonPath.included_in?(path, Delfos.application_directories)
+
+        if Delfos.application_directories.is_a? Proc
+          Delfos.application_directories.call(path)
+        else
+          !CommonPath.included_in?(path, Delfos.application_directories)
+        end
       end
     end
   end

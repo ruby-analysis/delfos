@@ -20,10 +20,12 @@ describe Delfos::MethodLogging::Args do
 
   let(:added_methods) do
     {
-      "A" => { "instance_method_some_method"    => [File.expand_path("fixtures/a.rb"), 4] },
-      "B" => { "instance_method_another_method" => [File.expand_path("fixtures/b.rb"), 2] },
+      "A" => { "instance_method_some_method"    =>  method_a},
+      "B" => { "instance_method_another_method" =>  method_b},
     }
   end
+  let(:method_a) { double "method a", source_location: [File.expand_path("fixtures/a.rb"), 4] }
+  let(:method_b) { double "method b", source_location: [File.expand_path("fixtures/b.rb"), 2] }
 
   before do
     path = Pathname.new(File.expand_path(__FILE__)) + "../../../../fixtures"

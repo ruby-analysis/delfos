@@ -19,13 +19,15 @@ describe Delfos::MethodLogging do
 
     let(:a_path) { File.expand_path "./fixtures/a.rb" }
     let(:b_path) { File.expand_path "./fixtures/b.rb" }
+    let(:method_a) { double "method a", source_location: [a_path, 4] }
+    let(:method_b) { double "method b", source_location: [b_path, 2] }
 
     before do
       expect(Delfos::Patching).
         to receive(:added_methods).
         and_return(
-          "A" => { instance_method_some_method: [a_path, 4] },
-          "B" => { instance_method_another_method: [b_path, 2] }).
+          "A" => { instance_method_some_method:  method_a},
+          "B" => { instance_method_another_method: method_b }).
         at_least(:once)
 
       Delfos.logger = logger
