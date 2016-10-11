@@ -1,9 +1,9 @@
 # frozen_string_literal: true
-require_relative "code_location"
+require_relative "call_site"
 
-describe Delfos::MethodLogging::CodeLocation do
+describe Delfos::MethodLogging::CallSite do
   describe "#file" do
-    let(:code_location) { described_class.new(anything, anything, anything, filename, (1..1000).to_a.sample) }
+    let(:call_site) { described_class.new(anything, anything, anything, filename, (1..1000).to_a.sample) }
     let(:dir) { "/Users/mark/code/some_app/" }
 
     before do
@@ -17,7 +17,7 @@ describe Delfos::MethodLogging::CodeLocation do
       let(:filename) { "#{dir}app/models/user.rb" }
 
       it do
-        expect(code_location.file).to eq "app/models/user.rb"
+        expect(call_site.file).to eq "app/models/user.rb"
       end
     end
 
@@ -25,7 +25,7 @@ describe Delfos::MethodLogging::CodeLocation do
       let(:filename) { "#{dir}lib/some_file.rb" }
 
       it do
-        expect(code_location.file).to eq "lib/some_file.rb"
+        expect(call_site.file).to eq "lib/some_file.rb"
       end
     end
 
@@ -33,7 +33,7 @@ describe Delfos::MethodLogging::CodeLocation do
       let(:filename) { "/some_big/long/path/lib/any_file.rb" }
 
       it do
-        expect(code_location.file).to eq "/some_big/long/path/lib/any_file.rb"
+        expect(call_site.file).to eq "/some_big/long/path/lib/any_file.rb"
       end
     end
   end

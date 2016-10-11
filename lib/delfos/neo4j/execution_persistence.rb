@@ -31,7 +31,7 @@ module Delfos
         <<-QUERY
         #{method_query(cs, i)}
 
-      MERGE
+        MERGE
         (m#{i})
 
         -[:CONTAINS]->

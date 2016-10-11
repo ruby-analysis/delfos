@@ -4,7 +4,7 @@ require "forwardable"
 require "binding_of_caller"
 require_relative "common_path"
 require_relative "method_logging/klass_determination"
-require_relative "method_logging/code_location"
+require_relative "method_logging/call_site"
 require_relative "method_logging/args"
 require_relative "execution_chain"
 
@@ -32,14 +32,14 @@ module Delfos
         called_method)
         check_setup!
 
-        call_site = CodeLocation.from_call_site(stack, call_site_binding)
+        call_site = CallSite.from(stack, call_site_binding)
         Delfos::ExecutionChain.push(call_site)
 
         return unless call_site
 
         args = Args.new(args.dup, keyword_args.dup)
 
-        called_code = CodeLocation.from_called(called_object, called_method, class_method)
+        called_code = CallSite.from_called(called_object, called_method, class_method)
 
         Delfos.logger.debug(args, call_site, called_code)
       end

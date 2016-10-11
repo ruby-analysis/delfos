@@ -1,6 +1,6 @@
 class SomeKlass
   class << self
-    def inspect
+    def to_s
       name
     end
 

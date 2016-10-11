@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 require_relative "method_logging"
-require_relative "patching"
+require_relative "patching/patching"
 require_relative "../../fixtures/a"
 require_relative "../../fixtures/b"
 
@@ -117,7 +117,7 @@ describe Delfos::MethodLogging do
 
       SomeObject.new.some_method do |o, call_site_binding|
         object = o
-        call_site_result = Delfos::MethodLogging::CodeLocation.from_call_site(caller, call_site_binding)
+        call_site_result = Delfos::MethodLogging::CallSite.from(caller, call_site_binding)
       end
 
       # sanity check

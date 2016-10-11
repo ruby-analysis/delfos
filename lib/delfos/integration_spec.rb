@@ -58,14 +58,19 @@ describe "integration" do
 
     context "without Delfos enabled" do
       before do
-        load "./fixtures/sub_classes/sub_classes.rb"
+        load "./lib/delfos/patching/remove_patching.rb"
       end
+      # This is just to replicate a bug created by delfos in the ManageIQ test
+      # suite where the sub class/super class metaprogramming was causing an
+      # infinite loop
+      it "doessn't hang forever" do
+        Timeout.timeout 3 do
+          load "./fixtures/sub_classes/sub_classes.rb"
+          expect(SomeKlass).to be_a Class
+          expect(SomeSubKlass).to be_a Class
 
-      it do
-        expect(SomeKlass).to be_a Class
-        expect(SomeSubKlass).to be_a Class
-
-        expect(SomeKlass.new).to be_a SomeSubKlass
+          expect(SomeKlass.new).to be_a SomeSubKlass
+        end
       end
     end
 

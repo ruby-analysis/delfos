@@ -10,6 +10,7 @@ describe Delfos::Neo4j::DistanceUpdate do
     dirs = ["fixtures/ruby/"]
     Delfos.setup! application_directories: dirs
 
+    #TODO - insert this data in a way that doesn't depend on the rest of the codebase
     load "fixtures/ruby/efferent_coupling.rb"
     EfferentCoupling.new.lots_of_coupling
   end

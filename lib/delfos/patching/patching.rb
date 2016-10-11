@@ -1,4 +1,9 @@
 # frozen_string_literal: true
+require "pry"
+require 'pry-nav'
+
+require_relative "added_methods"
+
 module Delfos
   class Patching
     class << self
@@ -7,34 +12,15 @@ module Delfos
       end
 
       def notify_inheritance(klass, sub_klass)
-        if added_methods[klass.to_s]
-          added_methods[sub_klass.to_s] ||= {}
-
-          added_methods[klass.to_s].each do |k,m|
-            if k[/^ClassMethod_/]
-              unbound = added_methods[klass.to_s][k].unbind
-              bound = unbound.bind(sub_klass)
-
-              added_methods[sub_klass.to_s][k] = bound
-            end
-          end
-        end
+        added_methods.set_sub_klass(klass, sub_klass)
       end
 
       def added_methods
-        @added_methods ||= {}
+        @added_methods ||= AddedMethods.new
       end
 
       def method_definition_for(klass, key)
-        # Find method definitions defined in klass or its ancestors
-        super_klass = klass.ancestors.detect do |k|
-          added_methods[k.to_s]
-        end
-
-        klass_hash = added_methods[super_klass.to_s] || {}
-        method_definition = klass_hash[key]
-        return unless method_definition
-        method_definition.source_location
+        added_methods.method_definition_for(klass, key)
       end
     end
 
@@ -76,7 +62,7 @@ module Delfos
           if original.receiver == instance
             original
           else
-            Delfos::Patching.added_methods[instance.to_s]["ClassMethod_#{original.name}"]
+            self.class.added_methods.fetch_class_method(original, instance.to_s)
           end
         else
           original.bind(instance)
@@ -107,8 +93,7 @@ module Delfos
     def ensure_method_recorded!
       return true if bail?
 
-      self.class.added_methods[klass.to_s] ||= {}
-      self.class.added_methods[klass.to_s][key] = original_method
+      self.class.added_methods.append(klass, key, original_method)
 
       false
     end
@@ -118,10 +103,7 @@ module Delfos
     end
 
     def method_has_been_added?
-      return false unless self.class.added_methods[self]
-      return false unless self.class.added_methods[self][klass]
-
-      self.class.added_methods[klass][key]
+      self.class.added_methods.added?(klass, key)
     end
 
     def private_method?

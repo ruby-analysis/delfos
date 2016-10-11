@@ -3,15 +3,16 @@ require_relative "klass_determination"
 
 module Delfos
   module MethodLogging
-    class CodeLocation
+    class CallSite
       include KlassDetermination
 
       class << self
-        def from_call_site(stack, call_site_binding)
+        def from(stack, call_site_binding)
           CallSiteParsing.new(stack, call_site_binding).perform
         end
 
         def from_called(object, called_method, class_method)
+          return unless called_method.respond_to? :source_location
           file, line_number = called_method.source_location
           return unless file && line_number
 
@@ -115,7 +116,7 @@ module Delfos
         file, line_number, method_name = method_details
         return unless current && file && line_number && method_name
 
-        CodeLocation.new(object, method_name.to_s, class_method, file, line_number)
+        CallSite.new(object, method_name.to_s, class_method, file, line_number)
       end
 
       private

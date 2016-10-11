@@ -2,8 +2,8 @@ require_relative "patching"
 require_relative "patching_unstubbing_spec_helper"
 
 #HACK this is awful
-Delfos::Patching.extend Unstubbing::ClassMethods
-Delfos::Patching.prepend Unstubbing::InstanceMethods
+Delfos::Patching.extend Delfos::Patching::Unstubbing::ClassMethods
+Delfos::Patching.prepend Delfos::Patching::Unstubbing::InstanceMethods
 
 describe Delfos::Patching do
   class SomeRandomClass
