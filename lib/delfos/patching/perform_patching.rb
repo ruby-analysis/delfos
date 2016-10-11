@@ -17,7 +17,9 @@ class BasicObject
   def self.singleton_method_added(name)
     return if name == :method_added || name == __method__
 
-    if name == :inherited
+    iv_name = "@__delfos_inherited_defined_#{self.name}"
+    if name == :inherited && instance_variable_get(iv_name).nil?
+      instance_variable_set(iv_name, true)
       original = method(name)
 
       define_singleton_method name do |*args, &block|

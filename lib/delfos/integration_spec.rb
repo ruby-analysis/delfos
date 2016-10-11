@@ -76,8 +76,10 @@ describe "integration" do
 
     context "with Delfos enabled" do
       before do
-        Delfos.setup! application_directories: ["./fixtures/sub_classes"]
-        load "./fixtures/sub_classes/sub_classes.rb"
+        Timeout.timeout 3 do
+          Delfos.setup! application_directories: ["./fixtures/sub_classes"]
+          load "./fixtures/sub_classes/sub_classes.rb"
+        end
       end
 
       it do
