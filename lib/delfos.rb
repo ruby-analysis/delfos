@@ -16,6 +16,11 @@ module Delfos
         MATCH (m)-[rel]->(n)
         DELETE m,rel,n
       QUERY
+
+      Delfos::Neo4j::QueryExecution.execute <<-QUERY
+        MATCH (m)
+        DELETE m
+      QUERY
     end
 
     def reset!

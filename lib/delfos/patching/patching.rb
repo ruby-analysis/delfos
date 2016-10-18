@@ -45,10 +45,11 @@ module Delfos
       method_defining_method.call(name) do |*args, **keyword_args, &block|
         method_to_call = method_selector.call(self, class_method, original)
 
+
         MethodLogging.log(self, args, keyword_args, block, class_method, caller.dup, binding.dup, method_to_call)
 
         result = performer.call(method_to_call, args, keyword_args, block)
-        Delfos::ExecutionChain.pop
+        ExecutionChain.pop
         result
       end
     end
@@ -62,7 +63,9 @@ module Delfos
           if original.receiver == instance
             original
           else
-            self.class.added_methods.fetch_class_method(original, instance.to_s)
+            result = self.class.added_methods.fetch_class_method(original, instance.to_s)
+            binding.pry if result.nil?
+            result
           end
         else
           original.bind(instance)

@@ -1,11 +1,11 @@
 class SomeKlass
   class << self
-    def to_s
-      name
+    def something
+      something_else
     end
 
-    def name
-      'SomeKlass'
+    def something_else
+      'something else'
     end
 
     def new
@@ -19,7 +19,7 @@ class SomeKlass
 end
 
 class SomeSubKlass < SomeKlass
-  def self.name
-    'SomeSubKlass'
+  def self.something
+    'some sub class class method call'
   end
 end
