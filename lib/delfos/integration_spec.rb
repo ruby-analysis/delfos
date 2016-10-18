@@ -80,10 +80,10 @@ describe "integration" do
       # This is just to replicate a bug created by delfos in the ManageIQ test
       # suite where the sub class/super class metaprogramming was causing an
       # infinite loop
-        #Timeout.timeout 3 do
+        Timeout.timeout 3 do
           Delfos.setup! application_directories: ["./fixtures/sub_classes"]
           load "./fixtures/sub_classes/sub_classes.rb"
-        #end
+        end
       end
 
       it do
