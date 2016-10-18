@@ -58,7 +58,7 @@ describe "integration" do
 
     context "without Delfos enabled" do
       before do
-        load "./lib/delfos/patching/remove_patching.rb"
+        load "./lib/delfos/patching/remove.rb"
       end
 
       # This is just to replicate a bug created by delfos in the ManageIQ test

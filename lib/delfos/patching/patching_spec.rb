@@ -1,5 +1,5 @@
 require_relative "patching"
-require_relative "patching_unstubbing_spec_helper"
+require_relative "unstubbing_spec_helper"
 
 #HACK this is awful
 Delfos::Patching.extend Delfos::Patching::Unstubbing::ClassMethods

@@ -6,8 +6,8 @@ describe Delfos do
   describe "#application_directories=" do
     it "requires the monkey patching file" do
       dir = ["some/dir"]
-      expect(Delfos).to receive(:load).with "delfos/patching/perform_patching.rb"
-      allow(Delfos).to receive(:load).with "delfos/patching/remove_patching.rb"
+      expect(Delfos).to receive(:load).with "delfos/patching/perform.rb"
+      allow(Delfos).to receive(:load).with "delfos/patching/remove.rb"
 
       Delfos.setup!(application_directories: dir)
 
