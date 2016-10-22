@@ -2,6 +2,7 @@
 require_relative "../../delfos"
 require_relative "../common_path"
 require_relative "klass_determination"
+require_relative "../patching/added_methods"
 
 module Delfos
   module MethodLogging
@@ -46,7 +47,8 @@ module Delfos
       end
 
       def method_sources(klass)
-        (Delfos::Patching.added_methods[klass.to_s] || {}).values.map(&:source_location).map(&:first)
+        (Delfos::Patching::AddedMethods.fetch(klass.to_s) || {}).
+          values.map(&:source_location).map(&:first)
       end
     end
   end

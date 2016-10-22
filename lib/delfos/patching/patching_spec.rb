@@ -1,8 +1,9 @@
 require_relative "patching"
+require_relative "added_methods"
 require_relative "unstubbing_spec_helper"
 
 #HACK this is awful
-Delfos::Patching.extend Delfos::Patching::Unstubbing::ClassMethods
+Delfos::Patching.extend  Delfos::Patching::Unstubbing::ClassMethods
 Delfos::Patching.prepend Delfos::Patching::Unstubbing::InstanceMethods
 
 describe Delfos::Patching do
@@ -22,10 +23,6 @@ describe Delfos::Patching do
       "private"
     end
   end
-
-  class SomeSubClass
-  end
-
 
   let(:klass) { SomeRandomClass }
   let(:some_random_instance) { klass.new }
@@ -48,7 +45,7 @@ describe Delfos::Patching do
     end
 
     it do
-      expect(described_class.added_methods).to eq({})
+      expect(Delfos::Patching::AddedMethods.instance.added_methods).to eq({})
 
       described_class.perform(klass, "some_public_method", klass.private_instance_methods, class_method: false)
       described_class.perform(klass, "some_class_method",  klass.private_methods,          class_method: true)

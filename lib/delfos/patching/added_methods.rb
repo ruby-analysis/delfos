@@ -1,19 +1,50 @@
+require "Forwardable"
 module Delfos
   class Patching # TODO: make this a module and rename the Patching class
-    class AddedMethods < ::Hash
+    class AddedMethods
+      class << self
+        extend Forwardable
+
+        def_delegators :instance,
+          :method_sources_for,
+          :append,
+          :set_sub_klass,
+          :fetch_class_method,
+          :fetch,
+          :method_definition_for, :added?
+
+        def instance
+          @instance ||= new
+        end
+      end
+
+      def initialize
+        @added_methods = {}
+      end
+
+      attr_reader :added_methods
+
+      def fetch(key)
+        added_methods[key]
+      end
+
+      def method_sources_for(klass)
+        (added_methods[klass.to_s] || {}).values.map(&:source_location).map(&:first)
+      end
+
       def set_sub_klass(klass, sub_klass)
         klass_key, sub_klass_key = klass.to_s, sub_klass.to_s
 
-        return unless self[klass_key]
+        return unless added_methods[klass_key]
 
         for_klass(sub_klass_key)
 
         for_klass(klass_key).each do |k, m|
           if k.match(/^ClassMethod_/)
-            unbound = self[klass_key][k].unbind
+            unbound = added_methods[klass_key][k].unbind
             bound = unbound.bind(sub_klass)
 
-            self[sub_klass_key][k] = bound
+            added_methods[sub_klass_key][k] = bound
           end
         end
       end
@@ -21,7 +52,7 @@ module Delfos
       def method_definition_for(klass, key)
         # Find method definitions defined in klass or its ancestors
         super_klass = klass.ancestors.detect do |k|
-          self[k.to_s]
+          added_methods[k.to_s]
         end
 
         klass_hash = for_klass(super_klass)
@@ -35,10 +66,10 @@ module Delfos
       end
 
       def added?(klass, key)
-        return false unless self[klass]
+        return false unless added_methods[klass]
         return false unless for_klass(klass)[key]
 
-        self[klass][key]
+        added_methods[klass][key]
       end
 
       def fetch_class_method(original_method, klass)
@@ -56,8 +87,8 @@ module Delfos
       end
 
       def for_klass(klass)
-        self[klass.to_s] ||= {}
-        self[klass.to_s]
+        added_methods[klass.to_s] ||= {}
+        added_methods[klass.to_s]
       end
     end
   end

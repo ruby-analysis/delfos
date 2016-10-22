@@ -23,12 +23,20 @@ describe Delfos::MethodLogging do
     let(:method_b) { double "method b", source_location: [b_path, 2] }
 
     before do
-      expect(Delfos::Patching).
+      m = lambda do |key|
+      case key
+      when "A"
+        { instance_method_some_method:  method_a}
+      when "B"
+        { instance_method_another_method: method_b }
+      end
+    end
+
+      added_methods = double "added methods", fetch: m
+
+      expect(Delfos::Patching::AddedMethods).
         to receive(:added_methods).
-        and_return(
-          "A" => { instance_method_some_method:  method_a},
-          "B" => { instance_method_another_method: method_b }).
-        at_least(:once)
+        and_return(added_methods)
 
       Delfos.logger = logger
       path_fixtures = Pathname.new(File.expand_path(__FILE__)) + "../../../fixtures"

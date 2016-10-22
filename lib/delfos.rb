@@ -33,7 +33,7 @@ module Delfos
     end
 
     def remove_patching!
-      Delfos::Patching.instance_eval { @added_methods = nil }
+      Delfos::Patching::AddedMethods.instance_eval { @added_methods = nil }
 
       load "delfos/patching/remove.rb"
     end

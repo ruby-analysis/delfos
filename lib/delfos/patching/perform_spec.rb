@@ -42,13 +42,13 @@ describe "patching BasicObject" do
       end
 
       it do
-        result = Delfos::Patching.added_methods["Delfos::Specs::Inheritance::A"]["ClassMethod_a_class_method_to_be_inherited"]
+        result = Delfos::Patching::AddedMethods.instance.added_methods["Delfos::Specs::Inheritance::A"]["ClassMethod_a_class_method_to_be_inherited"]
         expect(result).to be_a Method
 
-        result = Delfos::Patching.added_methods["Delfos::Specs::Inheritance::A"]["InstanceMethod_a_method_to_be_inherited"]
+        result = Delfos::Patching::AddedMethods.instance.added_methods["Delfos::Specs::Inheritance::A"]["InstanceMethod_a_method_to_be_inherited"]
         expect(result).to be_a UnboundMethod
 
-        result = Delfos::Patching.added_methods["Delfos::Specs::Inheritance::B"]["ClassMethod_a_class_method_to_be_inherited"]
+        result = Delfos::Patching::AddedMethods.instance.added_methods["Delfos::Specs::Inheritance::B"]["ClassMethod_a_class_method_to_be_inherited"]
         expect(result).to be_a Method
       end
     end

@@ -22,13 +22,13 @@ Zero gem dependencies.
 
 Delfos by default depends upon a connection to a Neo4j instance for recording data.
 
-## Usage
+##Example Usage
 
 ```ruby
 #Gemfile
 gem 'delfos'
 
-#e.g.  in config/initializers/delfos.rb or equivalent
+#e.g.  in config/initializers/delfos.rb, spec_helper.rb, rails_helper.rb or equivalent
 
 #Delfos is very slow, so we recommend only setting up when required
 if defined?(Delfos) && ENV["DELFOS_ENABLED"]
@@ -181,5 +181,3 @@ The rake task is setup to handle this default and is equivalent to the following
 ```
 NEO4J_URL=http://localhost:7474 NEO4J_USERNAME=username NEO4J_PASSWORD=password bundle exec rspec lib
 ```
-
-

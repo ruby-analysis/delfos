@@ -12,15 +12,7 @@ module Delfos
       end
 
       def notify_inheritance(klass, sub_klass)
-        added_methods.set_sub_klass(klass, sub_klass)
-      end
-
-      def added_methods
-        @added_methods ||= AddedMethods.new
-      end
-
-      def method_definition_for(klass, key)
-        added_methods.method_definition_for(klass, key)
+        AddedMethods.set_sub_klass(klass, sub_klass)
       end
     end
 
@@ -63,9 +55,7 @@ module Delfos
           if original.receiver == instance
             original
           else
-            result = self.class.added_methods.fetch_class_method(original, instance.to_s)
-            binding.pry if result.nil?
-            result
+            AddedMethods.fetch_class_method(original, instance.to_s)
           end
         else
           original.bind(instance)
@@ -96,7 +86,7 @@ module Delfos
     def ensure_method_recorded!
       return true if bail?
 
-      self.class.added_methods.append(klass, key, original_method)
+      AddedMethods.append(klass, key, original_method)
 
       false
     end
@@ -106,7 +96,7 @@ module Delfos
     end
 
     def method_has_been_added?
-      self.class.added_methods.added?(klass, key)
+      AddedMethods.added?(klass, key)
     end
 
     def private_method?

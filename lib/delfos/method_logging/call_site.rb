@@ -26,7 +26,7 @@ module Delfos
         def method_definition_for(klass, class_method, method_name)
           key = key_from(class_method, method_name)
 
-          Delfos::Patching.method_definition_for(klass, key)
+          Delfos::Patching::AddedMethods.method_definition_for(klass, key)
         end
 
         private
