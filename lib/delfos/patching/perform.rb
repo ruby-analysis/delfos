@@ -5,7 +5,7 @@ class BasicObject
   def self.inherited(sub_klass)
     return if self == ::BasicObject or self == ::Object
 
-    ::Delfos::Patching.notify_inheritance(self, sub_klass)
+    ::Delfos::Patching::AddedMethods.set_sub_klass(self, sub_klass)
   end
 
   def self.method_added(name)
@@ -29,7 +29,7 @@ class BasicObject
 
       define_singleton_method name do |*args, &block|
         parent = ancestors.select{|a| a.class == ::Class}[1]
-        ::Delfos::Patching.notify_inheritance(parent, self)
+        AddedMethods.set_sub_klass(parent, self)
 
         original.call(*args, &block)
       end

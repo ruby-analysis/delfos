@@ -8,10 +8,6 @@ module Delfos
       def perform(klass, name, private_methods, class_method:)
         new(klass, name, private_methods, class_method).setup
       end
-
-      def notify_inheritance(klass, sub_klass)
-        AddedMethods.set_sub_klass(klass, sub_klass)
-      end
     end
 
     attr_reader :klass, :name, :private_methods, :class_method
