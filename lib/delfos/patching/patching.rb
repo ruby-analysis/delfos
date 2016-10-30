@@ -1,6 +1,4 @@
 # frozen_string_literal: true
-require "pry"
-require 'pry-nav'
 
 require_relative "added_methods"
 
@@ -37,8 +35,7 @@ module Delfos
       method_defining_method.call(name) do |*args, **keyword_args, &block|
         method_to_call = method_selector.call(self, class_method, original)
 
-
-        MethodLogging.log(self, args, keyword_args, block, class_method, caller.dup, binding.dup, method_to_call)
+        Delfos.method_logging.log(self, args, keyword_args, block, class_method, caller.dup, binding.dup, method_to_call)
 
         result = performer.call(method_to_call, args, keyword_args, block)
         ExecutionChain.pop
