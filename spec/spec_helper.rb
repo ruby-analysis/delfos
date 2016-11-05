@@ -3,6 +3,7 @@ $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 
 require "byebug"
 require "delfos"
+ENV["DELFOS_DEVELOPMENT"] = "true"
 
 module DelfosSpecHelpers
   def expand_fixture_path(path = "")
@@ -39,10 +40,23 @@ RSpec.configure do |c|
     c.syntax = :expect
   end
 
-
-
   c.before(:suite) do
-    Delfos.wipe_db!
+    begin
+      Delfos.wipe_db!
+    rescue Errno::ECONNREFUSED => e
+      puts "*" * 80
+      puts "*" * 80
+      puts "*" * 80
+      puts "Failed to connect to Neo4j:"
+      puts Delfos.neo4j
+      puts "Start Neo4j or set the following environment variables:"
+      puts "  NEO4J_URL"
+      puts "  NEO4J_USERNAME"
+      puts "  NEO4J_PASSWORD"
+      puts "*" * 80
+      puts "*" * 80
+      puts "*" * 80
+    end
   end
 
   c.before(:each) do

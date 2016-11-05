@@ -44,7 +44,7 @@ module Delfos
 
         def build_request
           Net::HTTP::Post.new(uri.request_uri).tap do |request|
-            request.basic_auth(Delfos.neo4j_username, Delfos.neo4j_password)
+            request.basic_auth(Delfos.neo4j.username, Delfos.neo4j.password)
             request.content_type = 'application/json'
 
             request.body = yield
@@ -52,7 +52,7 @@ module Delfos
         end
 
         def uri
-          @uri ||= URI.parse "#{Delfos.neo4j_host}/db/data/transaction/commit"
+          @uri ||= URI.parse "#{Delfos.neo4j.url}/db/data/transaction/commit"
         end
       end
     end
