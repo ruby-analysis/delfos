@@ -14,26 +14,47 @@ Add this line to your application's Gemfile:
 gem 'delfos'
 ```
 
-##Usage
+## External Dependencies
+Delfos depends upon Neo4j for recording data.
+
+## Usage
+
+### With Rails 
 
 ```ruby
-#in config/environments/development.rb
-#or config/environments/test.rb
+#e.g.  in config/initializers/delfos.rb
 
 #Delfos is very slow, so we recommend only setting up when required
-if ENV["delfos"]
+if defined?(Delfos) && ENV["DELFOS_ENABLED"]
   Delfos.setup!
 end
 
 # Any code defined in the app or lib directories executed after this point will
-# automatically have coupling information recorded.
+# automatically have execution chains with type information recorded.
 
 # You could click around the app or run integration tests
 ```
 
-By default the results are stored in `tmp/delfos/results.json`
+## Development
 
+Delfos specs are organized in a similar fashion to `golang` tests and follow
+the principles outlined by this README.  That is that code that changes
+together lives together.
 
+So there are no specs in the `spec` folder, unit specs live next to their implementation.
+E.g.
+
+```
+#lib/delfos/neo4j/
+  distance_update.rb
+  distance_update_spec.rb
+```
+
+The rake task is setup to handle this default and is equivalent to the following:
+
+```
+NEO4J_URL=http://localhost:7474 NEO4J_USERNAME=username NEO4J_PASSWORD=password bundle exec rspec lib
+```
 
 ##A `SOLID CASE` for application architecture
 
