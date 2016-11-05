@@ -10,6 +10,7 @@ For more on the background behind this project see [SOLID](solid.md)
 
 # Functionality
   * Record runtime type information and call site file locations in every method call of your application for most ruby programs
+  * Ignores library code - i.e. only records method calls defined in your application
   * [Not yet] Working with programs which redefine `BasicObject.inherited`, `.method_added`, `.singleton_method_added`
   * [Not yet] Analysis of type information in Neo4j to:
     * show cyclic dependencies
