@@ -43,18 +43,18 @@ end
 
 #### Delfos.setup! options
 
-```
-logger: An object that responds to debug(args, call_site, called_code)
-  `args` contains argument type information and keyword args type information of the method call
-  `call_site`   contains file and line number of the caller
-  `called_code` contains file and line number of the callee
+`logger` An object that responds to `debug(args, call_site, called_code)`
+Where:
+  * `args` contains argument type information and keyword args type information of the method call
+  * `call_site` & `called_code` both respond to object, class_method, file, line_number to give call site information of the
+  caller and calle
 
-application_directories: A glob of application directories. Defaults to `app/**/*.rb` and `lib/**/*.rb`
+`application_directories` A glob of application directories. Defaults to `app/**/*.rb` and `lib/**/*.rb`
 
-NEO4J connection params
-  neo4j_url
-  neo4j_username
-  neo4j_password
+NEO4J connection related options
+  `neo4j_url`
+  `neo4j_username`
+  `neo4j_password`
 ```
 
 
