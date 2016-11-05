@@ -46,7 +46,7 @@ end
 
 `logger` An object that responds to `debug(args, call_site, called_code)`
 Where:
-  * `args` responds_to
+  * `args` responds to
    * `args` An array of classes referencing the type of the argument (if the argument is an instance - it refers to the class of that instance)
    * `keyword_args` as above but for the keyword_args
   * `call_site` & `called_code` both respond to
