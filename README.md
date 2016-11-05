@@ -46,6 +46,7 @@ end
 
 
 `logger` Defaults to recording to neo4j. You can supply an object that responds to `debug` and receives the following objects : `(arguments, call_site, called_code)`
+
 Where:
   * `arguments` has the following methods defined:
    * `args` An array of classes referencing the type of the argument (if the argument is an instance - it refers to the class of that instance)
@@ -54,15 +55,18 @@ Where:
     * `file`
     * `line_number`
     * `object` - refers to the self defined at that line during runtime
-    * `class_method` - whether or not this is an instance method
+    * `class_method` - boolean - true if the 
 
 
 `application_directories` A glob of application directories. Defaults to `app/**/*.rb` and `lib/**/*.rb`
 
 NEO4J connection related options
-  `neo4j_url`
-  `neo4j_username`
-  `neo4j_password`
+
+`neo4j_url`
+
+`neo4j_username`
+
+`neo4j_password`
 
 
 # Recorded data
@@ -152,7 +156,7 @@ I would like to create a UI for visualizing execution chains with their respecti
 ### Command line tool
 I want to detect common software design mistakes in a way which is useful/actionable like rubocop.
 
-## Cope with Metaprogramming
+### Cope with Metaprogramming
 It would be nice if Delfos were able to handle code which defines/re-defines
 the 3 metaprogramming methods it uses.
 
