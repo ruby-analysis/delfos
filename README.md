@@ -61,7 +61,6 @@ NEO4J connection related options
   `neo4j_url`
   `neo4j_username`
   `neo4j_password`
-```
 
 
 ## Development
