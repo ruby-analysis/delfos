@@ -47,8 +47,11 @@ end
 `logger` An object that responds to `debug(args, call_site, called_code)`
 Where:
   * `args` contains argument type information and keyword args type information of the method call
-  * `call_site` & `called_code` both respond to object, class_method, file, line_number to give call site information of the
-  caller and calle
+  * `call_site` & `called_code` both respond to 
+    * `object` - refers to the self defined at that line during runtime
+    * `class_method` - whether or not this is an instance method
+    * `file`
+    * `line_number` 
 
 `application_directories` A glob of application directories. Defaults to `app/**/*.rb` and `lib/**/*.rb`
 
