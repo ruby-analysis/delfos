@@ -41,10 +41,10 @@ end
 # and callsite information
 ```
 
-#### Delfos.setup options
+#### Delfos.setup! options
 
 ```
-logger: An instance that responds to #debug(args, call_site, called_code)
+logger: An object that responds to debug(args, call_site, called_code)
   `args` contains argument type information and keyword args type information of the method call
   `call_site`   contains file and line number of the caller
   `called_code` contains file and line number of the callee
