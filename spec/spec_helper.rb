@@ -30,12 +30,23 @@ module DelfosSpecHelpers
   end
 end
 
+module TimeoutHelpers
+  TIMEOUT_VALUE = ENV["CI"] ? 2 : 0.3
+
+  def timeout
+    Timeout.timeout TIMEOUT_VALUE do
+      yield
+    end
+  end
+end
+
 RSpec.configure do |c|
   c.include DelfosSpecHelpers
   c.expect_with :rspec do |c|
     c.syntax = :expect
   end
 
+  c.include TimeoutHelpers
   c.mock_with :rspec do |c|
     c.syntax = :expect
   end

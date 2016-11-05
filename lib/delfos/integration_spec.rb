@@ -80,7 +80,7 @@ describe "integration" do
         expect(SomeSubKlass).to be_a Class
 
         initialization = lambda do
-          Timeout.timeout 0.1 do
+          timeout do
             expect(SomeKlass.new).to be_a SomeSubKlass
           end
         end
