@@ -1,8 +1,0 @@
-%p
-  %span.light
-    Sign in with &nbsp;
-  - providers = button_based_providers
-  - providers.each do |provider|
-    %span.light
-      - has_icon = provider_has_icon?(provider)
-      = link_to provider_image_tag(provider), user_omniauth_authorize_path(provider), method: :post, class: (has_icon ? 'oauth-image-link' : 'btn'), "data-no-turbolink" => "true"

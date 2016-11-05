@@ -1,8 +1,0 @@
-%article.file-holder.readme-holder
-  .file-title
-    = blob_icon readme.mode, readme.name
-    = link_to namespace_project_blob_path(@project.namespace, @project, tree_join(@repository.root_ref, @path, readme.name)) do
-      %strong
-        = readme.name
-  .file-content.wiki
-    = render_readme(readme)
