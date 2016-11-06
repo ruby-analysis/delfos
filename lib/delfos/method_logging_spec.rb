@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 require_relative "method_logging"
-require_relative "patching"
 require_relative "../../fixtures/a"
 require_relative "../../fixtures/b"
 
@@ -23,12 +22,11 @@ describe Delfos::MethodLogging do
     let(:method_b) { double "method b", source_location: [b_path, 2] }
 
     before do
-      expect(Delfos::Patching).
-        to receive(:added_methods).
-        and_return(
-          "A" => { instance_method_some_method:  method_a},
-          "B" => { instance_method_another_method: method_b }).
-        at_least(:once)
+      expect_any_instance_of(Delfos::MethodLogging::AddedMethods).
+        to receive(:added_methods).at_least(:once).and_return({
+         "A"  => { instance_method_some_method:  method_a},
+         "B"  => { instance_method_another_method: method_b }
+      })
 
       Delfos.logger = logger
       path_fixtures = Pathname.new(File.expand_path(__FILE__)) + "../../../fixtures"
@@ -36,14 +34,14 @@ describe Delfos::MethodLogging do
       Delfos.application_directories = [path_spec, path_fixtures]
     end
 
-    class CalledObject
+    class TestCalledObject
       # This method represents a method with the meta programming hooks added for the logging
       def called_method(args, keyword_args, block)
         $called_line = __LINE__ - 1
         call_site_binding = binding
         stack = caller.dup
 
-        Delfos::MethodLogging.log(
+        Delfos.method_logging.log(
           self,
           args, keyword_args, block,
           class_method = false,
@@ -52,9 +50,9 @@ describe Delfos::MethodLogging do
       end
     end
 
-    class CallSiteObject
+    class TestCallSiteObject
       def call_site_method(called_object, args, keyword_args, block, _called_method)
-        called_object = CalledObject.new
+        called_object = TestCalledObject.new
 
         $call_site_line = __LINE__ + 1
         called_object.called_method(args, keyword_args, block)
@@ -62,10 +60,10 @@ describe Delfos::MethodLogging do
     end
 
     it do
-      called_object = CalledObject.new
-      expect(CalledObject).to receive(:new).and_return called_object
+      called_object = TestCalledObject.new
+      expect(TestCalledObject).to receive(:new).and_return called_object
 
-      call_site_object = CallSiteObject.new
+      call_site_object = TestCallSiteObject.new
       call_site_object.call_site_method(called_object, args, keyword_args, block, class_method)
 
       expect(logger).to have_received(:debug) do |args, call_site, called_code|
@@ -84,9 +82,7 @@ describe Delfos::MethodLogging do
       end
     end
   end
-end
 
-describe Delfos::MethodLogging do
   class SomeObject
     def some_method(&block)
       another_method(block, binding)
