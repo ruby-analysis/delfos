@@ -18,37 +18,39 @@ module Delfos
         @args ||= calculate_args(@raw_args)
       end
 
-      def calculate_args(args)
-        klass_file_locations(args).select do |_klass, locations|
-          Delfos::MethodLogging.include_any_path_in_logging?(locations)
-        end.map(&:first)
-      end
-
       def keyword_args
         @keyword_args ||= calculate_args(@raw_keyword_args.values)
       end
 
-      def klass_locations(klass)
-        files = method_sources(klass)
-
-        files.flatten.compact.uniq
-      end
-
       private
 
-      def klass_file_locations(args)
-        klasses(args).each_with_object({}) { |k, result| result[k] = klass_locations(k) }
+      def calculate_args(arguments)
+        arguments.
+          map { |o| klass_for(o) }.
+          select { |k| keep?(k)}
       end
 
-      def klasses(args)
-        args.map do |k|
-          klass_for(k)
-        end
+      def keep?(klass)
+        files_for(klass).
+          select{ |f| record?(f) }.length > 0
       end
 
-      def method_sources(klass)
-        (Delfos::Patching::AddedMethods.fetch(klass.to_s) || {}).
-          values.map(&:source_location).map(&:first)
+      def files_for(klass)
+        source_files(klass).
+          flatten.
+          compact.
+          uniq
+      end
+
+      def source_files(klass)
+        sources = Delfos::Patching::AddedMethods.method_sources(klass.to_s)
+
+        sources.map(&:first)
+      end
+
+
+      def record?(f)
+        Delfos.method_logging.include_any_path_in_logging?(f)
       end
     end
   end

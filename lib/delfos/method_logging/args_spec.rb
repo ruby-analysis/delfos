@@ -8,40 +8,47 @@ describe Delfos::MethodLogging::Args do
   let(:b) { B.new }
   let(:c) { 1 }
   let(:d) { "" }
-  let(:args) { described_class.new([a, b, c, d], c: c, d: d) }
   let(:a_path) { File.expand_path "./fixtures/a.rb" }
   let(:b_path) { File.expand_path "./fixtures/b.rb" }
 
-  before do
-    allow(Delfos::Patching).
-      to receive(:added_methods).
-      and_return(added_methods)
+  let(:method_logging) do
+    double("method_logging").tap do |m|
+      allow(m).to receive(:include_any_path_in_logging?) do |paths|
+        ([a_path, b_path] & Array(paths)).length > 0
+      end
+    end
+
   end
 
-  let(:added_methods) do
-    {
-      "A" => { "instance_method_some_method"    =>  method_a},
-      "B" => { "instance_method_another_method" =>  method_b},
-    }
-  end
-  let(:method_a) { double "method a", source_location: [File.expand_path("fixtures/a.rb"), 4] }
-  let(:method_b) { double "method b", source_location: [File.expand_path("fixtures/b.rb"), 2] }
-
   before do
+    allow(Delfos::Patching::AddedMethods).
+      to receive(:method_sources) do |k|
+      case k
+      when "A"
+        [[a_path, 1], [a_path, 23]]
+      when "B"
+        [[b_path, 34]]
+      else
+        [["/some-unincluded-path/example.rb", 12]]
+      end
+    end
+
+    allow(Delfos).to receive(:method_logging).and_return method_logging
     path = Pathname.new(File.expand_path(__FILE__)) + "../../../../fixtures"
     Delfos.application_directories = [path]
   end
 
-  describe "#klass_location" do
-    it do
-      expect(args.klass_locations(1.class)).to eq []
-      expect(args.klass_locations(A)).to eq [a_path]
-    end
-  end
+  subject { described_class.new([a, b, c, d], c: c, d: d) }
 
   describe "#args" do
     it do
-      expect(args.args).to eq [A, B]
+      expect(subject.args).to eq [A, B]
+    end
+  end
+
+  describe "#keyword_args" do
+    it "ignores non application defined classes" do
+      expect(subject.keyword_args).to eq []
     end
   end
 end

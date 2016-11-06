@@ -1,4 +1,4 @@
-require "Forwardable"
+require "Forwardable" unless defined? Forwardable
 module Delfos
   class Patching # TODO: make this a module and rename the Patching class
     class AddedMethods
@@ -11,6 +11,7 @@ module Delfos
           :set_sub_klass,
           :fetch_class_method,
           :fetch,
+          :method_sources,
           :method_definition_for, :added?
 
         def instance
@@ -26,6 +27,13 @@ module Delfos
 
       def fetch(key)
         added_methods[key]
+      end
+
+      def method_sources(klass)
+        methods = fetch(klass.to_s)
+        return [] unless methods
+
+        methods.values.map(&:source_location)
       end
 
       def method_sources_for(klass)
