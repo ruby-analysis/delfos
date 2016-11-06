@@ -10,8 +10,13 @@ module Delfos
       class << self
         def execute(query, url=nil)
           return unless query.length > 0
-          result = response_for(query)
 
+          strip_out_meta_data response_for(query)
+        end
+
+        private
+
+        def strip_out_meta_data(result)
           result = JSON.parse result.body
 
           results = result["results"]
@@ -26,8 +31,6 @@ module Delfos
             end
           end
         end
-
-        private
 
         def response_for(query)
           request = request_for(query)
