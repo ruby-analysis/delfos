@@ -7,7 +7,7 @@ class BasicObject
   def self.singleton_method_added(*_args)
     nil
   end
-  
+
   def self.inherited(*_args)
     nil
   end

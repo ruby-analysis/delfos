@@ -1,9 +1,9 @@
 # frozen_string_literal: true
+require "delfos"
+require "delfos/neo4j/informer"
+
 describe "integration" do
   before do
-    require "delfos"
-    require "delfos/neo4j/informer"
-
     Delfos.setup!(
         application_directories: ["fixtures"],
     )

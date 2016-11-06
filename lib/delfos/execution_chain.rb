@@ -2,16 +2,16 @@ require_relative "neo4j/execution_persistence"
 
 module Delfos
   class ExecutionChain
-    METHOD_CHAIN_MUTEX = Mutex.new
+    EXECUTION_CHAIN_MUTEX = Mutex.new
 
     def self.reset!
-      METHOD_CHAIN_MUTEX.synchronize do
+      EXECUTION_CHAIN_MUTEX.synchronize do
         Thread.current[:_delfos__execution_chain__method_chain] = nil
       end
     end
 
     def self.method_chain
-      METHOD_CHAIN_MUTEX.synchronize do
+      EXECUTION_CHAIN_MUTEX.synchronize do
         Thread.current[:_delfos__execution_chain__method_chain] ||= new
       end
     end

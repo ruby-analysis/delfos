@@ -28,7 +28,7 @@ module Delfos
     end
 
     def remove_patching!
-      load "delfos/remove_patching.rb"
+      load "delfos/patching/remove.rb"
 
       Delfos::Patching.instance_eval { @added_methods = nil }
     end
@@ -62,7 +62,8 @@ module Delfos
     end
 
     def perform_patching!
-      load "delfos/perform_patching.rb"
+      load "delfos/patching/basic_object.rb"
+      BasicObject.extend Delfos::Patching::BasicObject
     end
 
     attr_reader :application_directories, :neo4j_host, :neo4j_username, :neo4j_password

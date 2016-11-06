@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 require_relative "method_logging"
-require_relative "patching"
+require_relative "patching/patching"
 require_relative "../../fixtures/a"
 require_relative "../../fixtures/b"
 
@@ -36,7 +36,7 @@ describe Delfos::MethodLogging do
       Delfos.application_directories = [path_spec, path_fixtures]
     end
 
-    class CalledObject
+    class TestCalledObject
       # This method represents a method with the meta programming hooks added for the logging
       def called_method(args, keyword_args, block)
         $called_line = __LINE__ - 1
@@ -52,9 +52,9 @@ describe Delfos::MethodLogging do
       end
     end
 
-    class CallSiteObject
+    class TestCallSiteObject
       def call_site_method(called_object, args, keyword_args, block, _called_method)
-        called_object = CalledObject.new
+        called_object = TestCalledObject.new
 
         $call_site_line = __LINE__ + 1
         called_object.called_method(args, keyword_args, block)
@@ -62,10 +62,10 @@ describe Delfos::MethodLogging do
     end
 
     it do
-      called_object = CalledObject.new
-      expect(CalledObject).to receive(:new).and_return called_object
+      called_object = TestCalledObject.new
+      expect(TestCalledObject).to receive(:new).and_return called_object
 
-      call_site_object = CallSiteObject.new
+      call_site_object = TestCallSiteObject.new
       call_site_object.call_site_method(called_object, args, keyword_args, block, class_method)
 
       expect(logger).to have_received(:debug) do |args, call_site, called_code|
@@ -84,9 +84,7 @@ describe Delfos::MethodLogging do
       end
     end
   end
-end
 
-describe Delfos::MethodLogging do
   class SomeObject
     def some_method(&block)
       another_method(block, binding)

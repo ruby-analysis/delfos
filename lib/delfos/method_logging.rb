@@ -11,6 +11,11 @@ require_relative "execution_chain"
 module Delfos
   class << self
     attr_accessor :logger, :application_directories
+    attr_writer :method_logging
+
+    def method_logging
+      @method_logging ||= ::Delfos::MethodLogging
+    end
   end
 
   class ApplicationDirectoriesNotDefined < StandardError
