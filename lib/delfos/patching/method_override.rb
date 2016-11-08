@@ -7,7 +7,9 @@ module Delfos
     class MethodOverride
       class << self
         def setup(klass, name, private_methods, class_method:)
-          new(klass, name, private_methods, class_method).setup
+          instance = new(klass, name, private_methods, class_method)
+          return if instance.ensure_method_recorded!
+          instance.setup
         end
       end
 
@@ -22,18 +24,15 @@ module Delfos
 
       # Redefine the method (only once) at runtime to enabling logging to Neo4j
       def setup
-        return if ensure_method_recorded!
+        cm, performer, method_selector = class_method(), method(:perform_call), method(:method_selector)
 
-        class_method = class_method()
-        performer = method(:perform_call)
-        method_selector = method(:method_selector)
-
-        method_defining_method.call(name) do |*args, **keyword_args, &block|
+        method_defining_method.call(name) do |*args, **kw_args, &block|
           method_to_call = method_selector.call(self)
 
-          Delfos.method_logging.log(self, args, keyword_args, block, class_method, caller.dup, binding.dup, method_to_call)
+          Delfos.method_logging.log(self, args, kw_args, block, cm,
+                                    caller.dup, binding.dup, method_to_call)
 
-          performer.call(method_to_call, args, keyword_args, block).tap do
+          performer.call(method_to_call, args, kw_args, block).tap do
             ExecutionChain.pop
           end
         end
@@ -46,6 +45,15 @@ module Delfos
                                klass.instance_method(name)
                              end
       end
+
+      def ensure_method_recorded!
+        return true if bail?
+
+        Delfos::MethodLogging::AddedMethods.append(klass, key, original_method)
+
+        false
+      end
+
 
       private
 
@@ -68,14 +76,6 @@ module Delfos
 
       def method_defining_method
         class_method ? klass.method(:define_singleton_method) : klass.method(:define_method)
-      end
-
-      def ensure_method_recorded!
-        return true if bail?
-
-        Delfos::MethodLogging::AddedMethods.append(klass, key, original_method)
-
-        false
       end
 
       def bail?
