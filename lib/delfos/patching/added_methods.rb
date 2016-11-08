@@ -1,7 +1,7 @@
 require "Forwardable" unless defined? Forwardable
 
 module Delfos
-  class Patching # TODO: make this a module and rename the Patching class
+  module Patching
     class AddedMethods
       class << self
         extend Forwardable

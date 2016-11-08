@@ -7,7 +7,7 @@
 # If there is a better way to test Delfos::Patching without doing this then
 # please suggest or replace with a cleaner alternative
 module Delfos
-  class Patching #TODO make module
+  module Patching
     module Unstubbing
       module ClassMethods
         def add_instance_to_unstub!(object)

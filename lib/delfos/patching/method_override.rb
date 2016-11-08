@@ -4,7 +4,7 @@ require_relative "added_methods"
 require_relative "../method_logging"
 
 module Delfos
-  class Patching
+  module Patching
     class MethodOverride
       class << self
         def setup(klass, name, private_methods, class_method:)

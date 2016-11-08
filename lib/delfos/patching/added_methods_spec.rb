@@ -1,6 +1,6 @@
 require_relative "./added_methods"
 module Delfos
-  class Patching
+  module Patching
     describe AddedMethods do
       class SuperKlass
         $instance_method_line = __LINE__ + 1
