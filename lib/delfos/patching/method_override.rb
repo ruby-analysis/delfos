@@ -24,47 +24,22 @@ module Delfos
       def setup
         return if ensure_method_recorded!
 
-        original = original_method
-        class_method = class_method()
-        klass = klass()
+        recordable = Recordable.from(self)
         performer = method(:perform_call)
-        method_selector = method_selector()
-        method_name = name()
+        method_selector = method(:method_selector)
 
         method_defining_method.call(name) do |*args, **keyword_args, &block|
-          method_to_call = method_selector.call(self, class_method, original, method_name)
+          method_to_call = method_selector.call(self, recordable)
 
-          Delfos.method_logging.log(self, args, keyword_args, block, class_method, caller.dup, binding.dup, method_to_call)
+          Delfos.method_logging.log(self, args, keyword_args, block, recordable.class_method, caller.dup, binding.dup, method_to_call)
 
-          result = performer.call(method_to_call, args, keyword_args, block)
-          ExecutionChain.pop
-          result
+          performer.call(method_to_call, args, keyword_args, block).tap { ExecutionChain.pop }
         end
       end
 
-
-      private
-
-      def method_selector
-        lambda do |instance, class_method, original, method_name|
-          if class_method
-            m = Delfos::MethodLogging::AddedMethods.find(instance, "ClassMethod_#{method_name}")
-            if m.receiver == instance
-              m
-            else
-              m.unbind.bind(instance)
-            end
-          else
-            original.bind(instance)
-          end
-        end
-      end
-
-      def perform_call(method_to_call, args, keyword_args, block)
-        if keyword_args.empty?
-          method_to_call.call(*args, &block)
-        else
-          method_to_call.call(*args, **keyword_args, &block)
+      Recordable = Struct.new(:original, :class_method , :klass , :method_name) do
+        def self.from(other)
+          new(other.original_method, other.class_method, other.klass, other.name)
         end
       end
 
@@ -74,6 +49,26 @@ module Delfos
                              else
                                klass.instance_method(name)
                              end
+      end
+
+
+      private
+
+      def method_selector(instance, recordable)
+        if recordable.class_method
+          m = Delfos::MethodLogging::AddedMethods.find(instance, "ClassMethod_#{recordable.method_name}")
+          m.receiver == instance ?  m : m.unbind.bind(instance)
+        else
+          recordable.original.bind(instance)
+        end
+      end
+
+      def perform_call(method_to_call, args, keyword_args, block)
+        if keyword_args.empty?
+          method_to_call.call(*args, &block)
+        else
+          method_to_call.call(*args, **keyword_args, &block)
+        end
       end
 
       def method_defining_method
