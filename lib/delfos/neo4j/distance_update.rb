@@ -40,7 +40,7 @@ module Delfos
       private
 
       def update(results)
-        results.map do |klass, call_site, call_site_id, meth, called, called_id, called_klass|
+        Array(results).compact.map do |klass, call_site, call_site_id, meth, called, called_id, called_klass|
           start  = determine_full_path call_site["file"]
           finish = determine_full_path called["file"]
 

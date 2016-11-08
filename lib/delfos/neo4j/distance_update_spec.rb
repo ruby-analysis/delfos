@@ -7,8 +7,9 @@ describe Delfos::Neo4j::DistanceUpdate do
   def preload_graph!
     Delfos.wipe_db!
     Delfos.reset!
-    dirs = ["fixtures/ruby/"]
-    Delfos.setup! application_directories: dirs
+    dir = File.expand_path File.join(File.expand_path(__FILE__), "../../../../fixtures/ruby/")
+    raise unless Dir.exists?(dir)
+    Delfos.setup! application_directories: [dir]
 
     load "fixtures/ruby/efferent_coupling.rb"
     EfferentCoupling.new.lots_of_coupling
@@ -27,7 +28,8 @@ describe Delfos::Neo4j::DistanceUpdate do
         (called_klass) - [:OWNS]              -> (called),
         (call_site)    - [:EFFERENT_COUPLING] -> (called)
 
-      RETURN head(labels(klass)),
+      RETURN
+        head(labels(klass)),
         method,
         call_site, id(call_site),
         called, id(called),
@@ -36,28 +38,30 @@ describe Delfos::Neo4j::DistanceUpdate do
     @result = Delfos::Neo4j::QueryExecution.execute(query)
   end
 
-  it "records the Classes" do
-    @klasses = @result.map{|r| r[0]}
+  MAPPING = {klass: 0, method: 1, call_site: 2, called: 4, called_klass: 6}
 
-    expect(@klasses.flatten.uniq).to eq ["EfferentCoupling"]
+  def parse_result(key)
+    @result.map{|r| r[MAPPING[key]]}.flatten.uniq
+  end
+
+  it "records the Classes" do
+    klasses = parse_result(:klass)
+
+    expect(klasses.flatten.uniq).to eq ["EfferentCoupling"]
   end
 
   it "records the called classes" do
-    called_klasses = @result.map{|r| r[6]}.flatten.uniq
+    called_klasses = parse_result(:called_klass)
     expect(called_klasses).to match_array %w(This That SomeOther SoMuchCoupling HereIsSomeMore)
   end
 
   describe "call_site" do
-    before do
-      @call_sites = @result.map{|r| r[2]}.flatten.uniq
-    end
-
     it "returns the call_site" do
-      expect(@call_sites.length).to eq 7
+      expect(parse_result(:call_site).length).to eq 7
     end
 
     it "records the call_site details" do
-      expect(@call_sites).to eq [
+      expect(parse_result(:call_site)).to eq [
         {"file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 6},
         {"file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 7},
         {"file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 8},
@@ -72,7 +76,7 @@ describe Delfos::Neo4j::DistanceUpdate do
   it "records the called method details" do
     file_path = expand_fixture_path("ruby/this.rb").to_s
 
-    calleds = @result.map{|r|r[4] }.uniq
+    calleds = parse_result(:called)
 
     expect(calleds).to match_array [
       { "file" => file_path, "name" => "send_message",     "line_number" => 2 },

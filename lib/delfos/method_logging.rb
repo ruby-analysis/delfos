@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 require "pathname"
-require "forwardable"
+require "forwardable" unless defined? Forwardable
 require "binding_of_caller"
 require_relative "common_path"
 require_relative "method_logging/klass_determination"
@@ -50,12 +50,12 @@ module Delfos
       end
 
       def include_any_path_in_logging?(paths)
-        paths.inject(false) do |result, path|
+        Array(paths).inject(false) do |result, path|
           result || include_file_in_logging?(path)
         end
       end
 
-      def exclude_from_logging?(method)
+      def exclude_method_from_logging?(method)
         file, _line_number = method.source_location
         return true unless file
 

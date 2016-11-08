@@ -1,11 +1,11 @@
 class SomeKlass
   class << self
-    def inspect
-      name
+    def some_class_method_name
+      some_other_class_method_name
     end
 
-    def name
-      'SomeKlass'
+    def some_other_class_method_name
+      'Something'
     end
 
     def new

@@ -7,7 +7,7 @@ describe Delfos do
     it "requires the monkey patching file" do
       dir = ["some/dir"]
       expect(Delfos).to receive(:load).with "delfos/patching/basic_object.rb"
-      allow(Delfos).to receive(:load).with "delfos/patching/remove.rb"
+      allow(Delfos).to receive(:load).with "delfos/patching/basic_object_remove.rb"
 
       Delfos.setup!(application_directories: dir)
 

@@ -21,9 +21,8 @@ describe Delfos::MethodLogging::Args do
   end
 
   before do
-    allow(Delfos::Patching::AddedMethods).
-      to receive(:method_sources) do |k|
-      case k
+    definition = lambda do |k|
+      case k.to_s
       when "A"
         [[a_path, 1], [a_path, 23]]
       when "B"
@@ -32,6 +31,9 @@ describe Delfos::MethodLogging::Args do
         [["/some-unincluded-path/example.rb", 12]]
       end
     end
+    allow(Delfos::Patching::AddedMethods).
+      to receive(:method_sources_for, &definition)
+
 
     allow(Delfos).to receive(:method_logging).and_return method_logging
     path = Pathname.new(File.expand_path(__FILE__)) + "../../../../fixtures"

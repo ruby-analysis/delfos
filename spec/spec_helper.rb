@@ -3,6 +3,7 @@ $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 
 require "byebug"
 require "delfos"
+require "pathname"
 ENV["DELFOS_DEVELOPMENT"] = "true"
 
 module DelfosSpecHelpers
@@ -31,17 +32,26 @@ module DelfosSpecHelpers
 end
 
 module TimeoutHelpers
-  TIMEOUT_VALUE = ENV["CI"] ? 2 : 0.3
+  TIMEOUT_VALUE = (ENV["TIMEOUT"] || (ENV["CI"] ? 2 : 0.3)).to_f
 
   def timeout
-    Timeout.timeout TIMEOUT_VALUE do
-      yield
+    return yield if TIMEOUT_VALUE == 0.0
+
+    begin
+      Timeout.timeout TIMEOUT_VALUE do
+        yield
+      end
+    rescue Timeout::Error
+      Delfos.reset!
+      puts "Rescuing timeout"
+      raise
     end
   end
 end
 
 RSpec.configure do |c|
   c.include DelfosSpecHelpers
+
   c.expect_with :rspec do |c|
     c.syntax = :expect
   end
@@ -70,13 +80,12 @@ RSpec.configure do |c|
     end
   end
 
-  c.before(:each) do
+
+  c.around(:each) do |e|
     Delfos.reset!
+    timeout { e.run }
   end
 
-  c.after(:each) do
-    Delfos.reset!
-  end
 end
 
 

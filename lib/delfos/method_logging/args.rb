@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require_relative "../../delfos"
 require_relative "../common_path"
-require_relative "klass_determination"
+require_relative "./klass_determination"
 require_relative "../patching/added_methods"
 
 module Delfos
@@ -43,7 +43,7 @@ module Delfos
       end
 
       def source_files(klass)
-        sources = Delfos::Patching::AddedMethods.method_sources(klass.to_s)
+        sources = Delfos::Patching::AddedMethods.method_sources_for(klass)
 
         sources.map(&:first)
       end

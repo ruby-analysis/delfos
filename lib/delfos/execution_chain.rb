@@ -6,22 +6,22 @@ module Delfos
 
     def self.reset!
       EXECUTION_CHAIN_MUTEX.synchronize do
-        Thread.current[:_delfos__execution_chain__method_chain] = nil
+        Thread.current[:_delfos__execution_chain] = nil
       end
     end
 
-    def self.method_chain
+    def self.execution_chain
       EXECUTION_CHAIN_MUTEX.synchronize do
-        Thread.current[:_delfos__execution_chain__method_chain] ||= new
+        Thread.current[:_delfos__execution_chain] ||= new
       end
     end
 
     def self.push(method_object)
-      method_chain.push(method_object)
+      execution_chain.push(method_object)
     end
 
     def self.pop
-      method_chain.pop
+      execution_chain.pop
     end
 
     def push(method_object)
@@ -55,6 +55,8 @@ module Delfos
       call_sites.length
     end
 
+    attr_writer :stack_depth, :step_count, :execution_count, :call_sites
+
     private
 
     class PoppingEmptyStackError < StandardError
@@ -69,6 +71,5 @@ module Delfos
       self.call_sites = []
     end
 
-    attr_writer :stack_depth, :step_count, :execution_count, :call_sites
   end
 end

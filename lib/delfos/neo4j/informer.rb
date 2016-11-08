@@ -85,7 +85,7 @@ module Delfos
       end
 
       def code_execution_query
-        Delfos::Patching.method_chain
+        Delfos::Patching.execution_chain
       end
 
       class QueryVariables < Hash

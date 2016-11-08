@@ -21,18 +21,6 @@ module Delfos
         def method_type_from(class_method)
           class_method ? "ClassMethod" : "InstanceMethod"
         end
-
-        def method_definition_for(klass, class_method, method_name)
-          key = key_from(class_method, method_name)
-
-          Delfos::Patching.method_definition_for(klass, key)
-        end
-
-        private
-
-        def key_from(class_method, name)
-          "#{method_type_from(class_method)}_#{name}"
-        end
       end
 
       attr_reader :object, :method_name, :class_method, :method_type, :file, :line_number
@@ -44,7 +32,6 @@ module Delfos
         @method_type = self.class.method_type_from class_method
         @line_number = line_number.to_i
         @file = file
-
       end
 
       def file
@@ -94,7 +81,7 @@ module Delfos
       end
 
       def method_definition
-        (@method_definition ||= self.class.method_definition_for(klass, class_method, method_name)) || {}
+        @method_definition ||= ::Delfos::Patching::AddedMethods.method_sources_for(klass).first
       end
     end
 

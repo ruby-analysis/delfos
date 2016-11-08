@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 require_relative "method_logging"
-require_relative "patching/patching"
 require_relative "../../fixtures/a"
 require_relative "../../fixtures/b"
 
@@ -23,12 +22,11 @@ describe Delfos::MethodLogging do
     let(:method_b) { double "method b", source_location: [b_path, 2] }
 
     before do
-      expect(Delfos::Patching).
-        to receive(:added_methods).
-        and_return(
-          "A" => { instance_method_some_method:  method_a},
-          "B" => { instance_method_another_method: method_b }).
-        at_least(:once)
+      expect_any_instance_of(Delfos::Patching::AddedMethods).
+        to receive(:added_methods).at_least(:once).and_return({
+         "A"  => { instance_method_some_method:  method_a},
+         "B"  => { instance_method_another_method: method_b }
+      })
 
       Delfos.logger = logger
       path_fixtures = Pathname.new(File.expand_path(__FILE__)) + "../../../fixtures"
