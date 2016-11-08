@@ -1,17 +1,10 @@
 # frozen_string_literal: true
 
 require "bundler/gem_tasks"
+require "rspec/core/rake_task"
 
-task :all_specs do
-  files = ARGV.length == 0 ?  Dir.glob("lib/**/*_spec.rb") : ARGV
-
-  results = files.map do |f|
-    puts "Running specs: #{f}"
-    result = `rspec #{f} --color --require spec_helper`
-  end
-  puts results
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.pattern = "lib/**/*_spec.rb"
 end
 
-task :default => :all_specs
-
-
+task default: :spec
