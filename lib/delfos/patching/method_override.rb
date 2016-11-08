@@ -35,7 +35,7 @@ module Delfos
         method_defining_method.call(name) do |*args, **keyword_args, &block|
           method_to_call = method_selector.call(self, class_method, original, method_name)
 
-          Delfos::MethodLogging.log(self, args, keyword_args, block, class_method, caller.dup, binding.dup, method_to_call)
+          Delfos.method_logging.log(self, args, keyword_args, block, class_method, caller.dup, binding.dup, method_to_call)
 
           result = performer.call(method_to_call, args, keyword_args, block)
           ExecutionChain.pop
@@ -102,7 +102,7 @@ module Delfos
       end
 
       def exclude?
-        ::Delfos::MethodLogging.exclude_method_from_logging?(original_method)
+        ::Delfos.method_logging.exclude?(original_method)
       end
 
       def key

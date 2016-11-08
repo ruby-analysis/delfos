@@ -41,7 +41,7 @@ describe Delfos::MethodLogging do
         call_site_binding = binding
         stack = caller.dup
 
-        Delfos::MethodLogging.log(
+        Delfos.method_logging.log(
           self,
           args, keyword_args, block,
           class_method = false,

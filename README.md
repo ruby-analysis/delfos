@@ -18,8 +18,7 @@ For more on the background behind this project see [SOLID](solid.md)
     * suggest potential domain concept file system organisations to simplify app structure
 
 ## Dependencies
-Zero gem dependencies.
-
+Only one explicit gem dependency on `binding_of_caller` (and one implicit dependency on its `debug_inspector`)
 Delfos by default depends upon a connection to a Neo4j instance for recording data.
 
 ## Usage

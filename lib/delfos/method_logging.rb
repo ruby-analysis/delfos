@@ -55,7 +55,7 @@ module Delfos
         end
       end
 
-      def exclude_method_from_logging?(method)
+      def exclude?(method)
         file, _line_number = method.source_location
         return true unless file
 

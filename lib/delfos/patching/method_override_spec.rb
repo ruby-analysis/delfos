@@ -27,7 +27,7 @@ describe Delfos::Patching::MethodOverride do
   let(:some_random_instance) { klass.new }
 
   before do
-    allow(Delfos::MethodLogging).to receive(:exclude_method_from_logging?) do
+    allow(Delfos::MethodLogging).to receive(:exclude?) do
       klass != SomeRandomClass
     end
 
