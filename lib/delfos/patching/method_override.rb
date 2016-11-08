@@ -34,7 +34,7 @@ module Delfos
           Delfos.method_logging.log(self, args, keyword_args, block, class_method, caller.dup, binding.dup, method_to_call)
 
           performer.call(method_to_call, args, keyword_args, block).tap do
-            ExecutionChain.pop 
+            ExecutionChain.pop
           end
         end
       end
@@ -47,13 +47,12 @@ module Delfos
                              end
       end
 
-
       private
 
       def method_selector(instance)
         if class_method
           m = Delfos::MethodLogging::AddedMethods.find(instance, "ClassMethod_#{name}")
-          m.receiver == instance ?  m : m.unbind.bind(instance)
+          m.receiver == instance ? m : m.unbind.bind(instance)
         else
           original_method.bind(instance)
         end

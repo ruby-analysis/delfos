@@ -1,7 +1,8 @@
+# frozen_string_literal: true
 require_relative "method_override"
 require_relative "unstubbing_spec_helper"
 
-#HACK this is awful
+# HACK: this is awful
 Delfos::Patching::MethodOverride.extend  Delfos::Patching::Unstubbing::ClassMethods
 Delfos::Patching::MethodOverride.prepend Delfos::Patching::Unstubbing::InstanceMethods
 
@@ -37,7 +38,7 @@ describe Delfos::Patching::MethodOverride do
 
   describe ".added_methods" do
     let(:method_a) { SomeRandomClass.instance_method :some_public_method }
-    let(:method_b) { SomeRandomClass.method :some_class_method  }
+    let(:method_b) { SomeRandomClass.method :some_class_method }
 
     after(:each) do
       described_class.unstub_all!
@@ -77,7 +78,7 @@ describe Delfos::Patching::MethodOverride do
       end
 
       it "sends the correct args to the method logger" do
-        expect(Delfos::MethodLogging).to receive(:log) do |object, args, keyword_args, block, class_method, stack, call_site_binding, original_method|
+        expect(Delfos::MethodLogging).to receive(:log) do |object, _args, _keyword_args, _block, _class_method, _stack, _call_site_binding, original_method|
           expect(object).to be_a SomeRandomClass
           expect(original_method.name).to eq :some_public_method
         end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "execution_chain"
 
 describe Delfos::ExecutionChain do
@@ -45,7 +46,6 @@ describe Delfos::ExecutionChain do
     end
   end
 
-
   describe "#pop" do
     it "clears the call site list only on resetting" do
       subject.push(1)
@@ -77,8 +77,8 @@ describe Delfos::ExecutionChain do
       expect(subject.step_count).to eq 3
 
       2.times { subject.pop }
-      expect(subject.stack_depth).to eq 0 #sanity check
-      expect(subject.step_count).to eq 0 #step count is reset
+      expect(subject.stack_depth).to eq 0 # sanity check
+      expect(subject.step_count).to eq 0 # step count is reset
     end
 
     it "decrements the stack depth" do
@@ -95,8 +95,8 @@ describe Delfos::ExecutionChain do
       subject.pop
       expect(subject.stack_depth).to eq 0
 
-      #stays at zero without going negative
-      expect{subject.pop}.to raise_error Delfos::ExecutionChain::PoppingEmptyStackError
+      # stays at zero without going negative
+      expect { subject.pop }.to raise_error Delfos::ExecutionChain::PoppingEmptyStackError
     end
 
     it "increments the execution counter only when the stack depth increases from 0 to 1" do
@@ -112,15 +112,15 @@ describe Delfos::ExecutionChain do
 
       subject.pop
       expect(subject.stack_depth).to eq 1
-      expect(subject.execution_count).to eq 1 #remains same
+      expect(subject.execution_count).to eq 1 # remains same
 
       subject.pop
       expect(subject.stack_depth).to eq 0
-      expect(subject.execution_count).to eq 1 #remains same until next push(anything)
+      expect(subject.execution_count).to eq 1 # remains same until next push(anything)
 
       subject.push(anything)
       expect(subject.stack_depth).to eq 1
-      expect(subject.execution_count).to eq 2 #now it increments
+      expect(subject.execution_count).to eq 2 # now it increments
     end
   end
 end

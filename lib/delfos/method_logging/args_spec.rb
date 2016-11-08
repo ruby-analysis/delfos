@@ -14,10 +14,9 @@ describe Delfos::MethodLogging::Args do
   let(:method_logging) do
     double("method_logging").tap do |m|
       allow(m).to receive(:include_any_path_in_logging?) do |paths|
-        ([a_path, b_path] & Array(paths)).length > 0
+        ([a_path, b_path] & Array(paths)).length.positive?
       end
     end
-
   end
 
   before do
@@ -33,7 +32,6 @@ describe Delfos::MethodLogging::Args do
     end
     allow(Delfos::MethodLogging::AddedMethods).
       to receive(:method_sources_for, &definition)
-
 
     allow(Delfos).to receive(:method_logging).and_return method_logging
     path = Pathname.new(File.expand_path(__FILE__)) + "../../../../fixtures"

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class SomeKlass
   class << self
     def some_class_method_name
@@ -5,7 +6,7 @@ class SomeKlass
     end
 
     def some_other_class_method_name
-      'Something'
+      "Something"
     end
 
     def new
@@ -20,6 +21,6 @@ end
 
 class SomeSubKlass < SomeKlass
   def self.name
-    'SomeSubKlass'
+    "SomeSubKlass"
   end
 end

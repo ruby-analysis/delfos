@@ -8,8 +8,8 @@ module Delfos
   module Neo4j
     module QueryExecution
       class << self
-        def execute(query, url=nil)
-          return unless query.length > 0
+        def execute(query, _url = nil)
+          return unless query.length.positive?
 
           strip_out_meta_data response_for(query)
         end
@@ -25,9 +25,7 @@ module Delfos
             result = results.first
             if result
               data = result["data"]
-              if data
-                data .map{|r| r["row"]}
-              end
+              data &.map { |r| r["row"] }
             end
           end
         end
@@ -48,7 +46,7 @@ module Delfos
         def build_request
           Net::HTTP::Post.new(uri.request_uri).tap do |request|
             request.basic_auth(Delfos.neo4j.username, Delfos.neo4j.password)
-            request.content_type = 'application/json'
+            request.content_type = "application/json"
 
             request.body = yield
           end
@@ -61,6 +59,3 @@ module Delfos
     end
   end
 end
-
-
-

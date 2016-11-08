@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "./added_methods"
 module Delfos
   module MethodLogging
@@ -28,23 +29,22 @@ module Delfos
       let(:sub_klass_class_method)    { SubKlass.method(:method_not_in_super_klass) }
 
       before do
-        subject.append(SuperKlass , "ClassMethod_some_class_method"            , class_method)
-        subject.append(SuperKlass , "InstanceMethod_some_method"               , instance_method)
-        subject.append(SubKlass   , "ClassMethod_method_not_in_super_klass"    , sub_klass_class_method)
-        subject.append(SubKlass   , "InstanceMethod_method_not_in_super_klass" , sub_klass_instance_method)
+        subject.append(SuperKlass, "ClassMethod_some_class_method", class_method)
+        subject.append(SuperKlass, "InstanceMethod_some_method", instance_method)
+        subject.append(SubKlass, "ClassMethod_method_not_in_super_klass", sub_klass_class_method)
+        subject.append(SubKlass, "InstanceMethod_method_not_in_super_klass", sub_klass_instance_method)
       end
-
 
       describe "#append" do
         it do
           subject.append(SuperKlass, "B", "C")
-          expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include({"B" => "C"})
+          expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include("B" => "C")
 
           subject.append(SuperKlass, "B", "D")
-          expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include({"B" => "D"})
+          expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include("B" => "D")
 
           subject.append(SuperKlass, "E", "F")
-          expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include({"B" => "D", "E"=>"F"})
+          expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include("B" => "D", "E" => "F")
         end
       end
 

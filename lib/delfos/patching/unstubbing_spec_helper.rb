@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # This existence of these `Unstubbing` modules are an unfortunate side effect of trying to
 # test something that redefines methods.  In order to not call the logging
 # defined in `Delfos::Patching::MethodOverride#setup` multiple times we have to keep track of
@@ -16,7 +17,7 @@ module Delfos
 
         def unstub_all!
           instances_to_unstub.each(&:unstub!)
-          @instances_to_unstub =[]
+          @instances_to_unstub = []
         end
 
         private

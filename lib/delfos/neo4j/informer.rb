@@ -58,7 +58,7 @@ module Delfos
       end
 
       def method_node(code, id)
-        if code.method_definition_file.length > 0 && code.method_definition_line > 0
+        if code.method_definition_file.length.positive? && code.method_definition_line.positive?
           <<-NODE
             (#{id}:#{code.method_type}{name: "#{code.method_name}", file: #{code.method_definition_file.inspect}, line_number: #{code.method_definition_line}})
           NODE
@@ -95,7 +95,7 @@ module Delfos
         end
 
         def assign(klass, prefix)
-          klass = klass.to_s.gsub(/:/, "_")
+          klass = klass.to_s.tr(":", "_")
           val = self[klass]
           return val if val
 

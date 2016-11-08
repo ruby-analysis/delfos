@@ -44,7 +44,6 @@ describe "integration" do
     a_klass_count, b_klass_count, call_site_1_count, call_site_2_count,
       instance_method_1_count, instance_method_2_count, execution_count = Delfos::Neo4j::QueryExecution.execute(query).first
 
-
     expect(b_klass_count).to eq 1
     expect(a_klass_count).to eq 1
     expect(call_site_1_count).to eq 1

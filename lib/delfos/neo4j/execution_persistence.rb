@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "query_execution"
 
 module Delfos
@@ -42,7 +43,7 @@ module Delfos
         QUERY
       end
 
-      def execution_chain_query(cs, i)
+      def execution_chain_query(_cs, i)
         <<-QUERY
         MERGE (e#{i}:ExecutionChain{number: #{execution_count}})
 

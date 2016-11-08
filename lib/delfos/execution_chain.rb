@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "neo4j/execution_persistence"
 
 module Delfos
@@ -25,18 +26,18 @@ module Delfos
     end
 
     def push(method_object)
-      self.call_sites.push(method_object)
+      call_sites.push(method_object)
       self.stack_depth += 1
 
       self.execution_count += self.stack_depth == 1 ? 1 : 0
     end
 
     def pop
-      popping_empty_stack! if self.stack_depth == 0
+      popping_empty_stack! if self.stack_depth.zero?
 
       self.stack_depth -= 1
 
-      save_and_reset!  if self.stack_depth == 0
+      save_and_reset!  if self.stack_depth.zero?
     end
 
     def stack_depth
@@ -67,9 +68,8 @@ module Delfos
     end
 
     def save_and_reset!
-      Neo4j::ExecutionPersistence.save!(self)  if call_sites.length > 0
+      Neo4j::ExecutionPersistence.save!(self) if call_sites.length.positive?
       self.call_sites = []
     end
-
   end
 end

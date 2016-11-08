@@ -13,7 +13,7 @@ module Delfos
       allow(Delfos::ExecutionChain).to receive(:push)
       allow(Delfos::ExecutionChain).to receive(:pop)
 
-      Delfos.logger= logger
+      Delfos.logger = logger
       current_file = Pathname.new(File.expand_path(__FILE__))
       Delfos.application_directories = [
         current_file + "../../../../fixtures",

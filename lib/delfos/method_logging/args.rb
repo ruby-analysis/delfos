@@ -27,12 +27,12 @@ module Delfos
       def calculate_args(arguments)
         arguments.
           map { |o| klass_for(o) }.
-          select { |k| keep?(k)}
+          select { |k| keep?(k) }
       end
 
       def keep?(klass)
         files_for(klass).
-          select{ |f| record?(f) }.length > 0
+          select { |f| record?(f) }.length.positive?
       end
 
       def files_for(klass)
@@ -47,7 +47,6 @@ module Delfos
 
         sources.map(&:first)
       end
-
 
       def record?(f)
         Delfos.method_logging.include_any_path_in_logging?(f)

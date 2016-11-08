@@ -80,12 +80,8 @@ RSpec.configure do |c|
     end
   end
 
-
   c.around(:each) do |e|
     Delfos.reset!
     timeout { e.run }
   end
-
 end
-
-

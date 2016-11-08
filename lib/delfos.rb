@@ -39,15 +39,15 @@ module Delfos
     end
 
     def setup!(logger: Delfos::Neo4j::Informer.new,
-               neo4j_url: nil,
-               neo4j_username: nil,
-               neo4j_password: nil,
-               application_directories: nil)
+      neo4j_url: nil,
+      neo4j_username: nil,
+      neo4j_password: nil,
+      application_directories: nil)
 
       @application_directories = if application_directories.is_a?(Proc)
-        application_directories
-      else
-        Array(application_directories).map{|f| Pathname.new(File.expand_path(f.to_s))}
+                                   application_directories
+                                 else
+                                   Array(application_directories).map { |f| Pathname.new(File.expand_path(f.to_s)) }
       end
 
       @logger = logger
@@ -56,7 +56,7 @@ module Delfos
       perform_patching!
     end
 
-    def setup_neo4j!(url=nil, username=nil, password=nil)
+    def setup_neo4j!(url = nil, username = nil, password = nil)
       url ||= ENV["NEO4J_URL"] || "http://localhost:7474"
       username ||= ENV["NEO4J_USERNAME"] || "neo4j"
       password ||= ENV["NEO4J_PASSWORD"] || "password"
@@ -74,8 +74,6 @@ module Delfos
         "  url: #{url}\n  username: #{username}\n  password: #{password}"
       end
     end
-
-
 
     attr_reader :application_directories, :neo4j_host, :neo4j_username, :neo4j_password
   end

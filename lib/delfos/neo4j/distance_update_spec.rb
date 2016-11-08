@@ -8,7 +8,7 @@ describe Delfos::Neo4j::DistanceUpdate do
     Delfos.wipe_db!
     Delfos.reset!
     dir = File.expand_path File.join(File.expand_path(__FILE__), "../../../../fixtures/ruby/")
-    raise unless Dir.exists?(dir)
+    raise unless Dir.exist?(dir)
     Delfos.setup! application_directories: [dir]
 
     load "fixtures/ruby/efferent_coupling.rb"
@@ -38,10 +38,10 @@ describe Delfos::Neo4j::DistanceUpdate do
     @result = Delfos::Neo4j::QueryExecution.execute(query)
   end
 
-  MAPPING = {klass: 0, method: 1, call_site: 2, called: 4, called_klass: 6}
+  MAPPING = { klass: 0, method: 1, call_site: 2, called: 4, called_klass: 6 }.freeze
 
   def parse_result(key)
-    @result.map{|r| r[MAPPING[key]]}.flatten.uniq
+    @result.map { |r| r[MAPPING[key]] }.flatten.uniq
   end
 
   it "records the Classes" do
@@ -62,13 +62,13 @@ describe Delfos::Neo4j::DistanceUpdate do
 
     it "records the call_site details" do
       expect(parse_result(:call_site)).to eq [
-        {"file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 6},
-        {"file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 7},
-        {"file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 8},
-        {"file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 9},
-        {"file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 10},
-        {"file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 11},
-        {"file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 12}
+        { "file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 6 },
+        { "file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 7 },
+        { "file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 8 },
+        { "file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 9 },
+        { "file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 10 },
+        { "file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 11 },
+        { "file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 12 },
       ]
     end
   end
@@ -79,9 +79,9 @@ describe Delfos::Neo4j::DistanceUpdate do
     calleds = parse_result(:called)
 
     expect(calleds).to match_array [
-      { "file" => file_path, "name" => "send_message",     "line_number" => 2 },
-      { "file" => file_path, "name" => "found_in_here",    "line_number" => 12 },
-      { "file" => file_path, "name" => "for_good_measure", "line_number" => 16 },
+      { "file" => file_path, "name" => "send_message",     "line_number" => 3 },
+      { "file" => file_path, "name" => "found_in_here",    "line_number" => 13 },
+      { "file" => file_path, "name" => "for_good_measure", "line_number" => 17 },
     ]
   end
 

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "Forwardable" unless defined? Forwardable
 
 module Delfos
@@ -39,7 +40,7 @@ module Delfos
       def fetch(klass)
         # Find method definitions defined in klass or its ancestors
         super_klass = klass.ancestors.detect do |k|
-          (fetch_without_default(k) || {}).values.length > 0
+          (fetch_without_default(k) || {}).values.length.positive?
         end
 
         added_methods[(super_klass || klass).to_s] ||= {}

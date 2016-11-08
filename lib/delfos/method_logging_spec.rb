@@ -23,10 +23,8 @@ describe Delfos::MethodLogging do
 
     before do
       expect_any_instance_of(Delfos::MethodLogging::AddedMethods).
-        to receive(:added_methods).at_least(:once).and_return({
-         "A"  => { instance_method_some_method:  method_a},
-         "B"  => { instance_method_another_method: method_b }
-      })
+        to receive(:added_methods).at_least(:once).and_return("A" => { instance_method_some_method:  method_a },
+                                                              "B" => { instance_method_another_method: method_b })
 
       Delfos.logger = logger
       path_fixtures = Pathname.new(File.expand_path(__FILE__)) + "../../../fixtures"
@@ -46,7 +44,8 @@ describe Delfos::MethodLogging do
           args, keyword_args, block,
           class_method = false,
           stack, call_site_binding,
-          method(__method__))
+          method(__method__)
+        )
       end
     end
 
