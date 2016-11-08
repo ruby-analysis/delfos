@@ -24,22 +24,18 @@ module Delfos
       def setup
         return if ensure_method_recorded!
 
-        recordable = Recordable.from(self)
+        class_method = class_method()
         performer = method(:perform_call)
         method_selector = method(:method_selector)
 
         method_defining_method.call(name) do |*args, **keyword_args, &block|
-          method_to_call = method_selector.call(self, recordable)
+          method_to_call = method_selector.call(self)
 
-          Delfos.method_logging.log(self, args, keyword_args, block, recordable.class_method, caller.dup, binding.dup, method_to_call)
+          Delfos.method_logging.log(self, args, keyword_args, block, class_method, caller.dup, binding.dup, method_to_call)
 
-          performer.call(method_to_call, args, keyword_args, block).tap { ExecutionChain.pop }
-        end
-      end
-
-      Recordable = Struct.new(:original, :class_method , :klass , :method_name) do
-        def self.from(other)
-          new(other.original_method, other.class_method, other.klass, other.name)
+          performer.call(method_to_call, args, keyword_args, block).tap do
+            ExecutionChain.pop 
+          end
         end
       end
 
@@ -54,12 +50,12 @@ module Delfos
 
       private
 
-      def method_selector(instance, recordable)
-        if recordable.class_method
-          m = Delfos::MethodLogging::AddedMethods.find(instance, "ClassMethod_#{recordable.method_name}")
+      def method_selector(instance)
+        if class_method
+          m = Delfos::MethodLogging::AddedMethods.find(instance, "ClassMethod_#{name}")
           m.receiver == instance ?  m : m.unbind.bind(instance)
         else
-          recordable.original.bind(instance)
+          original_method.bind(instance)
         end
       end
 
