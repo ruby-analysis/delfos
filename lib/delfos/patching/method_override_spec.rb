@@ -44,12 +44,12 @@ describe Delfos::Patching::MethodOverride do
     end
 
     it do
-      expect(Delfos::Patching::AddedMethods.instance.added_methods).to eq({})
+      expect(Delfos::MethodLogging::AddedMethods.instance.added_methods).to eq({})
 
       described_class.setup(klass, "some_public_method", klass.private_instance_methods, class_method: false)
       described_class.setup(klass, "some_class_method",  klass.private_methods,          class_method: true)
 
-      result = Delfos::Patching::AddedMethods.instance.added_methods
+      result = Delfos::MethodLogging::AddedMethods.instance.added_methods
 
       expect(result["SomeRandomClass"]["InstanceMethod_some_public_method"].source_location).
         to eq [File.expand_path(__FILE__), $instance_method_line_number]

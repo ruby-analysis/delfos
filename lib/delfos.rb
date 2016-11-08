@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 require "delfos/version"
-require "delfos/patching/added_methods"
-require "delfos/neo4j/query_execution"
 require "delfos/neo4j/informer"
 
 module Delfos
@@ -14,6 +12,8 @@ module Delfos
 
     def wipe_db!
       Delfos.setup_neo4j!
+
+      require "delfos/neo4j/query_execution"
       Delfos::Neo4j::QueryExecution.execute <<-QUERY
         MATCH (m)-[rel]->(n)
         DELETE m,rel,n
@@ -24,9 +24,13 @@ module Delfos
       @application_directories = []
       @neo4j = nil
       @logger = nil
+
       require "delfos/execution_chain"
       Delfos::ExecutionChain.reset!
-      Delfos::Patching::AddedMethods.instance_eval { @instance = nil }
+
+      require "delfos/method_logging/added_methods"
+      Delfos::MethodLogging::AddedMethods.instance_eval { @instance = nil }
+
       remove_patching!
     end
 

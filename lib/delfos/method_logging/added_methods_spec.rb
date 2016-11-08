@@ -1,6 +1,6 @@
 require_relative "./added_methods"
 module Delfos
-  module Patching
+  module MethodLogging
     describe AddedMethods do
       class SuperKlass
         $instance_method_line = __LINE__ + 1
@@ -38,13 +38,13 @@ module Delfos
       describe "#append" do
         it do
           subject.append(SuperKlass, "B", "C")
-          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include({"B" => "C"})
+          expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include({"B" => "C"})
 
           subject.append(SuperKlass, "B", "D")
-          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include({"B" => "D"})
+          expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include({"B" => "D"})
 
           subject.append(SuperKlass, "E", "F")
-          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include({"B" => "D", "E"=>"F"})
+          expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include({"B" => "D", "E"=>"F"})
         end
       end
 

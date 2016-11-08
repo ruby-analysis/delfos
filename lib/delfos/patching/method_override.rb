@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "added_methods"
 require_relative "../method_logging"
 
 module Delfos
@@ -49,7 +48,7 @@ module Delfos
       def method_selector
         lambda do |instance, class_method, original, method_name|
           if class_method
-            m = Delfos::Patching::AddedMethods.find(instance, "ClassMethod_#{method_name}")
+            m = Delfos::MethodLogging::AddedMethods.find(instance, "ClassMethod_#{method_name}")
             if m.receiver == instance
               m
             else
@@ -84,7 +83,7 @@ module Delfos
       def ensure_method_recorded!
         return true if bail?
 
-        AddedMethods.append(klass, key, original_method)
+        Delfos::MethodLogging::AddedMethods.append(klass, key, original_method)
 
         false
       end
@@ -94,7 +93,7 @@ module Delfos
       end
 
       def method_has_been_added?
-        AddedMethods.find(klass, key)
+        Delfos::MethodLogging::AddedMethods.find(klass, key)
       end
 
       def private_method?

@@ -31,7 +31,7 @@ describe Delfos::MethodLogging::Args do
         [["/some-unincluded-path/example.rb", 12]]
       end
     end
-    allow(Delfos::Patching::AddedMethods).
+    allow(Delfos::MethodLogging::AddedMethods).
       to receive(:method_sources_for, &definition)
 
 

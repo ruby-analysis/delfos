@@ -81,7 +81,7 @@ module Delfos
       end
 
       def method_definition
-        @method_definition ||= ::Delfos::Patching::AddedMethods.method_sources_for(klass).first
+        @method_definition ||= ::Delfos::MethodLogging::AddedMethods.method_sources_for(klass).first
       end
     end
 

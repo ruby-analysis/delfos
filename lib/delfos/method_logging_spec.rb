@@ -22,7 +22,7 @@ describe Delfos::MethodLogging do
     let(:method_b) { double "method b", source_location: [b_path, 2] }
 
     before do
-      expect_any_instance_of(Delfos::Patching::AddedMethods).
+      expect_any_instance_of(Delfos::MethodLogging::AddedMethods).
         to receive(:added_methods).at_least(:once).and_return({
          "A"  => { instance_method_some_method:  method_a},
          "B"  => { instance_method_another_method: method_b }
