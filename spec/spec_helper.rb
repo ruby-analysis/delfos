@@ -6,6 +6,10 @@ require "delfos"
 require "pathname"
 ENV["DELFOS_DEVELOPMENT"] = "true"
 
+ENV["NEO4J_URL"]      ||= "http://localhost:7476"
+ENV["NEO4J_USERNAME"] ||= "neo4j"
+ENV["NEO4J_PASSWORD"] ||= "password"
+
 module DelfosSpecHelpers
   def expand_fixture_path(path = "")
     s = File.join File.expand_path(fixture_path), path

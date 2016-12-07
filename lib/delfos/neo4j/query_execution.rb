@@ -8,7 +8,7 @@ module Delfos
   module Neo4j
     module QueryExecution
       class << self
-        def execute(query, _url = nil)
+        def execute(query, params={})
           return unless query.length.positive?
 
           strip_out_meta_data response_for(query)

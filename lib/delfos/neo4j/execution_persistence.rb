@@ -9,7 +9,7 @@ module Delfos
       end
 
       def save!
-        Neo4j::QueryExecution.execute query
+        Neo4j::QueryExecution.execute(query, params)
       end
 
       private
@@ -23,41 +23,72 @@ module Delfos
       attr_reader :call_sites, :execution_count
 
       def query
-        call_sites.compact.map.with_index do |c, i|
+        map_call_sites do |c,i|
           call_site_query(c, i)
         end.join("\n")
       end
 
+      def params
+        params = {}
+
+        map_call_sites do |c,i|
+          params.merge(call_site_params(c, i))
+        end
+
+        params
+      end
+
+      def map_call_sites
+        call_sites.compact.map.with_index do |c, i|
+          yield c, i
+        end
+      end
+
       def call_site_query(cs, i)
-        <<-QUERY
-        #{method_query(cs, i)}
+         <<-QUERY
+          MERGE
 
-      MERGE
-        (m#{i})
+          (k#{i}:{klass#{i}})
 
-        -[:CONTAINS]->
+          - [:OWNS] ->
 
-        (cs#{i}:CallSite {file: "#{cs.file}", line_number: #{cs.line_number}})
+          (
+            m#{i} :{method_type#{i}} {
+              name: {method_name#{i}},
+              file: {method_definition_file#{i}},
+              line_number: {method_definition_line#{i}}}
+          )
 
-        #{execution_chain_query(cs, i)}
+          MERGE
+
+          (m#{i})
+
+          -[:CONTAINS]->
+
+          (cs#{i}:CallSite {file: {file#{i}}, line_number: {line_number#{i}}})
+
+          MERGE (e#{i}:ExecutionChain{number: {execution_count}})
+
+          MERGE (e#{i})
+            -
+            [:STEP{number: {step_number#{i}}}]
+            ->
+          (cs#{i})
         QUERY
       end
 
-      def execution_chain_query(_cs, i)
-        <<-QUERY
-        MERGE (e#{i}:ExecutionChain{number: #{execution_count}})
-
-        MERGE e#{i}-[:STEP{number: #{i + 1}}]-> (cs#{i})
-        QUERY
-      end
-
-      def method_query(cs, i)
-        <<-QUERY
-        MERGE (k#{i}:#{cs.klass})
-        - [:OWNS] ->
-
-        (m#{i} :#{cs.method_type} {name: "#{cs.method_name}", file: "#{cs.method_definition_file}", line_number: #{cs.method_definition_line}})
-        QUERY
+      def call_site_params(cs, i)
+        {
+          "klass#{i}"                  => cs.klass,
+          "method_name#{i}"            => cs.method_name,
+          "method_type#{i}"            => cs.method_type,
+          "method_definition_file#{i}" => cs.method_definition_file,
+          "execution_count#{i}"        => execution_count,
+          "method_definition_line#{i}" => cs.method_definition_line,
+          "file#{i}"                   => cs.file,
+          "line_number#{i}"            => cs.line_number,
+          "step_number#{i}"            => i + 1
+        }
       end
     end
   end

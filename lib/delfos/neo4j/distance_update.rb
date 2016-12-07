@@ -51,19 +51,19 @@ module Delfos
       end
 
       def perform_query(calc, call_site_id, called_id)
-        Delfos::Neo4j::QueryExecution.execute <<-QUERY
-          START call_site = node(#{call_site_id}),
-                called    = node(#{called_id})
+        Delfos::Neo4j::QueryExecution.execute <<-QUERY, {call_site_id: call_site_id, called_id: called_id, sum_traversals: calc.sum_traversals, sum_possible_traversals: calc.sum_possible_traversals}
+          START call_site = node({call_site_id}),
+                called    = node({called_id})
 
-           MERGE (call_site) - #{rel_for(calc)} -> (called)
+           MERGE (call_site) - #{rel} -> (called)
         QUERY
       end
 
-      def rel_for(calc)
+      def rel
         <<-REL
            [:EFFERENT_COUPLING{
-             distance:          #{calc.sum_traversals},
-             possible_distance: #{calc.sum_possible_traversals}
+             distance:          {sum_traversals},
+             possible_distance: {sum_possible_traversals}
              }
            ]
         REL

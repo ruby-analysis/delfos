@@ -43,6 +43,7 @@ module Delfos
       neo4j_username: nil,
       neo4j_password: nil,
       application_directories: nil)
+      application_directories ||= %w(app lib)
 
       @application_directories = if application_directories.is_a?(Proc)
                                    application_directories
@@ -51,6 +52,7 @@ module Delfos
       end
 
       @logger = logger
+
       setup_neo4j!(neo4j_url, neo4j_username, neo4j_password)
 
       perform_patching!
