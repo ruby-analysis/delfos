@@ -9,9 +9,12 @@ module Delfos
     class Args
       include KlassDetermination
 
-      def initialize(args, keyword_args)
-        @raw_args = args
-        @raw_keyword_args = keyword_args
+      attr_reader :block
+
+      def initialize(arguments)
+        @raw_args = arguments.args
+        @raw_keyword_args = arguments.keyword_args
+        @block = arguments.block
       end
 
       def args
@@ -43,9 +46,7 @@ module Delfos
       end
 
       def source_files(klass)
-        sources = AddedMethods.method_sources_for(klass)
-
-        sources.map(&:first)
+        AddedMethods.all_method_sources_for(klass).map(&:first)
       end
 
       def record?(f)

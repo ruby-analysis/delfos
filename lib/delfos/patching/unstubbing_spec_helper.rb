@@ -35,13 +35,11 @@ module Delfos
 
         # This method is the inverse of `Delfos::Patching#setup`
         def unstub!
-          original = original_method
-          class_method = class_method()
-          performer = method(:perform_call)
+          method_selector = method :method_selector
 
           method_defining_method.call(name) do |*args, **keyword_args, &block|
-            method_to_call = class_method ? original : original.bind(self)
-            performer.call(method_to_call, args, keyword_args, block)
+            arguments = Delfos::Patching::MethodOverride::MethodArguments.new(args, keyword_args, block)
+            arguments.perform_call_on(method_selector.call(self))
           end
         end
       end

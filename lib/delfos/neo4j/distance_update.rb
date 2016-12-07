@@ -7,24 +7,7 @@ module Delfos
   module Neo4j
     class DistanceUpdate
       def perform
-        query = <<-QUERY
-          MATCH
-            (klass)        -  [:OWNS]     -> (method),
-            (method)       -  [:CONTAINS] -> (call_site),
-            (call_site)    -  [:CALLS]    -> (called),
-            (called_klass) -  [:OWNS]     -> (called)
-
-          RETURN
-            head(labels(klass)),
-            call_site, id(call_site),
-            method,
-            called, id(called),
-            head(labels(called_klass))
-        QUERY
-
-        results = Delfos::Neo4j::QueryExecution.execute(query)
-
-        update(results)
+        update Delfos::Neo4j::QueryExecution.execute(query)
       end
 
       def determine_full_path(f)
@@ -38,6 +21,23 @@ module Delfos
       end
 
       private
+
+      def query
+        <<-QUERY
+          MATCH
+            (klass)        -  [:OWNS]     -> (method),
+            (method)       -  [:CONTAINS] -> (call_site),
+            (call_site)    -  [:CALLS]    -> (called),
+            (called_klass) -  [:OWNS]     -> (called)
+
+          RETURN
+            head(labels(klass)),
+            call_site, id(call_site),
+            method,
+            called, id(called),
+            head(labels(called_klass))
+        QUERY
+      end
 
       def update(results)
         Array(results).compact.map do |_klass, call_site, call_site_id, _meth, called, called_id, _called_klass|

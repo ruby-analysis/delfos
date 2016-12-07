@@ -67,10 +67,10 @@ module Delfos
 
       describe "#method_sources_for" do
         it do
-          expect(subject.method_sources_for(SubKlass)).to include([__FILE__, $class_method_line])
-          expect(subject.method_sources_for(SubKlass)).to include([__FILE__, $instance_method_line])
-          expect(subject.method_sources_for(SubKlass)).to include([__FILE__, $sub_klass_method_not_in_super_klass_line])
-          expect(subject.method_sources_for(SubKlass)).to include([__FILE__, $sub_klass_class_method_not_in_super_klass_line])
+          expect(subject.all_method_sources_for(SubKlass)).to include([__FILE__, $class_method_line])
+          expect(subject.all_method_sources_for(SubKlass)).to include([__FILE__, $instance_method_line])
+          expect(subject.all_method_sources_for(SubKlass)).to include([__FILE__, $sub_klass_method_not_in_super_klass_line])
+          expect(subject.all_method_sources_for(SubKlass)).to include([__FILE__, $sub_klass_class_method_not_in_super_klass_line])
         end
       end
     end

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require_relative "method_logging"
+require_relative "./patching/method_override"
 require_relative "../../fixtures/a"
 require_relative "../../fixtures/b"
 
@@ -23,8 +24,10 @@ describe Delfos::MethodLogging do
 
     before do
       expect_any_instance_of(Delfos::MethodLogging::AddedMethods).
-        to receive(:added_methods).at_least(:once).and_return("A" => { instance_method_some_method:  method_a },
-                                                              "B" => { instance_method_another_method: method_b })
+        to receive(:added_methods).
+        at_least(:once).
+        and_return("A" => { instance_method_some_method:  method_a },
+                   "B" => { instance_method_another_method: method_b })
 
       Delfos.logger = logger
       path_fixtures = Pathname.new(File.expand_path(__FILE__)) + "../../../fixtures"
@@ -32,38 +35,43 @@ describe Delfos::MethodLogging do
       Delfos.application_directories = [path_spec, path_fixtures]
     end
 
-    class TestCalledObject
-      # This method represents a method with the meta programming hooks added for the logging
+    class DummyPatchedObject
+      # This represents the stack offset from the point at parsing the stack,
+      # and the aimed at location to determine the caller object. It is
+      # unfortunately implementation specific. Hence the magic number.
+      MAGIC_OFFSET = 3
+
+      # This method represents a simulated version of a method patched by
+      # MethodOverride#setup
       def called_method(args, keyword_args, block)
         $called_line = __LINE__ - 1
-        call_site_binding = binding
-        stack = caller.dup
+        call_site = Delfos::MethodLogging::CallSiteParsing.new(caller.dup, binding.dup, stack_offset: MAGIC_OFFSET).perform
+        args = Delfos::Patching::MethodOverride::MethodArguments.new(args, keyword_args, block)
 
         Delfos.method_logging.log(
+          call_site,
           self,
-          args, keyword_args, block,
+          method(__method__),
           class_method = false,
-          stack, call_site_binding,
-          method(__method__)
+          args
         )
+
+        #real method would do stuff here
       end
     end
 
     class TestCallSiteObject
-      def call_site_method(called_object, args, keyword_args, block, _called_method)
-        called_object = TestCalledObject.new
-
+      def call_site_method(called_object, args, keyword_args, block)
         $call_site_line = __LINE__ + 1
         called_object.called_method(args, keyword_args, block)
       end
     end
 
     it do
-      called_object = TestCalledObject.new
-      expect(TestCalledObject).to receive(:new).and_return called_object
+      dummy = DummyPatchedObject.new
 
       call_site_object = TestCallSiteObject.new
-      call_site_object.call_site_method(called_object, args, keyword_args, block, class_method)
+      call_site_object.call_site_method(dummy, args, keyword_args, block)
 
       expect(logger).to have_received(:debug) do |args, call_site, called_code|
         expect(args.args).to eq [A, B]
@@ -77,7 +85,7 @@ describe Delfos::MethodLogging do
         expect(called_code.file).to eq "delfos/method_logging_spec.rb"
         expect(called_code.line_number).to eq $called_line
         expect(called_code.method_name).to eq "called_method"
-        expect(called_code.object).to eq called_object
+        expect(called_code.object).to eq dummy
       end
     end
   end

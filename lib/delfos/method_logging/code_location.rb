@@ -67,11 +67,21 @@ module Delfos
       end
 
       def method_definition_file
-        method_definition[0].to_s
+        if method_definition
+          method_definition[0].to_s
+        else
+          #TODO fix edge case when block
+          "#{@file} in block"
+        end
       end
 
       def method_definition_line
-        method_definition[1].to_i
+        if method_definition
+          method_definition[1].to_i
+        else
+          #TODO fix edge case when block
+          0
+        end
       end
 
       private
@@ -81,7 +91,7 @@ module Delfos
       end
 
       def method_definition
-        @method_definition ||= ::Delfos::MethodLogging::AddedMethods.method_sources_for(klass).first
+        @method_definition ||= ::Delfos::MethodLogging::AddedMethods.method_source_for(klass, method_key)
       end
     end
 
@@ -93,9 +103,10 @@ module Delfos
 
       attr_reader :stack, :call_site_binding
 
-      def initialize(stack, call_site_binding)
+      def initialize(stack, call_site_binding, stack_offset: nil)
         @stack = stack
         @call_site_binding = call_site_binding
+        @stack_offset = stack_offset
       end
 
       def perform
@@ -119,7 +130,11 @@ module Delfos
       end
 
       def object
-        @object ||= call_site_binding.of_caller(stack_index + STACK_OFFSET).receiver
+        @object ||= call_site_binding.of_caller(stack_index + stack_offset).receiver
+      end
+
+      def stack_offset
+        @stack_offset ||= STACK_OFFSET
       end
 
       def stack_index

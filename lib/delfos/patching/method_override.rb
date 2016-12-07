@@ -8,8 +8,8 @@ module Delfos
       class << self
         def setup(klass, name, private_methods, class_method:)
           instance = new(klass, name, private_methods, class_method)
-          return if instance.ensure_method_recorded!
-          instance.setup
+
+          instance.ensure_method_recorded_once!
         end
       end
 
@@ -20,23 +20,64 @@ module Delfos
         @name = name
         @private_methods = private_methods
         @class_method = class_method
+        original_method # ensure memoized method is the original not the overridden one
+      end
+
+      def ensure_method_recorded_once!
+        record_method! { setup }
       end
 
       # Redefine the method (only once) at runtime to enabling logging to Neo4j
       def setup
-        cm, performer, method_selector = class_method(), method(:perform_call), method(:method_selector)
+        processor = method(:process)
 
         method_defining_method.call(name) do |*args, **kw_args, &block|
-          method_to_call = method_selector.call(self)
+          arguments = MethodArguments.new(args, kw_args, block)
 
-          Delfos.method_logging.log(self, args, kw_args, block, cm,
-                                    caller.dup, binding.dup, method_to_call)
+          processor.call(self, caller.dup, binding.dup, arguments)
+        end
+      end
 
-          performer.call(method_to_call, args, kw_args, block).tap do
-            ExecutionChain.pop
+      def process(instance, stack, caller_binding, arguments)
+        method_to_call = method_selector(instance)
+
+        call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
+
+        with_logging(call_site, instance, method_to_call, class_method, arguments) do
+          arguments.perform_call_on(method_to_call)
+        end
+      end
+
+      def with_logging(call_site, instance, method_to_call, class_method, arguments)
+        Delfos.method_logging.log(call_site, instance, method_to_call, class_method, arguments) if call_site
+
+        with_stack(call_site) do
+          yield
+        end
+      end
+
+
+      def with_stack(call_site)
+        return yield unless call_site
+
+        begin
+          ExecutionChain.push(call_site)
+          yield
+        ensure
+          ExecutionChain.pop
+        end
+      end
+
+      class MethodArguments < Struct.new(:args, :keyword_args, :block, :class_method)
+        def perform_call_on(method_to_call)
+          if keyword_args.empty?
+            method_to_call.call(*args, &block)
+          else
+            method_to_call.call(*args, **keyword_args, &block)
           end
         end
       end
+
 
       def original_method
         @original_method ||= if class_method
@@ -46,16 +87,14 @@ module Delfos
                              end
       end
 
-      def ensure_method_recorded!
+      private
+
+      def record_method!
         return true if bail?
+        yield
 
         Delfos::MethodLogging::AddedMethods.append(klass, key, original_method)
-
-        false
       end
-
-
-      private
 
       def method_selector(instance)
         if class_method
@@ -63,14 +102,6 @@ module Delfos
           m.receiver == instance ? m : m.unbind.bind(instance)
         else
           original_method.bind(instance)
-        end
-      end
-
-      def perform_call(method_to_call, args, keyword_args, block)
-        if keyword_args.empty?
-          method_to_call.call(*args, &block)
-        else
-          method_to_call.call(*args, **keyword_args, &block)
         end
       end
 

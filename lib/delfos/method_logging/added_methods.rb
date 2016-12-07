@@ -8,7 +8,8 @@ module Delfos
         extend Forwardable
 
         def_delegators :instance,
-          :method_sources_for,
+          :all_method_sources_for,
+          :method_source_for,
           :append,
           :find
 
@@ -23,11 +24,20 @@ module Delfos
 
       attr_reader :added_methods
 
-      def method_sources_for(klass)
+      def all_method_sources_for(klass)
         fetch(klass).values.map(&:source_location)
       end
 
+      def method_source_for(klass, key)
+        meth = find(klass, key)
+
+        if meth
+          meth.source_location
+        end
+      end
+
       def append(klass, key, original_method)
+        puts "Recording method #{klass} #{key}"
         fetch(klass)[key] = original_method
       end
 

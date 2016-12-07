@@ -11,6 +11,10 @@ describe Delfos::MethodLogging::Args do
   let(:a_path) { File.expand_path "./fixtures/a.rb" }
   let(:b_path) { File.expand_path "./fixtures/b.rb" }
 
+  def f(*args, **keyword_args)
+    double("Arguments object", args: args, keyword_args: keyword_args, block: nil)
+  end
+
   let(:method_logging) do
     double("method_logging").tap do |m|
       allow(m).to receive(:include_any_path_in_logging?) do |paths|
@@ -31,14 +35,14 @@ describe Delfos::MethodLogging::Args do
       end
     end
     allow(Delfos::MethodLogging::AddedMethods).
-      to receive(:method_sources_for, &definition)
+      to receive(:all_method_sources_for, &definition)
 
     allow(Delfos).to receive(:method_logging).and_return method_logging
     path = Pathname.new(File.expand_path(__FILE__)) + "../../../../fixtures"
     Delfos.application_directories = [path]
   end
 
-  subject { described_class.new([a, b, c, d], c: c, d: d) }
+  subject { described_class.new(f(a, b, c, d, c: c, d: d)) }
 
   describe "#args" do
     it do

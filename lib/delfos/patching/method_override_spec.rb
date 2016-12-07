@@ -12,6 +12,10 @@ describe Delfos::Patching::MethodOverride do
     def self.some_class_method
     end
 
+    def some_externally_called_public_method
+      some_public_method
+    end
+
     $instance_method_line_number = __LINE__ + 1
     def some_public_method
       some_private_method
@@ -61,31 +65,68 @@ describe Delfos::Patching::MethodOverride do
   end
 
   describe ".perform" do
-    context "with a class with a private method" do
-      it "includes public methods" do
-        expect(Delfos::MethodLogging).to receive(:log)
-        described_class.setup(klass, "some_public_method", klass.private_instance_methods, class_method: false)
+    let(:method_logging) { 
+      exclusion = lambda{|m| 
+        ![:some_public_method, :some_externally_called_public_method].include?(m.name)
+      }
 
+      m = double("MethodLogging")
+      allow(m).to receive(:include_file_in_logging?) {|f| f == __FILE__ }
+      allow(m).to receive(:exclude?, &exclusion)
+      m
+    }
+
+    before do
+      Delfos.method_logging = method_logging
+    end
+
+    context "with a class with a private method" do
+      def setup_method(m)
+        described_class.setup(klass, m, klass.private_instance_methods, class_method: false)
+      end
+
+      before do
+        byebug
+        setup_method("some_externally_called_public_method")
+        setup_method("some_public_method")
+      end
+
+      it "includes public methods" do
+        expect(method_logging).to receive(:log)
+        byebug
         some_random_instance.some_public_method
       end
 
       it "excludes private methods" do
-        expect(Delfos::MethodLogging).not_to receive(:log)
+        expect(method_logging).not_to receive(:log)
 
-        described_class.setup(klass, "some_private_method", klass.private_instance_methods, class_method: false)
+        setup_method("some_private_method")
 
         some_random_instance.send(:some_private_method)
       end
 
       it "sends the correct args to the method logger" do
-        expect(Delfos::MethodLogging).to receive(:log) do |object, _args, _keyword_args, _block, _class_method, _stack, _call_site_binding, original_method|
+        call_count = 0
+
+        expect(method_logging).to receive(:log) do |call_site, object, called_method,  _class_method, _arguments|
+          call_count += 1
           expect(object).to be_a SomeRandomClass
-          expect(original_method.name).to eq :some_public_method
-        end
+          expect(call_site).to be_a Delfos::MethodLogging::CodeLocation
 
-        described_class.setup(klass, "some_public_method", klass.private_instance_methods, class_method: false)
+          case call_count
+          when 1
+            expect(call_site.object.class.name).to match /RSpec::ExampleGroups/
+            expect(called_method.name).to eq :some_externally_called_public_method
+          when 2
+            #expect(called_method.name).to eq  :some_public_method
+            expect(call_site.object.class.name).to match /Delfos::Patching::MethodOverride::MethodArguments/
+          end
+        end.twice
 
-        some_random_instance.some_public_method
+        setup_method("some_public_method")
+        setup_method("some_externally_called_public_method")
+
+        some_random_instance.some_externally_called_public_method
       end
     end
   end

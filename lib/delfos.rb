@@ -22,6 +22,7 @@ module Delfos
 
     def reset!
       @application_directories = []
+      @method_logging = nil
       @neo4j = nil
       @logger = nil
 

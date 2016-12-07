@@ -30,23 +30,12 @@ module Delfos
         raise Delfos::ApplicationDirectoriesNotDefined unless Delfos.application_directories
       end
 
-      def log(called_object,
-        args, keyword_args, _block,
-        class_method,
-        stack, call_site_binding,
-        called_method)
+      def log(call_site, called_object, called_method, class_method, arguments)
         check_setup!
-
-        call_site = CodeLocation.from_call_site(stack, call_site_binding)
-        Delfos::ExecutionChain.push(call_site)
-
-        return unless call_site
-
-        args = Args.new(args.dup, keyword_args.dup)
-
+        arguments = Args.new(arguments)
         called_code = CodeLocation.from_called(called_object, called_method, class_method)
 
-        Delfos.logger.debug(args, call_site, called_code)
+        Delfos.logger.debug(arguments, call_site, called_code)
       end
 
       def include_any_path_in_logging?(paths)

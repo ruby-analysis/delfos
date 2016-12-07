@@ -34,6 +34,7 @@ module Delfos
           request = request_for(query)
           http = Net::HTTP.new(uri.host, uri.port)
 
+          puts "HERE"
           http.request(request)
         end
 
