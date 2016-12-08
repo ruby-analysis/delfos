@@ -36,7 +36,7 @@ module DelfosSpecHelpers
 end
 
 module TimeoutHelpers
-  TIMEOUT_VALUE = (ENV["TIMEOUT"] || (ENV["CI"] ? 20 : 0.0)).to_f
+  TIMEOUT_VALUE = (ENV["TIMEOUT"] || (ENV["CI"] ? 40 : 0.0)).to_f
 
   def timeout
     return yield if TIMEOUT_VALUE == 0.0
