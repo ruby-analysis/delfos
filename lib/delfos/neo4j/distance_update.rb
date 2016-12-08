@@ -25,10 +25,10 @@ module Delfos
       def query
         <<-QUERY
           MATCH
-            (klass)        -  [:OWNS]     -> (method),
-            (method)       -  [:CONTAINS] -> (call_site),
-            (call_site)    -  [:CALLS]    -> (called),
-            (called_klass) -  [:OWNS]     -> (called)
+            (klass:Class)        -  [:OWNS]     -> (method:Method),
+            (method)             -  [:CONTAINS] -> (call_site:CallSite),
+            (call_site)          -  [:CALLS]    -> (called:Method),
+            (called_klass:Class) -  [:OWNS]     -> (called:Method)
 
           RETURN
             head(labels(klass)),

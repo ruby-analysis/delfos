@@ -29,12 +29,14 @@ describe Delfos::Neo4j::DistanceUpdate do
         (call_site)    - [:EFFERENT_COUPLING] -> (called)
 
       RETURN
-        head(labels(klass)),
+
+        klass.name,
         method,
         call_site, id(call_site),
         called, id(called),
-        head(labels(called_klass))
+        called_klass.name
     QUERY
+
     @result = Delfos::Neo4j::QueryExecution.execute(query)
   end
 
@@ -79,9 +81,9 @@ describe Delfos::Neo4j::DistanceUpdate do
     calleds = parse_result(:called)
 
     expect(calleds).to match_array [
-      { "file" => file_path, "name" => "send_message",     "line_number" => 3 },
-      { "file" => file_path, "name" => "found_in_here",    "line_number" => 13 },
-      { "file" => file_path, "name" => "for_good_measure", "line_number" => 17 },
+      { "file" => file_path, "name" => "send_message",     "line_number" => 3,  "type"=>"ClassMethod" },
+      { "file" => file_path, "name" => "found_in_here",    "line_number" => 13, "type"=>"ClassMethod" },
+      { "file" => file_path, "name" => "for_good_measure", "line_number" => 17, "type"=>"ClassMethod" },
     ]
   end
 

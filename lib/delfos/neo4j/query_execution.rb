@@ -7,18 +7,35 @@ require "uri"
 module Delfos
   module Neo4j
     module QueryExecution
+      class ExecutionError  < IOError
+        def initialize(response, query, params)
+          message = response.inspect
+
+          super [message, query, params.to_json].join("\n\n    ")
+        end
+      end
+
       class << self
         def execute(query, params={})
           return unless query.length.positive?
 
-          strip_out_meta_data response_for(query)
+          parse_response(*response_for(query, params))
         end
 
         private
 
-        def strip_out_meta_data(result)
+
+        def parse_response(result, query, params)
           result = JSON.parse result.body
 
+          if result["errors"].length.positive?
+            raise ExecutionError.new(result["errors"], query, params)
+          end
+
+          strip_out_meta_data(result)
+        end
+
+        def strip_out_meta_data(result)
           results = result["results"]
 
           if results
@@ -30,17 +47,17 @@ module Delfos
           end
         end
 
-        def response_for(query)
-          request = request_for(query)
+        def response_for(query, params)
+          request = request_for(query, params)
           http = Net::HTTP.new(uri.host, uri.port)
 
-          puts "HERE"
-          http.request(request)
+          response = http.request(request)
+          [response, query, params]
         end
 
-        def request_for(query)
+        def request_for(query, params)
           build_request do
-            "{\"statements\": [{\"statement\": #{query.inspect} }]}"
+            "{\"statements\": [{\"statement\": #{query.inspect} , \"parameters\": #{params.to_json}}]}"
           end
         end
 

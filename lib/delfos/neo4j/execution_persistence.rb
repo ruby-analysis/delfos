@@ -4,8 +4,8 @@ require_relative "query_execution"
 module Delfos
   module Neo4j
     class ExecutionPersistence
-      def self.save!(other)
-        new(other.call_sites, other.execution_count).save!
+      def self.save!(chain)
+        new(chain.call_sites, chain.execution_count).save!
       end
 
       def save!
@@ -32,7 +32,7 @@ module Delfos
         params = {}
 
         map_call_sites do |c,i|
-          params.merge(call_site_params(c, i))
+          params.merge!(call_site_params(c, i))
         end
 
         params
@@ -48,12 +48,15 @@ module Delfos
          <<-QUERY
           MERGE
 
-          (k#{i}:{klass#{i}})
+          (
+            k#{i}:Class { name: {klass#{i}} }
+          )
 
           - [:OWNS] ->
 
           (
-            m#{i} :{method_type#{i}} {
+            m#{i} :Method {
+              type: {method_type#{i}},
               name: {method_name#{i}},
               file: {method_definition_file#{i}},
               line_number: {method_definition_line#{i}}}
@@ -67,11 +70,11 @@ module Delfos
 
           (cs#{i}:CallSite {file: {file#{i}}, line_number: {line_number#{i}}})
 
-          MERGE (e#{i}:ExecutionChain{number: {execution_count}})
+          MERGE (e#{i}:ExecutionChain{number: {execution_count#{i}}})
 
           MERGE (e#{i})
             -
-            [:STEP{number: {step_number#{i}}}]
+            [:STEP {number: {step_number#{i}}}]
             ->
           (cs#{i})
         QUERY

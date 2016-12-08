@@ -55,17 +55,17 @@ describe Delfos::Neo4j::Informer do
     query = subject.query_for(args, call_site, called_code)
 
     expected = <<-QUERY
-      MERGE (k1:A)
-      MERGE (k2:E)
-      MERGE (k3:B)
-      MERGE (k4:C)
-      MERGE (k5:D)
+      MERGE (k1:Class {name: "A"})
+      MERGE (k2:Class {name: "E"})
+      MERGE (k3:Class {name: "B"})
+      MERGE (k4:Class {name: "C"})
+      MERGE (k5:Class {name: "D"})
 
-      MERGE (k1) - [:OWNS] -> (m1:ClassMethod{name: "method_a", file: "a.rb", line_number: 2})
+      MERGE (k1) - [:OWNS] -> (m1:Method{type: "ClassMethod", name: "method_a", file: "a.rb", line_number: 2})
 
       MERGE (m1) - [:CONTAINS] -> (cs:CallSite{file: "a.rb", line_number: 4})
 
-      MERGE (k2) - [:OWNS] -> (m2:InstanceMethod{name: "method_e", file: "some/filename", line_number: 2})
+      MERGE (k2) - [:OWNS] -> (m2:Method{type: "InstanceMethod", name: "method_e", file: "some/filename", line_number: 2})
       MERGE (cs) - [:CALLS] -> m2
       MERGE (cs) - [:ARG] -> (k3)
       MERGE (cs) - [:ARG] -> (k4)

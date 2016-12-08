@@ -1,11 +1,8 @@
 # frozen_string_literal: true
-require_relative "klass_determination"
 
 module Delfos
   module MethodLogging
     class CodeLocation
-      include KlassDetermination
-
       class << self
         def from_call_site(stack, call_site_binding)
           CallSiteParsing.new(stack, call_site_binding).perform
@@ -58,7 +55,7 @@ module Delfos
       end
 
       def klass
-        klass_for(object)
+        object.is_a?(Class) ? object : object.class
       end
 
       def klass_name

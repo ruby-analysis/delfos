@@ -1,12 +1,15 @@
 # frozen_string_literal: true
-# This existence of these `Unstubbing` modules are an unfortunate side effect of trying to
-# test something that redefines methods.  In order to not call the logging
-# defined in `Delfos::Patching::MethodOverride#setup` multiple times we have to keep track of
-# and remove the method definitions and replace with the original definition
-# (or as close to the original as possible).
-#
-# If there is a better way to test Delfos::Patching without doing this then
-# please suggest or replace with a cleaner alternative
+
+
+# These `Unstubbing` modules because we are testing something that redefines
+# methods.
+
+# We don't want to call the logging defined in
+# `Delfos::Patching::MethodOverride#setup` multiple times. So we replace with
+# the original definition, or to as close as possible.
+
+# If there is a better way to do this please suggest
+
 module Delfos
   module Patching
     module Unstubbing
@@ -33,13 +36,20 @@ module Delfos
           self.class.add_instance_to_unstub!(self) unless bail?
         end
 
-        # This method is the inverse of `Delfos::Patching#setup`
+        # This method is the inverse of `Delfos::Patching::MethodOverride#setup`
         def unstub!
-          method_selector = method :method_selector
+          method = Delfos::MethodLogging::AddedMethods.find(klass, key)
+          return unless method
+          file = File.expand_path(__FILE__)
 
-          method_defining_method.call(name) do |*args, **keyword_args, &block|
-            arguments = Delfos::Patching::MethodOverride::MethodArguments.new(args, keyword_args, block)
-            arguments.perform_call_on(method_selector.call(self))
+          cm = class_method
+          if cm
+            method.unbind.bind(klass)
+          else
+            klass.send(:define_method, name) do |*args, **kw_args, &block|
+              arguments = Delfos::Patching::MethodOverride::MethodArguments.new(args, kw_args, block, cm)
+              arguments.apply_to(method.bind(self))
+            end
           end
         end
       end

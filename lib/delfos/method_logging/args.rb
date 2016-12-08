@@ -1,14 +1,11 @@
 # frozen_string_literal: true
 require_relative "../../delfos"
 require_relative "../common_path"
-require_relative "./klass_determination"
 require_relative "./added_methods"
 
 module Delfos
   module MethodLogging
     class Args
-      include KlassDetermination
-
       attr_reader :block
 
       def initialize(arguments)
@@ -29,7 +26,7 @@ module Delfos
 
       def calculate_args(arguments)
         arguments.
-          map { |o| klass_for(o) }.
+          map { |o| o.is_a?(Class) ? o : o.class }.
           select { |k| keep?(k) }
       end
 

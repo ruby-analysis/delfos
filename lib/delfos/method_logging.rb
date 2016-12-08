@@ -3,7 +3,6 @@ require "pathname"
 require "forwardable" unless defined? Forwardable
 require "binding_of_caller"
 require_relative "common_path"
-require_relative "method_logging/klass_determination"
 require_relative "method_logging/code_location"
 require_relative "method_logging/args"
 require_relative "execution_chain"

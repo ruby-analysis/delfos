@@ -40,13 +40,13 @@ describe Delfos::Patching::MethodOverride do
     allow(Delfos::ExecutionChain).to receive(:pop)
   end
 
+  after(:each) do
+    described_class.unstub_all!
+  end
+
   describe ".added_methods" do
     let(:method_a) { SomeRandomClass.instance_method :some_public_method }
     let(:method_b) { SomeRandomClass.method :some_class_method }
-
-    after(:each) do
-      described_class.unstub_all!
-    end
 
     it do
       expect(Delfos::MethodLogging::AddedMethods.instance.added_methods).to eq({})
@@ -65,7 +65,7 @@ describe Delfos::Patching::MethodOverride do
   end
 
   describe ".perform" do
-    let(:method_logging) { 
+    let(:method_logging) do
       exclusion = lambda{|m| 
         ![:some_public_method, :some_externally_called_public_method].include?(m.name)
       }
@@ -74,7 +74,7 @@ describe Delfos::Patching::MethodOverride do
       allow(m).to receive(:include_file_in_logging?) {|f| f == __FILE__ }
       allow(m).to receive(:exclude?, &exclusion)
       m
-    }
+    end
 
     before do
       Delfos.method_logging = method_logging
@@ -86,14 +86,12 @@ describe Delfos::Patching::MethodOverride do
       end
 
       before do
-        byebug
         setup_method("some_externally_called_public_method")
         setup_method("some_public_method")
       end
 
       it "includes public methods" do
         expect(method_logging).to receive(:log)
-        byebug
         some_random_instance.some_public_method
       end
 
@@ -118,8 +116,9 @@ describe Delfos::Patching::MethodOverride do
             expect(call_site.object.class.name).to match /RSpec::ExampleGroups/
             expect(called_method.name).to eq :some_externally_called_public_method
           when 2
-            #expect(called_method.name).to eq  :some_public_method
-            expect(call_site.object.class.name).to match /Delfos::Patching::MethodOverride::MethodArguments/
+            expect(called_method.name).to eq  :some_public_method
+            expect(call_site.object.class).to eq SomeRandomClass
+            expect(call_site.object).to eq object
           end
         end.twice
 

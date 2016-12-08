@@ -37,8 +37,11 @@ module Delfos
       end
 
       def append(klass, key, original_method)
-        puts "Recording method #{klass} #{key}"
-        fetch(klass)[key] = original_method
+        m = fetch(klass)[key] 
+
+        if m.nil?
+          fetch(klass)[key]  = original_method
+        end
       end
 
       def find(klass, key)

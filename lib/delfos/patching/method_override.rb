@@ -30,9 +30,10 @@ module Delfos
       # Redefine the method (only once) at runtime to enabling logging to Neo4j
       def setup
         processor = method(:process)
+        cm = class_method
 
         method_defining_method.call(name) do |*args, **kw_args, &block|
-          arguments = MethodArguments.new(args, kw_args, block)
+          arguments = MethodArguments.new(args, kw_args, block, cm)
 
           processor.call(self, caller.dup, binding.dup, arguments)
         end
@@ -44,7 +45,7 @@ module Delfos
         call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
 
         with_logging(call_site, instance, method_to_call, class_method, arguments) do
-          arguments.perform_call_on(method_to_call)
+          arguments.apply_to(method_to_call)
         end
       end
 
@@ -68,12 +69,12 @@ module Delfos
         end
       end
 
-      class MethodArguments < Struct.new(:args, :keyword_args, :block, :class_method)
-        def perform_call_on(method_to_call)
+      MethodArguments = Struct.new(:args, :keyword_args, :block, :class_method) do
+        def apply_to(method)
           if keyword_args.empty?
-            method_to_call.call(*args, &block)
+            method.call(*args, &block)
           else
-            method_to_call.call(*args, **keyword_args, &block)
+            method.call(*args, **keyword_args, &block)
           end
         end
       end

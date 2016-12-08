@@ -36,15 +36,21 @@ module Delfos
       end
 
       describe "#append" do
-        it do
+        it "appends to the methods" do
           subject.append(SuperKlass, "B", "C")
           expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include("B" => "C")
+        end
 
+        it "doesn't replace existing definitions" do
+          subject.append(SuperKlass, "B", "C")
           subject.append(SuperKlass, "B", "D")
-          expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include("B" => "D")
+          expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include("B" => "C")
+        end
 
+        it do
+          subject.append(SuperKlass, "B", "C")
           subject.append(SuperKlass, "E", "F")
-          expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include("B" => "D", "E" => "F")
+          expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include("B" => "C", "E" => "F")
         end
       end
 

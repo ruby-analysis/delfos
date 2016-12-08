@@ -2,16 +2,15 @@
 # frozen_string_literal: true
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "delfos/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "delfos"
-  spec.version       = Delfos::VERSION
+  spec.version       = "0.0.1-beta"
   spec.authors       = ["Mark Burns"]
-  spec.email         = ["markburns@notonthehighstreet.com"]
+  spec.email         = ["markthedeveloper@gmail..com"]
 
-  spec.summary       = "Record every method call in an application"
-  spec.description   = "Just because"
+  spec.summary       = "Runtime type analysis"
+  spec.description   = "Record every method call, call-site, arguments and their types in your application code"
   spec.homepage      = "https://github.com/markburns/delfos"
   spec.license       = "MIT"
 

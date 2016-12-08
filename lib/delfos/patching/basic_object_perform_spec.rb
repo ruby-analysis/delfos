@@ -5,6 +5,7 @@ module Delfos
   class << self
   attr_writer :logger
   end
+
   describe "patching BasicObject" do
     let(:logger) { double "logger" }
 
@@ -34,12 +35,14 @@ module Delfos
       it do
         expect(B).to receive(:new).and_return(b).at_least(:once)
 
+        allow(logger).to receive(:debug)
+
         expect(logger).to receive(:debug) do |args, call_site, called_code|
-          expect(call_site.object).to eq(a)
-          expect(called_code.object).to eq(b)
-          expect(args.args).to eq [A, B]
-          expect(args.keyword_args).to eq([B])
-        end.at_least(:once)
+          expect(call_site.object).   to eq(a)
+          expect(called_code.object). to eq(b)
+          expect(args.args).          to eq [A, B]
+          expect(args.keyword_args).  to eq([B])
+        end
 
         a.some_method(b, 2, c: b, b: "some string")
       end

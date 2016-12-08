@@ -11,21 +11,29 @@ module Delfos
 
       def execute_query(*args)
         query = query_for(*args)
+        params = {}
 
-        QueryExecution.execute(query)
+        QueryExecution.execute(query, params)
       end
 
       def query_for(args, call_site, called_code)
         assign_query_variables(args, call_site, called_code)
 
         klasses_query = query_variables.map do |klass, name|
-          "MERGE (#{name}:#{klass})"
+          "MERGE (#{name}:Class {name: #{klass.inspect}})"
         end.join("\n")
 
         <<-QUERY
           #{klasses_query}
 
-          #{merge_query(call_site, called_code)}
+          MERGE (#{query_variable(call_site.klass)}) - [:OWNS] -> #{method_node(call_site, "m1")}
+
+          MERGE (m1) - [:CONTAINS] -> (cs:CallSite{file: "#{call_site.file}", line_number: #{call_site.line_number}})
+
+          MERGE (#{query_variable(called_code.klass)}) - [:OWNS] -> #{method_node(called_code, "m2")}
+
+          MERGE (cs)  - [:CALLS]     ->  m2
+
           #{args_query args}
         QUERY
       end
@@ -39,32 +47,14 @@ module Delfos
         end
       end
 
-      def merge_query(call_site, called_code)
-        <<-MERGE_QUERY
-          #{method_definition call_site, "m1"}
-
-          MERGE (m1) - [:CONTAINS] -> (cs:CallSite{file: "#{call_site.file}", line_number: #{call_site.line_number}})
-
-          #{method_definition called_code, "m2"}
-
-          MERGE (cs)  - [:CALLS]     ->  m2
-        MERGE_QUERY
-      end
-
-      def method_definition(code, id)
-        <<-METHOD
-          MERGE (#{query_variable(code.klass)}) - [:OWNS] -> #{method_node(code, id)}
-        METHOD
-      end
-
       def method_node(code, id)
         if code.method_definition_file.length.positive? && code.method_definition_line.positive?
           <<-NODE
-            (#{id}:#{code.method_type}{name: "#{code.method_name}", file: #{code.method_definition_file.inspect}, line_number: #{code.method_definition_line}})
+            (#{id}:Method{type: "#{code.method_type}", name: "#{code.method_name}", file: #{code.method_definition_file.inspect}, line_number: #{code.method_definition_line}})
           NODE
         else
           <<-NODE
-            (#{id}:#{code.method_type}{name: "#{code.method_name}"})
+            (#{id}:Method{type: "#{code.method_type}", name: "#{code.method_name}"})
           NODE
         end
       end

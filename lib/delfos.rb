@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "delfos/version"
 require "delfos/neo4j/informer"
 
 module Delfos
@@ -26,13 +25,31 @@ module Delfos
       @neo4j = nil
       @logger = nil
 
-      require "delfos/execution_chain"
-      Delfos::ExecutionChain.reset!
+      if defined? Delfos::ExecutionChain
+        Delfos::ExecutionChain.reset!
+      end
 
-      require "delfos/method_logging/added_methods"
-      Delfos::MethodLogging::AddedMethods.instance_eval { @instance = nil }
+      # unstubbing depends upon AddedMethods being still defined
+      # so this order is important
+      unstub_all!
+      remove_added_methods!
 
       remove_patching!
+    end
+
+    def unstub_all!
+      if defined? Delfos::Patching::MethodOverride
+
+        if Delfos::Patching::MethodOverride.respond_to?(:unstub_all!)
+          Delfos::Patching::MethodOverride.unstub_all!
+        end
+      end
+    end
+
+    def remove_added_methods!
+      if defined? Delfos::MethodLogging::AddedMethods
+        Delfos::MethodLogging::AddedMethods.instance_eval { @instance = nil }
+      end
     end
 
     def remove_patching!
@@ -40,17 +57,17 @@ module Delfos
     end
 
     def setup!(logger: Delfos::Neo4j::Informer.new,
-      neo4j_url: nil,
-      neo4j_username: nil,
-      neo4j_password: nil,
-      application_directories: nil)
+               neo4j_url: nil,
+               neo4j_username: nil,
+               neo4j_password: nil,
+               application_directories: nil)
       application_directories ||= %w(app lib)
 
       @application_directories = if application_directories.is_a?(Proc)
                                    application_directories
                                  else
                                    Array(application_directories).map { |f| Pathname.new(File.expand_path(f.to_s)) }
-      end
+                                 end
 
       @logger = logger
 
