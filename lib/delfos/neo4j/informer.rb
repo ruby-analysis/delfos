@@ -39,10 +39,9 @@ module Delfos
       end
 
       def assign_query_variables(args, call_site, called_code)
-        query_variables.assign(call_site.klass, "k")
-        query_variables.assign(called_code.klass, "k")
+        klasses = [call_site.klass, called_code.klass]  + args.args + args.keyword_args
 
-        (args.args + args.keyword_args).uniq.each do |k|
+        klasses.uniq.each do |k|
           query_variables.assign(k, "k")
         end
       end
