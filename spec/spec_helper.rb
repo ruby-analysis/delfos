@@ -68,6 +68,15 @@ RSpec.configure do |c|
   c.before(:suite) do
     begin
       Delfos.wipe_db!
+
+      Delfos::Neo4j::QueryExecution.execute <<-QUERY
+        CREATE CONSTRAINT ON (c:Class) ASSERT c.name IS UNIQUE
+      QUERY
+
+      Delfos::Neo4j::QueryExecution.execute <<-QUERY
+        CREATE CONSTRAINT ON (e:ExecutionChain) ASSERT e.number IS UNIQUE
+      QUERY
+
     rescue Errno::ECONNREFUSED => e
       puts "*" * 80
       puts "*" * 80

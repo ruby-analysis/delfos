@@ -13,10 +13,27 @@ module Delfos
       Delfos.setup_neo4j!
 
       require "delfos/neo4j/query_execution"
+
       Delfos::Neo4j::QueryExecution.execute <<-QUERY
         MATCH (m)-[rel]->(n)
         DELETE m,rel,n
       QUERY
+
+      Delfos::Neo4j::QueryExecution.execute <<-QUERY
+        MATCH (m)
+        DELETE m
+      QUERY
+
+      drop_constraint "Class", "name"
+      drop_constraint "ExecutionChain", "number"
+    end
+
+    def drop_constraint(label, attribute)
+      Delfos::Neo4j::QueryExecution.execute <<-QUERY
+        DROP CONSTRAINT ON (c:#{label}) ASSERT c.#{attribute} IS UNIQUE
+      QUERY
+    rescue Delfos::Neo4j::QueryExecution::ExecutionError => e
+      raise unless e.message["Unable to drop CONSTRAINT ON"]
     end
 
     def reset!
