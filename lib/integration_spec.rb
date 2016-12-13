@@ -4,7 +4,7 @@ require "delfos/neo4j/informer"
 
 describe "integration" do
   before do
-    Delfos.wipe_db!
+    wipe_db!
 
     Delfos.setup!(
       application_directories: ["fixtures"],

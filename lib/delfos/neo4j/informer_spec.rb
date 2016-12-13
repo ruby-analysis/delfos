@@ -11,7 +11,7 @@ describe Delfos::Neo4j::Informer do
   let(:args) { double "args", args: [B], keyword_args: [C, D] }
 
   before do
-    Delfos.wipe_db!
+    wipe_db!
   end
 
   let(:call_site) do

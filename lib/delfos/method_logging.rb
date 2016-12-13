@@ -30,7 +30,7 @@ module Delfos
       end
 
       def log(call_site, called_object, called_method, class_method, arguments)
-        return if skip_meta_programming_defined_methods?
+        return if skip_meta_programming_defined_method?
         check_setup!
         arguments = Args.new(arguments)
         called_code = CodeLocation.from_called(called_object, called_method, class_method)
@@ -67,7 +67,11 @@ module Delfos
       end
 
       def skip_meta_programming_defined_method?
-        caller[caller.index{|c|c["delfos/patching/basic_object.rb"]}+1][/`define_method'\z/]
+        i = caller.index do |l| 
+          l["delfos/patching/basic_object.rb"]
+        end
+
+        l[i+1][/`define_method'\z/] if i
       end
     end
   end

@@ -5,7 +5,7 @@ require_relative "../../delfos"
 
 describe Delfos::Neo4j::DistanceUpdate do
   def preload_graph!
-    Delfos.wipe_db!
+    wipe_db!
     Delfos.reset!
     dir = File.expand_path File.join(File.expand_path(__FILE__), "../../../../fixtures/ruby/")
     raise unless Dir.exist?(dir)

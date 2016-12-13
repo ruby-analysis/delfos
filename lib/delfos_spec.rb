@@ -3,6 +3,7 @@ require "spec_helper"
 require_relative "delfos"
 
 describe Delfos do
+
   describe "#application_directories=" do
     it "requires the monkey patching file" do
       dir = ["some/dir"]

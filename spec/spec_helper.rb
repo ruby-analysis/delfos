@@ -11,6 +11,8 @@ ENV["NEO4J_USERNAME"] ||= "neo4j"
 ENV["NEO4J_PASSWORD"] ||= "password"
 
 module DelfosSpecHelpers
+  extend self
+
   def expand_fixture_path(path = "")
     s = File.join File.expand_path(fixture_path), path
 
@@ -33,7 +35,31 @@ module DelfosSpecHelpers
 
     expect(a).to match_array(b.map { |f| t(f) }.map(&format))
   end
+
+  def wipe_db!
+    Delfos.setup_neo4j!
+
+    perform_query "MATCH (m)-[rel]->(n) DELETE m, rel, n"
+    perform_query "MATCH (m) DELETE m"
+
+    drop_constraint "Class", "name"
+    drop_constraint "ExecutionChain", "number"
+  end
+
+  def perform_query(q)
+    require "delfos/neo4j/query_execution"
+    Delfos::Neo4j::QueryExecution.execute(q)
+  end
+
+  def drop_constraint(label, attribute)
+    perform_query <<-QUERY
+      DROP CONSTRAINT ON (c:#{label}) ASSERT c.#{attribute} IS UNIQUE
+    QUERY
+  rescue Delfos::Neo4j::QueryExecution::ExecutionError => e
+    raise unless e.message["Unable to drop CONSTRAINT ON"]
+  end
 end
+
 
 module TimeoutHelpers
   TIMEOUT_VALUE = (ENV["TIMEOUT"] || (ENV["CI"] ? 40 : 0.0)).to_f
@@ -67,15 +93,10 @@ RSpec.configure do |c|
 
   c.before(:suite) do
     begin
-      Delfos.wipe_db!
+      DelfosSpecHelpers.wipe_db!
 
-      Delfos::Neo4j::QueryExecution.execute <<-QUERY
-        CREATE CONSTRAINT ON (c:Class) ASSERT c.name IS UNIQUE
-      QUERY
-
-      Delfos::Neo4j::QueryExecution.execute <<-QUERY
-        CREATE CONSTRAINT ON (e:ExecutionChain) ASSERT e.number IS UNIQUE
-      QUERY
+      DelfosSpecHelpers.perform_query "CREATE CONSTRAINT ON (c:Class) ASSERT c.name IS UNIQUE"
+      DelfosSpecHelpers.perform_query "CREATE CONSTRAINT ON (e:ExecutionChain) ASSERT e.number IS UNIQUE"
 
     rescue Errno::ECONNREFUSED => e
       puts "*" * 80
