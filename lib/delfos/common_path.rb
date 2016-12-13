@@ -8,14 +8,14 @@ module Delfos
 
       def included_in?(p1, paths)
         paths = paths.map do |p2|
-          common = common_parent_directory_path(p1, p2)
+          common = common_parent(p1, p2)
           common.to_s.length >= p2.to_s.length
         end
 
         paths.compact.detect { |v| v }
       end
 
-      def common_parent_directory_path(path_a, path_b)
+      def common_parent(path_a, path_b)
         dirs = [
           File.expand_path(path_a.to_s),
           File.expand_path(path_b.to_s)
