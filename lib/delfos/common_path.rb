@@ -36,7 +36,8 @@ module Delfos
       end
 
       def valid_length?(common_path, path_a, path_b)
-        (common_path.to_s.length <= path_a.to_s.length) || (common_path.to_s.length <= path_b.to_s.length)
+        l = common_path.to_s.length
+        (l <= path_a.to_s.length) || (l <= path_b.to_s.length)
       end
 
       def common_path(dir1, dir2)

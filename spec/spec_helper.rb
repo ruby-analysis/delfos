@@ -4,7 +4,9 @@ $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 require "byebug"
 require "delfos"
 require "pathname"
-ENV["DELFOS_DEVELOPMENT"] = "true"
+require "webmock"
+require "webmock/rspec"
+WebMock.allow_net_connect!
 
 ENV["NEO4J_URL"]      ||= "http://localhost:7476"
 ENV["NEO4J_USERNAME"] ||= "neo4j"
@@ -36,6 +38,13 @@ module DelfosSpecHelpers
     expect(a).to match_array(b.map { |f| t(f) }.map(&format))
   end
 
+  def strip_whitespace(s)
+    s.
+      gsub(/^\s+/, "").
+      gsub(/ +/, " ").
+      gsub("\n\n", "\n")
+  end
+
   def wipe_db!
     Delfos.setup_neo4j!
 
@@ -55,7 +64,7 @@ module DelfosSpecHelpers
     perform_query <<-QUERY
       DROP CONSTRAINT ON (c:#{label}) ASSERT c.#{attribute} IS UNIQUE
     QUERY
-  rescue Delfos::Neo4j::QueryExecution::ExecutionError => e
+  rescue Delfos::Neo4j::QueryExecution::InvalidQuery => e
     raise unless e.message["Unable to drop CONSTRAINT ON"]
   end
 end

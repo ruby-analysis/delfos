@@ -25,53 +25,37 @@ module Delfos
 
   module MethodLogging
     class << self
-      def check_setup!
-        raise Delfos::ApplicationDirectoriesNotDefined unless Delfos.application_directories
-      end
-
       def log(call_site, called_object, called_method, class_method, arguments)
         return if skip_meta_programming_defined_method?
-        check_setup!
         arguments = Args.new(arguments)
         called_code = CodeLocation.from_called(called_object, called_method, class_method)
 
         Delfos.logger.debug(arguments, call_site, called_code)
       end
 
-      def include_any_path_in_logging?(paths)
-        Array(paths).inject(false) do |result, path|
-          result || include_file_in_logging?(path)
-        end
-      end
-
       def exclude?(method)
-        file, _line_number = method.source_location
+        file, _ = method.source_location
         return true unless file
 
         exclude_file_from_logging?(File.expand_path(file))
+      end
+
+      def exclude_file_from_logging?(file)
+        !CommonPath.included_in?(File.expand_path(file), Delfos.application_directories)
       end
 
       def include_file_in_logging?(file)
         !exclude_file_from_logging?(file)
       end
 
-      def exclude_file_from_logging?(file)
-        check_setup!
-        path = Pathname.new(File.expand_path(file))
-
-        if Delfos.application_directories.is_a? Proc
-          Delfos.application_directories.call(path)
-        else
-          !CommonPath.included_in?(path, Delfos.application_directories)
-        end
-      end
+      private
 
       def skip_meta_programming_defined_method?
-        i = caller.index do |l| 
+        i = caller.index do |l|
           l["delfos/patching/basic_object.rb"]
         end
 
-        l[i+1][/`define_method'\z/] if i
+        l[i + 1][/`define_method'\z/] if i
       end
     end
   end

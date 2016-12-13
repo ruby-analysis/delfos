@@ -17,8 +17,8 @@ describe Delfos::MethodLogging::Args do
 
   let(:method_logging) do
     double("method_logging").tap do |m|
-      allow(m).to receive(:include_any_path_in_logging?) do |paths|
-        ([a_path, b_path] & Array(paths)).length.positive?
+      allow(m).to receive(:include_file_in_logging?) do |file|
+        [a_path, b_path].include?(file)
       end
     end
   end

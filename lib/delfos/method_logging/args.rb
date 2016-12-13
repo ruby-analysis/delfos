@@ -32,7 +32,7 @@ module Delfos
 
       def keep?(klass)
         files_for(klass).
-          select { |f| record?(f) }.length.positive?
+          any? { |f| record?(f) }
       end
 
       def files_for(klass)
@@ -47,7 +47,7 @@ module Delfos
       end
 
       def record?(f)
-        Delfos.method_logging.include_any_path_in_logging?(f)
+        Delfos.method_logging.include_file_in_logging?(f)
       end
     end
   end

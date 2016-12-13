@@ -7,12 +7,8 @@ describe Delfos::Neo4j::DistanceUpdate do
   def preload_graph!
     wipe_db!
     Delfos.reset!
-    dir = File.expand_path File.join(File.expand_path(__FILE__), "../../../../fixtures/ruby/")
-    raise unless Dir.exist?(dir)
-    Delfos.setup! application_directories: [dir]
-
-    load "fixtures/ruby/efferent_coupling.rb"
-    EfferentCoupling.new.lots_of_coupling
+    Delfos.setup_neo4j!
+    perform_query File.read "fixtures/cypher/coupling.cypher"
   end
 
   before(:all) do

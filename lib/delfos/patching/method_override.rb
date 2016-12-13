@@ -57,7 +57,6 @@ module Delfos
         end
       end
 
-
       def with_stack(call_site)
         return yield unless call_site
 

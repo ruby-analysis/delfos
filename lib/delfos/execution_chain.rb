@@ -37,7 +37,7 @@ module Delfos
 
       self.stack_depth -= 1
 
-      save_and_reset!  if self.stack_depth.zero?
+      save_and_reset! if self.stack_depth.zero?
     end
 
     def stack_depth
@@ -69,6 +69,7 @@ module Delfos
 
     def save_and_reset!
       Neo4j::ExecutionPersistence.save!(self) if call_sites.length.positive?
+
       self.call_sites = []
     end
   end
