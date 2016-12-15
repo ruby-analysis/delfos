@@ -9,7 +9,7 @@ module Delfos
       end
 
       def save!
-        Neo4j::QueryExecution.execute(query, params)
+        Neo4j::QueryExecution::Sync.new(query, params).perform
       end
 
       private

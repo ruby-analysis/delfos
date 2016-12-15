@@ -53,14 +53,16 @@ module DelfosSpecHelpers
 
     drop_constraint "Class", "name"
     drop_constraint "ExecutionChain", "number"
+    #Delfos::Neo4j::QueryExecution.flush!
   end
 
   def perform_query(q)
-    require "delfos/neo4j/query_execution"
-    Delfos::Neo4j::QueryExecution.execute(q)
+    require "delfos/neo4j/query_execution/sync"
+    Delfos::Neo4j::QueryExecution::Sync.new(q).perform
   end
 
   def drop_constraint(label, attribute)
+    require "delfos/neo4j/query_execution/sync"
     perform_query <<-QUERY
       DROP CONSTRAINT ON (c:#{label}) ASSERT c.#{attribute} IS UNIQUE
     QUERY
@@ -74,7 +76,7 @@ module TimeoutHelpers
   TIMEOUT_VALUE = (ENV["TIMEOUT"] || (ENV["CI"] ? 40 : 0.0)).to_f
 
   def timeout
-    return yield if TIMEOUT_VALUE == 0.0
+    return yield if TIMEOUT_VALUE == 0.5
 
     begin
       Timeout.timeout TIMEOUT_VALUE do
@@ -94,6 +96,8 @@ RSpec.configure do |c|
   c.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  c.example_status_persistence_file_path = ".rspec-failed-examples"
 
   c.include TimeoutHelpers
   c.mock_with :rspec do |c|

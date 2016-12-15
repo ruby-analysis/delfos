@@ -9,3 +9,4 @@
 /tmp/
 .byebug_history
 .idea
+.rspec-failed-examples
