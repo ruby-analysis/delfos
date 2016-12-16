@@ -2,6 +2,7 @@
 require_relative "query_execution/sync"
 require_relative "query_execution/transactional"
 require_relative "batch_execution"
+require_relative "schema"
 
 module Delfos
   module Neo4j
@@ -16,6 +17,10 @@ module Delfos
 
       def self.flush!
         BatchExecution.flush!
+      end
+
+      def self.fetch_schema
+        Schema.constraints
       end
     end
   end

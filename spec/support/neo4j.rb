@@ -21,12 +21,56 @@ module DelfosSpecNeo4jHelpers
   end
 
   def drop_constraint(label, attribute)
+    change_constraint "drop", label, attribute
+  end
+
+  def create_constraint(label, attribute)
+    change_constraint "create", label, attribute
+  end
+
+  def change_constraint(type, label, attribute)
     require "delfos/neo4j/query_execution/sync"
-    #perform_query <<-QUERY
-    #  DROP CONSTRAINT ON (c:#{label}) ASSERT c.#{attribute} IS UNIQUE
-    #QUERY
+    perform_query <<-QUERY
+      #{type.upcase} CONSTRAINT ON (c:#{label}) ASSERT c.#{attribute} IS UNIQUE
+    QUERY
   rescue Delfos::Neo4j::QueryExecution::InvalidQuery => e
-    raise unless e.message["Unable to drop CONSTRAINT ON"]
+    raise unless e.message["Unable to #{type} CONSTRAINT ON"]
+  end
+
+  def ensure_constraints(required)
+    puts "-" * 80
+    puts "checking constraints"
+    puts Time.now
+    puts "-" * 80
+
+    existing = Delfos::Neo4j::Schema.constraints
+
+    if satisfies_constraints?(existing, required)
+      puts "Neo4j schema constraints satisfied"
+    else
+      puts "-" * 80
+      puts "Neo4j schema constraints not satisfied - adding"
+      puts Time.now
+
+      required.each do |label, attribute|
+        create_constraint(label, attribute)
+      end
+
+      puts "-" * 80
+      puts "Constraints added"
+      puts Time.now
+
+
+    end
+
+  end
+
+  def satisfies_constraints?(existing, required)
+    required.inject(true) do |result, (label, attribute)|
+      constraint = existing.find{|c| c["label"] == label }
+
+      constraint && constraint["property_keys"].include?(attribute)
+    end
   end
 end
 
@@ -52,8 +96,12 @@ RSpec.configure do |c|
       puts "*" * 80
     end
 
-    DelfosSpecNeo4jHelpers.perform_query "CREATE CONSTRAINT ON (c:Class) ASSERT c.name IS UNIQUE"
-    DelfosSpecNeo4jHelpers.perform_query "CREATE CONSTRAINT ON (e:ExecutionChain) ASSERT e.number IS UNIQUE"
+
+    DelfosSpecNeo4jHelpers.ensure_constraints({
+      "Class" => "name",
+      "ExecutionChain" => "number"
+    })
+
   end
 
   c.after(:suite) do
