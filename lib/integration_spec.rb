@@ -26,34 +26,36 @@ describe "integration" do
 
       MATCH (c:Class{name: "C"})  -  [:OWNS] ->  (mc:Method{type: "InstanceMethod", name: "method_with_no_more_method_calls"})
 
-      MATCH (ma)-[:CONTAINS]->(cs1:CallSite)-[:CALLS]->(mb)
-      MATCH (mb)-[:CONTAINS]->(cs2:CallSite)-[:CALLS]->(mc)
+      MATCH (ma)-[:CONTAINS]->(csA2B:CallSite)-[:CALLS]->(mb)
+      MATCH (mb)-[:CONTAINS]->(csB2C:CallSite)-[:CALLS]->(mc)
 
-      MATCH (ma)-[:CONTAINS]->(cs3:CallSite)-[:CALLS]->(mc)
+      MATCH (ma)-[:CONTAINS]->(csA2C:CallSite)-[:CALLS]->(mc)
 
-      MATCH cs1-[:ARG]->(a)
+      MATCH (csA2B)-[:ARG]->(a)
 
-      MATCH (e:ExecutionChain) - [:STEP{number: 1}] -> (cs1)
-      MATCH (e) - [:STEP] -> (cs2)
+      MATCH (e:ExecutionChain) - [:STEP{number: 1}] -> (csA2B)
+      MATCH (e) - [:STEP{number: 2}] -> (csB2A:CallSite)
 
-      MATCH (e2:ExecutionChain)  - [:STEP{number: 1}] -> (cs3)
+      MATCH (e2:ExecutionChain)  - [:STEP{number: 1}] -> (csA2C)
 
 
       RETURN 
         count(a),
         count(b),
-        count(cs1),
-        count(cs2),
-        count(ma),
+        count(csA2B),
+        count(csB2C),
+        count(csA2C),
         count(mb),
         count(e)
 
 
     QUERY
 
+    Delfos::Neo4j::QueryExecution.flush!
+
     a_klass_count, b_klass_count, call_site_1_count, call_site_2_count,
       instance_method_1_count, instance_method_2_count, execution_count =
-      Delfos::Neo4j::QueryExecution.execute(query).first
+      Delfos::Neo4j::QueryExecution.execute_sync(query).first
 
     expect(b_klass_count).to eq 1
     expect(a_klass_count).to eq 1

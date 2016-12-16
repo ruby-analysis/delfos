@@ -30,6 +30,7 @@ module Delfos
 
         def response(request)
           http = Net::HTTP.new(uri.host, uri.port)
+
           http.request(request)
         rescue *ERRORS => e
           raise ConnectionError.new(e)
@@ -37,6 +38,8 @@ module Delfos
 
         def build_request(body)
           Net::HTTP::Post.new(uri.request_uri).tap do |request|
+
+            request.initialize_http_header({"Accept" => "application/json; charset=UTF-8"})
             request.basic_auth(Delfos.neo4j.username, Delfos.neo4j.password)
             request.content_type = "application/json"
 

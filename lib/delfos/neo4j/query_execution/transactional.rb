@@ -7,10 +7,20 @@ module Delfos
   module Neo4j
     module QueryExecution
       class Transactional
+        class InvalidCommit < IOError
+          def initialize(commit_url, response)
+            super ["URL:", commit_url, response].join("\n")
+          end
+        end
+
         attr_reader :query, :params
 
         def self.flush!(commit_url)
-          Http.new(commit_url).post("{}")
+          response = Http.new(commit_url).post({statements: []}.to_json)
+
+          unless response.code == "200"
+            raise InvalidCommit.new(commit_url, response)
+          end
         end
 
         def initialize(query, params, uri=nil)
@@ -24,9 +34,9 @@ module Delfos
             raise InvalidQuery.new(body["errors"], query, params)
           end
 
-          transaction_url = URI.parse header("location")
-          commit_url      = URI.parse body["commit"]
-          expires          = Time.parse body["transaction"]["expires"]
+          transaction_url = URI.parse header("location") if header("location")
+          commit_url      = URI.parse body["commit"] if body["commit"]
+          expires         = Time.parse body["transaction"]["expires"]
 
           [transaction_url, commit_url, expires]
         end
@@ -34,7 +44,7 @@ module Delfos
         private
 
         def header(name)
-          response.each_header.to_a.find{|n,_| n == name}.last
+          response.each_header.to_a.find{|n,_| n == name}&.last
         end
 
         def response

@@ -33,7 +33,7 @@ describe Delfos::Neo4j::DistanceUpdate do
         called_klass.name
     QUERY
 
-    @result = Delfos::Neo4j::QueryExecution.execute(query)
+    @result = Delfos::Neo4j::QueryExecution.execute_sync(query)
   end
 
   MAPPING = { klass: 0, method: 1, call_site: 2, called: 4, called_klass: 6 }.freeze
@@ -59,15 +59,10 @@ describe Delfos::Neo4j::DistanceUpdate do
     end
 
     it "records the call_site details" do
-      expect(parse_result(:call_site)).to eq [
-        { "file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 6 },
-        { "file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 7 },
-        { "file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 8 },
-        { "file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 9 },
-        { "file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 10 },
-        { "file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 11 },
-        { "file" => "fixtures/ruby/efferent_coupling.rb", "line_number" => 12 },
-      ]
+      files = parse_result(:call_site).map{|r| r["file"]}.uniq
+      lines = parse_result(:call_site).map{|r| r["line_number"]}.sort
+      expect(files).to eq ["fixtures/ruby/efferent_coupling.rb"]
+      expect(lines).to eq [6,7,8,9,10,11,12]
     end
   end
 

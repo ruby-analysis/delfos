@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 require_relative "../distance/calculation"
 require_relative "query_execution"
+require_relative "batch_execution"
 require "json"
 
 module Delfos
   module Neo4j
     class DistanceUpdate
       def perform
-        update Delfos::Neo4j::QueryExecution.execute(query)
+        update QueryExecution.execute_sync(query)
       end
 
       def determine_full_path(f)
@@ -44,14 +45,16 @@ module Delfos
           start  = determine_full_path call_site["file"]
           finish = determine_full_path called["file"]
 
-          calc = Delfos::Distance::Calculation.new(start, finish)
+          calc = Distance::Calculation.new(start, finish)
 
           perform_query(calc, call_site_id, called_id)
         end
+
+        BatchExecution.flush!
       end
 
       def perform_query(calc, call_site_id, called_id)
-        Delfos::Neo4j::QueryExecution.execute <<-QUERY, {call_site_id: call_site_id, called_id: called_id, sum_traversals: calc.sum_traversals, sum_possible_traversals: calc.sum_possible_traversals}
+        QueryExecution.execute <<-QUERY, {call_site_id: call_site_id, called_id: called_id, sum_traversals: calc.sum_traversals, sum_possible_traversals: calc.sum_possible_traversals}
           START call_site = node({call_site_id}),
                 called    = node({called_id})
 

@@ -57,7 +57,7 @@ module Delfos
           allow(described_class).
             to receive(:new).
             with(size: size).
-            and_return batch
+            and_return(batch)
         end
 
         it "calls execute on the batch returning the url and expiry" do
@@ -68,7 +68,7 @@ module Delfos
             with(*args).
             and_return([transaction_url, commit_url, expires])
 
-          returned_url, commit_url, returned_expiry = described_class.execute!(*args, size: size)
+          returned_url, commit_url, returned_expiry = described_class.execute!(*args, size)
 
           expect(returned_url)    .to eq transaction_url
           expect(commit_url)      .to eq commit_url
@@ -141,11 +141,11 @@ module Delfos
           it "resets the batch" do
             expect(->{2.times{batch.execute!(anything, anything)}}).to raise_error BatchExecution::ExpiredError
 
-            new_batch = described_class.batch(size: size)
+            new_batch = described_class.new_batch(size)
 
             expect(new_batch).not_to eq batch
             expect(new_batch.query_count).to eq 0
-            expect(new_batch.transaction_url).to eq nil
+            expect(new_batch.current_transaction_url).to eq nil
             expect(new_batch.commit_url).to eq nil
             expect(new_batch.expires).to eq nil
           end

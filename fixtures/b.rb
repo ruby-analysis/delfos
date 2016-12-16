@@ -3,7 +3,7 @@ class B
   def another_method(that, *_args, **_keyword_args)
     that.to_s
 
-    C.new.method_with_no_more_method_calls
+    C.new.method_with_no_more_method_calls #cs2 e-step
 
     C.new.third(self)
   end

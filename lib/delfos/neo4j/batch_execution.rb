@@ -9,12 +9,18 @@ module Delfos
       BATCH_MUTEX = Mutex.new
 
       class << self
-        def execute!(query, params={}, size: 1_000)
-          batch(size: size).execute!(query, params)
+        def execute!(query, params={}, size=nil)
+          batch = @batch || new_batch(size || 1000)
+
+          batch.execute!(query, params)
         end
 
-        def batch(size:)
-          @batch ||= new(size: size)
+        def new_batch(size)
+          @batch = new(size: size)
+        end
+
+        def flush!
+          @batch.flush! if @batch
         end
 
         def reset!
@@ -31,23 +37,39 @@ module Delfos
       end
 
       attr_accessor :size, :query_count
-      attr_reader :transaction_url, :commit_url, :expires
+      attr_reader :current_transaction_url, :commit_url, :expires
 
       def execute!(query, params={})
         BATCH_MUTEX.synchronize do
           check_for_expiry!
-          @transaction_url, @commit_url, @expires = QueryExecution::Transactional.new(query, params, url).perform
+          transactional_query = QueryExecution::Transactional.new(query, params, url)
+          transaction_url, @commit_url, @expires = transactional_query.perform
+          @current_transaction_url ||= transaction_url # the transaction_url is only returned with the first request
 
           flush_if_required!
-
-          [@transaction_url, @commit_url, @expires]
         end
+      end
+
+      def flush!
+        return unless @query_count.positive?
+        return unless @commit_url
+        QueryExecution::Transactional.flush!(@commit_url)
+      ensure
+        reset!
       end
 
       private
 
       def url
-        @transaction_url || URI.parse("#{Delfos.neo4j.url}/db/data/transaction/")
+        if @commit_url && batch_full? || expires_soon?
+          return @commit_url
+        end
+
+        current_transaction_url || new_transaction_url
+      end
+
+      def new_transaction_url
+        URI.parse("#{Delfos.neo4j.url}/db/data/transaction/")
       end
 
       def check_for_expiry!
@@ -63,23 +85,22 @@ module Delfos
         check_for_expiry!
         @query_count += 1
 
-        if query_count >= size || expires_soon?
+        if batch_full? || expires_soon?
           flush!
         end
       end
 
-      def expires_soon?
-        @clock.now + 2 > @expires
+      def batch_full?
+        query_count >= size
       end
 
-      def flush!
-        QueryExecution::Transactional.flush!(@commit_url)
-        reset!
+      def expires_soon?
+        @expires && (@clock.now + 2 > @expires)
       end
 
       def reset!
         @query_count = 0
-        @transaction_url = nil
+        @current_transaction_url = nil
         @commit_url = nil
         @expires = nil
       end

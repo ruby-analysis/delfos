@@ -16,13 +16,8 @@ module Delfos
         logger = Delfos:: Neo4j::Informer.new
       end
 
-      @application_directories = if application_directories.is_a?(Proc)
-                                   application_directories
-                                 else
-                                   require "pathname"
-                                   Array(application_directories).map { |f| Pathname.new(File.expand_path(f.to_s)) }
-                                 end
-
+      require "pathname"
+      @application_directories = Array(application_directories).map { |f| Pathname.new(File.expand_path(f.to_s)) }
       @logger = logger
 
       if defined? Delfos::Neo4j::Informer
@@ -46,15 +41,19 @@ module Delfos
     end
 
     def reset!
-      @application_directories = []
-      @method_logging = nil
-      @neo4j = nil
-      @logger = nil
+      if defined? Delfos::Neo4j::BatchExecution && neo4j.username
+        Delfos::Neo4j::BatchExecution.flush!
+        Delfos::Neo4j::BatchExecution.reset!
+      end
 
       if defined? Delfos::ExecutionChain
         Delfos::ExecutionChain.reset!
       end
 
+      @application_directories = []
+      @method_logging = nil
+      @neo4j = nil
+      @logger = nil
       # unstubbing depends upon AddedMethods being still defined
       # so this order is important
       unstub_all!
