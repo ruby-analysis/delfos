@@ -11,8 +11,8 @@ module Delfos
         let(:size)      { 10 }
         let(:batch)     { described_class.new(size: size, clock: clock) }
         let(:execution) { double("") }
-        let(:transaction_url)       { URI.parse("http://localhost:7476/db/data/transaction/1") }
-        let(:commit_url) { URI.parse("http://localhost:7474/db/data/transaction/1/commit") }
+        let(:transaction_url)       { Delfos.neo4j.uri_for("/db/data/transaction/1") }
+        let(:commit_url) { Delfos.neo4j.uri_for("/db/data/transaction/1/commit") }
 
         let(:expires_string)    { "Wed, 14 Dec 2016 10:39:44 GMT" }
         let(:expires)    { Time.parse(expires_string) }
