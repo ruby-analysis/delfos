@@ -4,6 +4,7 @@ module Delfos
       HTTP_ERRORS = [
         EOFError,
         Errno::ECONNRESET,
+        Errno::ECONNREFUSED,
         Errno::EINVAL,
         Net::HTTPBadResponse,
         Net::HTTPHeaderSyntaxError,
