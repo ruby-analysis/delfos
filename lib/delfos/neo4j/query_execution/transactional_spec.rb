@@ -14,8 +14,8 @@ module Delfos
       end
 
       describe "#perform" do
-        let(:transaction_url) { URI.parse "http://localhost:7474/db/data/transaction/10" }
-        let(:commit_url) { URI.parse "http://localhost:7474/db/data/transaction/10/commit" }
+        let(:transaction_url) { Delfos.neo4j.uri_for("/db/data/transaction/10") }
+        let(:commit_url) { Delfos.neo4j.uri_for("/db/data/transaction/10/commit") }
         let(:expiry) { "Thu, 08 Dec 2016 11:13:49 +0000" }
 
 
@@ -34,7 +34,7 @@ module Delfos
             }
           RESPONSE
 
-          stub_request(:post, "http://localhost:7476/db/data/transaction").
+          stub_request(:post, Delfos.neo4j.uri_for("/db/data/transaction")).
             to_return(
               :status  => 200,
               :body    => response,

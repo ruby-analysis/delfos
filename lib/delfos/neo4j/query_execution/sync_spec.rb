@@ -20,7 +20,7 @@ module Delfos
               data = [{"row"=>["some name", 2, "other name"]}]
               body = {"results"=>[{"columns"=>["n.name", "r.rel_attribute", "o.name"], "data"=>data}], "errors"=>[]}.to_json
 
-              stub_request(:post, "http://localhost:7476/db/data/transaction/commit").
+              stub_request(:post, Delfos.neo4j.uri_for("/db/data/transaction/commit")).
                 to_return(
                   :status  => 200,
                   :body    => body,
@@ -40,7 +40,7 @@ module Delfos
             before do
               body = {"results"=>[], "errors"=>[{code: "some error", message: "some message"}]}.to_json
 
-              stub_request(:post, "http://localhost:7476/db/data/transaction/commit").
+              stub_request(:post, Delfos.neo4j.uri_for("/db/data/transaction/commit")).
                 to_return(
                   :status  => 200,
                   :body    => body,

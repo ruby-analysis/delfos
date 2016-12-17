@@ -35,7 +35,7 @@ module Delfos
 
     def setup_neo4j!
       host     ||= ENV["NEO4J_HOST"]     || "http://localhost"
-      port     ||= ENV["NEO4J_PORT"]     || "7476"
+      port     ||= ENV["NEO4J_PORT"]     || "7474"
       username ||= ENV["NEO4J_USERNAME"] || "neo4j"
       password ||= ENV["NEO4J_PASSWORD"] || "password"
 

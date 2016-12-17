@@ -196,7 +196,7 @@ lib/delfos/neo4j/
 The rake task is setup to handle this default and is equivalent to the following:
 
 ```
-NEO4J_URL=http://localhost:7474 NEO4J_USERNAME=username NEO4J_PASSWORD=password bundle exec rspec lib
+NEO4J_HOST=http://localhost NEO4J_PORT=7474 NEO4J_USERNAME=username NEO4J_PASSWORD=password bundle exec rspec lib
 ```
 
 

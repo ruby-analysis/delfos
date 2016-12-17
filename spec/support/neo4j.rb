@@ -1,4 +1,5 @@
-ENV["NEO4J_URL"]      ||= "http://localhost:7476"
+ENV["NEO4J_HOST"]     ||= "http://localhost"
+ENV["NEO4J_PORT"]     ||= "7476"
 ENV["NEO4J_USERNAME"] ||= "neo4j"
 ENV["NEO4J_PASSWORD"] ||= "password"
 
@@ -33,7 +34,8 @@ RSpec.configure do |c|
       puts "Failed to connect to Neo4j:"
       puts Delfos.neo4j
       puts "Start Neo4j or set the following environment variables:"
-      puts "  NEO4J_URL"
+      puts "  NEO4J_HOST"
+      puts "  NEO4J_PORT"
       puts "  NEO4J_USERNAME"
       puts "  NEO4J_PASSWORD"
       puts "*" * 80
