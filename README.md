@@ -35,16 +35,43 @@ if defined?(Delfos) && ENV["DELFOS_ENABLED"]
 end
 
 # Any code defined in the app or lib directories executed after this point will
-# automatically have execution chains with type information recorded.
+# automatically have call stacks with type information recorded.
 
 # You could now click around the app or run integration tests to record type
 # and callsite information
+
+# When you are finished call from e.g. a console
+
+Delfos.flush!
+Delfos.update_distance!
+
+
+```
+
+recording test runs with rspec
+
+```
+RSpec.configure do |c|
+  c.before(:suite) do
+    require "delfos"
+
+    your_library_path = File.expand_path("../../lib", __FILE__)
+    Delfos.setup! application_directories: your_library_path
+  end
+
+  c.after(:suite) do
+    Delfos.flush!
+    Delfos.update_distance!
+  end
+end
 ```
 
 #### Delfos.setup! options
 
 
-`logger` Defaults to recording to neo4j. You can supply an object that responds to `debug` and receives the following objects : `(arguments, call_site, called_code)`
+`application_directories` An array of application directories. Defaults to `app` and `lib`
+`logger` For outputing debug information during method recording.
+`call_site_logger` Defaults to recording to neo4j. You can supply an object that responds to `debug` and receives the following objects : `(arguments, call_site, called_code)`
 
 Where:
   * `arguments` has the following methods defined:
@@ -54,22 +81,13 @@ Where:
     * `file`
     * `line_number`
     * `object` - refers to the self defined at that line during runtime
-    * `class_method` - boolean - true if the 
-
-
-`application_directories` A glob of application directories. Defaults to `app/**/*.rb` and `lib/**/*.rb`
-
-NEO4J connection related options
-
-`neo4j_url`
-
-`neo4j_username`
-
-`neo4j_password`
+    * `class_method` - boolean
+      * for call sites - true if the call site is defined in a class method
+      * for called_code if the called method is a class method
 
 
 # Recorded data
-As well as recording the execution chains, call sites, file and line number,
+As well as recording the call stacks, call sites, file and line number,
 Delfos also records the distance across the file system.  The distance is
 defined as basically the visual distance in an ordinary filesystem tree view
 like vim's NERDTree view.
@@ -136,7 +154,7 @@ If `code_location.rb` were to call neo4j `query_execution.rb` it would receive
  * and more penalty points for traversing into the `neo4j` directory
  * plus penalty points for possible traversals across the 4 directories
 
-Finally it would receive 
+Finally it would receive
   * penalty points for traversing across the 6 files
   * penalty points for the 6 possible traversals
 
@@ -150,7 +168,7 @@ Following are some ideas of where to take this project next:
 ## Analysis
 
 ### UI
-I would like to create a UI for visualizing execution chains with their respective file system traversals.
+I would like to create a UI for visualizing call stacks with their respective file system traversals.
 
 ### Command line tool
 I want to detect common software design mistakes in a way which is useful/actionable like rubocop.
