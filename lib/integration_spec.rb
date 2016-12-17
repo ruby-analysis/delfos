@@ -89,9 +89,7 @@ describe "integration" do
       before do
         Delfos.setup! application_directories: ["./fixtures/sub_classes"]
 
-        timeout do
-          load "./fixtures/sub_classes/sub_classes.rb"
-        end
+        load "./fixtures/sub_classes/sub_classes.rb"
       end
 
       it do
@@ -99,9 +97,7 @@ describe "integration" do
         expect(SomeSubKlass).to be_a Class
 
         initialization = lambda do
-          timeout do
-            expect(SomeKlass.new).to be_a SomeSubKlass
-          end
+          expect(SomeKlass.new).to be_a SomeSubKlass
         end
 
         expect(initialization).not_to raise_error
