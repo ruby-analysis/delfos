@@ -71,7 +71,7 @@ end
 
 * `application_directories` An array of application directories. Defaults to `app` and `lib`
 * `logger` For outputing debug information during method recording.
-* `call_site_logger` Defaults to recording to neo4j. You can supply an object that responds to `debug` and receives the following objects : `(arguments, call_site, called_code)`
+* `call_site_logger` Defaults to recording to neo4j. You can supply an object that responds to `log` and receives the following objects : `(arguments, call_site, called_code)`
 
 Where:
   * `arguments` has the following methods defined:
