@@ -32,7 +32,7 @@ gem 'delfos', :git => 'https://github.com/markburns/delfos.git'
 
 #e.g.  in config/initializers/delfos.rb or equivalent
 
-#Delfos is very slow, so we recommend only setting up when required
+# Delfos monkey patches BasicObjeect, so we recommend only setting up when required
 if defined?(Delfos) && ENV["DELFOS_ENABLED"]
   Delfos.setup!
 end
