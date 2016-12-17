@@ -26,19 +26,9 @@ module Delfos
           http = Net::HTTP.new(uri.host, uri.port)
 
           http.request(request)
-        rescue *ERRORS => e
+        rescue *HTTP_ERRORS => e
           raise ConnectionError.new(e)
         end
-
-        ERRORS = [
-          EOFError,
-          Errno::ECONNRESET,
-          Errno::EINVAL,
-          Net::HTTPBadResponse,
-          Net::HTTPHeaderSyntaxError,
-          Net::ProtocolError,
-          Timeout::Error
-        ]
 
 
         def build_post(body)

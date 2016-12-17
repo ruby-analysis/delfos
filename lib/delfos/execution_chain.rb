@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require_relative "neo4j/execution_persistence"
+require_relative "neo4j/execution_chain_query"
 
 module Delfos
   class ExecutionChain
@@ -25,6 +25,10 @@ module Delfos
       execution_chain.pop
     end
 
+    def self.pop_until_top!
+      execution_chain.pop_until_top!
+    end
+
     def push(method_object)
       call_sites.push(method_object)
       self.stack_depth += 1
@@ -38,6 +42,10 @@ module Delfos
       self.stack_depth -= 1
 
       save_and_reset! if self.stack_depth.zero?
+    end
+
+    def pop_until_top!
+      pop while self.stack_depth.positive?
     end
 
     def stack_depth
@@ -68,7 +76,10 @@ module Delfos
     end
 
     def save_and_reset!
-      Neo4j::ExecutionPersistence.save!(self) if call_sites.length.positive?
+      if call_sites.length.positive?
+        ex = Neo4j::ExecutionChainQuery.new(call_sites, execution_count)
+        Neo4j.execute(ex.query, ex.params)
+      end
 
       self.call_sites = []
     end

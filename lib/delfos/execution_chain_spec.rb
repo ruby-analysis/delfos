@@ -2,9 +2,14 @@
 require_relative "execution_chain"
 
 describe Delfos::ExecutionChain do
+  let(:execution_chain_query) { double "execution chain query", query: query, params: params }
+  let(:params) { {some: "params"} }
+  let(:query) { "some query" }
+
   before do
     Delfos::ExecutionChain.reset!
-    allow(Delfos::Neo4j::ExecutionPersistence).to receive(:save!)
+    allow(Delfos::Neo4j::ExecutionChainQuery).to receive(:new).and_return(execution_chain_query)
+    allow(Delfos::Neo4j).to receive(:execute).with(query, params)
   end
 
   describe "#push(anything)" do
@@ -59,6 +64,7 @@ describe Delfos::ExecutionChain do
       subject.pop
       subject.pop
       expect(subject.call_sites).to eq []
+      expect(Delfos::Neo4j::ExecutionChainQuery).to have_received(:new).with([1,2,3],1)
     end
 
     it "only decrements the step counter once the stack depth decrements to 0" do

@@ -1,19 +1,7 @@
 # frozen_string_literal: true
-require_relative "query_execution"
-
 module Delfos
   module Neo4j
-    class ExecutionPersistence
-      def self.save!(chain)
-        new(chain.call_sites, chain.execution_count).save!
-      end
-
-      def save!
-        QueryExecution.execute(query, params)
-      end
-
-      private
-
+    class ExecutionChainQuery
       def initialize(call_sites, execution_count)
         @call_sites = call_sites
 
@@ -37,6 +25,8 @@ module Delfos
 
         params
       end
+
+      private
 
       def map_call_sites
         call_sites.compact.map.with_index do |c, i|

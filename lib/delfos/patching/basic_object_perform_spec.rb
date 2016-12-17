@@ -2,19 +2,15 @@
 require "pathname"
 
 module Delfos
-  class << self
-  attr_writer :logger
-  end
-
   describe "patching BasicObject" do
-    let(:logger) { double "logger" }
+    let(:call_site_logger) { double "call_site_logger" }
 
     before do
       require "delfos/execution_chain"
       allow(Delfos::ExecutionChain).to receive(:push)
       allow(Delfos::ExecutionChain).to receive(:pop)
 
-      Delfos.logger = logger
+      Delfos.call_site_logger = call_site_logger
       current_file = Pathname.new(File.expand_path(__FILE__))
       Delfos.application_directories = [
         current_file + "../../../../fixtures",
@@ -35,9 +31,9 @@ module Delfos
       it do
         expect(B).to receive(:new).and_return(b).at_least(:once)
 
-        allow(logger).to receive(:debug)
+        allow(call_site_logger).to receive(:log)
 
-        expect(logger).to receive(:debug) do |args, call_site, called_code|
+        expect(call_site_logger).to receive(:log) do |args, call_site, called_code|
           expect(call_site.object).   to eq(a)
           expect(called_code.object). to eq(b)
           expect(args.args).          to eq [A, B]

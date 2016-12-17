@@ -55,7 +55,7 @@ module Delfos
         end
 
         def uri
-          @uri ||= URI.parse "#{Delfos.neo4j.url}/db/data/transaction/commit"
+          @uri ||= Delfos.neo4j.uri_for("/db/data/transaction/commit")
         end
       end
     end

@@ -1,19 +1,12 @@
 # frozen_string_literal: true
-require "delfos"
-require_relative "query_execution"
-
 module Delfos
   module Neo4j
     class Informer
-      def debug(args, call_site, called_code)
-        execute_query(args, call_site, called_code)
-      end
+      def log(args, call_site, called_code)
+        query = query_for(args, call_site, called_code)
+        params = params_for(args, call_site, called_code)
 
-      def execute_query(*args)
-        query = query_for(*args)
-        params = params_for(*args)
-
-        QueryExecution.execute(query, params)
+        Neo4j.execute(query, params)
       end
 
       def params_for(args, call_site, called_code)
@@ -35,6 +28,7 @@ module Delfos
         params["m2_name"]        = called_code.method_name
         params["m2_file"]        = called_code.method_definition_file
         params["m2_line_number"] = called_code.method_definition_line
+
         params
       end
 
@@ -102,10 +96,6 @@ module Delfos
 
       def query_variables
         @query_variables ||= QueryVariables.new
-      end
-
-      def code_execution_query
-        Delfos::Patching.execution_chain
       end
 
       class QueryVariables < Hash

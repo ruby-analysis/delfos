@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "binding_of_caller"
 
 module Delfos
   module MethodLogging

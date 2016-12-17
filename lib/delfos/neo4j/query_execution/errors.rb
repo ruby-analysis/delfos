@@ -1,6 +1,16 @@
 module Delfos
   module Neo4j
     module QueryExecution
+      HTTP_ERRORS = [
+        EOFError,
+        Errno::ECONNRESET,
+        Errno::EINVAL,
+        Net::HTTPBadResponse,
+        Net::HTTPHeaderSyntaxError,
+        Net::ProtocolError,
+        Timeout::Error
+      ]
+
       class InvalidQuery  < IOError
         def initialize(errors, query, params)
           message = errors.map do |e|

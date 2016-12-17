@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 require "json"
 require "uri"
+require "time"
+
 require_relative "http"
 
 module Delfos
@@ -13,8 +15,6 @@ module Delfos
           end
         end
 
-        attr_reader :query, :params
-
         def self.flush!(commit_url)
           response = Http.new(commit_url).post({statements: []}.to_json)
 
@@ -22,6 +22,8 @@ module Delfos
             raise InvalidCommit.new(commit_url, response)
           end
         end
+
+        attr_reader :query, :params
 
         def initialize(query, params, uri=nil)
           @query, @params, @uri = query, params, uri
@@ -34,8 +36,8 @@ module Delfos
             raise InvalidQuery.new(body["errors"], query, params)
           end
 
-          transaction_url = URI.parse header("location") if header("location")
-          commit_url      = URI.parse body["commit"] if body["commit"]
+          transaction_url = URI.parse  header("location") if header("location")
+          commit_url      = URI.parse  body["commit"]     if body["commit"]
           expires         = Time.parse body["transaction"]["expires"]
 
           [transaction_url, commit_url, expires]
@@ -62,7 +64,7 @@ module Delfos
         end
 
         def uri
-          @uri ||= URI.parse "#{Delfos.neo4j.url}/db/data/transaction"
+          @uri ||= Delfos.neo4j.uri_for("/db/data/transaction")
         end
       end
     end

@@ -103,7 +103,7 @@ describe Delfos::Patching::MethodOverride do
         some_random_instance.send(:some_private_method)
       end
 
-      it "sends the correct args to the method logger" do
+      it "sends the correct args to the method call_site_logger" do
         call_count = 0
 
         expect(method_logging).to receive(:log) do |call_site, object, called_method,  _class_method, _arguments|

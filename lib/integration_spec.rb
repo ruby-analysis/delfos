@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 require "delfos"
-require "delfos/neo4j/informer"
+require "delfos/neo4j"
 
 describe "integration" do
   before do
@@ -51,11 +51,11 @@ describe "integration" do
 
     QUERY
 
-    Delfos::Neo4j::QueryExecution.flush!
+    Delfos::Neo4j.flush!
 
     a_klass_count, b_klass_count, call_site_1_count, call_site_2_count,
       instance_method_1_count, instance_method_2_count, execution_count =
-      Delfos::Neo4j::QueryExecution.execute_sync(query).first
+      Delfos::Neo4j.execute_sync(query).first
 
     expect(b_klass_count).to eq 1
     expect(a_klass_count).to eq 1

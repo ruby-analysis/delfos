@@ -15,7 +15,7 @@ describe Delfos::MethodLogging do
     let(:class_keyword) { B }
 
     let(:called_object) { double "called_object" }
-    let(:logger) { double "logger", debug: nil }
+    let(:call_site_logger) { double "call_site_logger", log: nil }
 
     let(:a_path) { File.expand_path "./fixtures/a.rb" }
     let(:b_path) { File.expand_path "./fixtures/b.rb" }
@@ -29,7 +29,7 @@ describe Delfos::MethodLogging do
         and_return("A" => { instance_method_some_method:  method_a },
                    "B" => { instance_method_another_method: method_b })
 
-      Delfos.logger = logger
+      Delfos.call_site_logger = call_site_logger
       path_fixtures = Pathname.new(File.expand_path(__FILE__)) + "../../../fixtures"
       path_spec     = Pathname.new(File.expand_path(__FILE__)) + ".."
       Delfos.application_directories = [path_spec, path_fixtures]
@@ -73,7 +73,7 @@ describe Delfos::MethodLogging do
       call_site_object = TestCallSiteObject.new
       call_site_object.call_site_method(dummy, args, keyword_args, block)
 
-      expect(logger).to have_received(:debug) do |args, call_site, called_code|
+      expect(call_site_logger).to have_received(:log) do |args, call_site, called_code|
         expect(args.args).to eq [A, B]
         expect(args.keyword_args).to eq [A, B]
 
