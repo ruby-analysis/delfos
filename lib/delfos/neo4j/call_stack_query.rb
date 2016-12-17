@@ -8,8 +8,6 @@ module Delfos
         @execution_count = execution_count
       end
 
-      attr_reader :call_sites, :execution_count
-
       def query
         map_call_sites do |c,i|
           call_site_query(c, i)
@@ -27,6 +25,8 @@ module Delfos
       end
 
       private
+
+      attr_reader :call_sites, :execution_count
 
       def map_call_sites
         call_sites.compact.map.with_index do |c, i|
