@@ -25,7 +25,10 @@ Delfos by default depends upon a connection to a Neo4j instance for recording da
 
 ```ruby
 #Gemfile
-gem 'delfos'
+# Until this gem is a little more stable, then github master will be the best
+# place to install from.
+gem 'delfos', :git => 'https://github.com/markburns/delfos.git'
+
 
 #e.g.  in config/initializers/delfos.rb or equivalent
 
