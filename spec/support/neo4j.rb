@@ -29,19 +29,28 @@ RSpec.configure do |c|
     begin
       DelfosSpecNeo4jHelpers.wipe_db!
     rescue *Delfos::Neo4j::QueryExecution::HTTP_ERRORS, Delfos::Neo4j::QueryExecution::ConnectionError => e
-      Delfos.logger.error "*" * 80
-      Delfos.logger.error "*" * 80
-      Delfos.logger.error "*" * 80
-      Delfos.logger.error "Failed to connect to Neo4j:"
-      Delfos.logger.error Delfos.neo4j
-      Delfos.logger.error "Start Neo4j or set the following environment variables:"
-      Delfos.logger.error "  NEO4J_HOST"
-      Delfos.logger.error "  NEO4J_PORT"
-      Delfos.logger.error "  NEO4J_USERNAME"
-      Delfos.logger.error "  NEO4J_PASSWORD"
-      Delfos.logger.error "*" * 80
-      Delfos.logger.error "*" * 80
-      Delfos.logger.error "*" * 80
+      Delfos.logger.error <<-ERROR
+       ***************************************
+       ***************************************
+       ***************************************
+
+       Failed to connect to Neo4j:
+         #{e}
+
+       Neo4j config:
+         #{Delfos.neo4j}
+
+       Start Neo4j or set the following environment variables:
+         NEO4J_HOST
+         NEO4J_PORT
+         NEO4J_USERNAME
+         NEO4J_PASSWORD
+
+       ***************************************
+       ***************************************
+       ***************************************
+      ERROR
+      exit -1
     end
 
     Delfos::Neo4j.ensure_schema!

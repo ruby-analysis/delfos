@@ -1,5 +1,5 @@
 module TimeoutHelpers
-  TIMEOUT_VALUE = 5
+  TIMEOUT_VALUE = 10
 
   def timeout
     return yield if TIMEOUT_VALUE == 0.5

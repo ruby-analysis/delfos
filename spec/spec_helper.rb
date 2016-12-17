@@ -7,11 +7,12 @@ require "delfos"
 require "ostruct"
 
 unless ENV["CI"]
-  #silent logger in dev
+  #only log errors in dev
   Delfos.logger= Object.new.tap do |o|
     def o.debug(s); nil; end
     def o.info(s); nil; end
     def o.log(s); nil; end
+    def o.error(s); puts s; end
   end
 
   require_relative "support/timeout"
