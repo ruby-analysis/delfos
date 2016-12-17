@@ -6,14 +6,17 @@ require "delfos"
 
 require "ostruct"
 
-Delfos.logger= Object.new.tap do |o|
-  #silent logger
-  def o.debug(s); nil; end
-  def o.info(s); nil; end
-  def o.log(s); nil; end
+unless ENV["CI"]
+  #silent logger in dev
+  Delfos.logger= Object.new.tap do |o|
+    def o.debug(s); nil; end
+    def o.info(s); nil; end
+    def o.log(s); nil; end
+  end
+
+  require_relative "support/timeout"
 end
 
-require_relative "support/timeout"
 require_relative "support/neo4j"
 require_relative "support/web_mock"
 require_relative "support/helper_methods"

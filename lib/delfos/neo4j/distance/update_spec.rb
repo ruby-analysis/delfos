@@ -69,7 +69,7 @@ module Delfos
         end
 
         it "records the called method details" do
-          file_path = expand_fixture_path("ruby/this.rb").to_s
+          file_path = "fixtures/ruby/this.rb"
 
           calleds = parse_result(:called)
 

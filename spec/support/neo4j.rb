@@ -5,6 +5,7 @@ ENV["NEO4J_PASSWORD"] ||= "password"
 
 module DelfosSpecNeo4jHelpers
   extend self
+
   def wipe_db!
     require "delfos/neo4j"
     Delfos.setup_neo4j!
@@ -27,22 +28,21 @@ RSpec.configure do |c|
     require "delfos/neo4j/query_execution/errors"
     begin
       DelfosSpecNeo4jHelpers.wipe_db!
-    rescue *Delfos::Neo4j::QueryExecution::HTTP_ERRORS => e
-      puts "*" * 80
-      puts "*" * 80
-      puts "*" * 80
-      puts "Failed to connect to Neo4j:"
-      puts Delfos.neo4j
-      puts "Start Neo4j or set the following environment variables:"
-      puts "  NEO4J_HOST"
-      puts "  NEO4J_PORT"
-      puts "  NEO4J_USERNAME"
-      puts "  NEO4J_PASSWORD"
-      puts "*" * 80
-      puts "*" * 80
-      puts "*" * 80
+    rescue *Delfos::Neo4j::QueryExecution::HTTP_ERRORS, Delfos::Neo4j::QueryExecution::ConnectionError => e
+      Delfos.logger.error "*" * 80
+      Delfos.logger.error "*" * 80
+      Delfos.logger.error "*" * 80
+      Delfos.logger.error "Failed to connect to Neo4j:"
+      Delfos.logger.error Delfos.neo4j
+      Delfos.logger.error "Start Neo4j or set the following environment variables:"
+      Delfos.logger.error "  NEO4J_HOST"
+      Delfos.logger.error "  NEO4J_PORT"
+      Delfos.logger.error "  NEO4J_USERNAME"
+      Delfos.logger.error "  NEO4J_PASSWORD"
+      Delfos.logger.error "*" * 80
+      Delfos.logger.error "*" * 80
+      Delfos.logger.error "*" * 80
     end
-
 
     Delfos::Neo4j.ensure_schema!
   end

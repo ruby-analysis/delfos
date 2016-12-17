@@ -1,5 +1,5 @@
 module TimeoutHelpers
-  TIMEOUT_VALUE = (ENV["TIMEOUT"] || (ENV["CI"] ? 40 : 0.0)).to_f
+  TIMEOUT_VALUE = 5
 
   def timeout
     return yield if TIMEOUT_VALUE == 0.5
