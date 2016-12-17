@@ -43,15 +43,13 @@ module Delfos
       end
 
       def satisfies_constraints?(required)
+        existing_constraints = fetch_existing_constraints
+
         required.inject(true) do |result, (label, attribute)|
           constraint = existing_constraints.find{|c| c["label"] == label }
 
           constraint && constraint["property_keys"].include?(attribute)
         end
-      end
-
-      def existing_constraints
-        @existing_constraints ||= fetch_existing_constraints
       end
 
       def fetch_existing_constraints

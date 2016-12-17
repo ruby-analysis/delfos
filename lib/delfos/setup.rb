@@ -22,8 +22,6 @@ module Delfos
 
         require "delfos/neo4j/informer"
         call_site_logger = Delfos:: Neo4j::Informer.new
-
-        Delfos::Neo4j.ensure_schema!
       end
 
       Delfos.call_site_logger = call_site_logger
