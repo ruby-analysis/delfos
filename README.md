@@ -53,7 +53,7 @@ Delfos.update_distance!
 
 recording test runs with rspec
 
-```
+``` ruby
 RSpec.configure do |c|
   c.before(:suite) do
     require "delfos"
