@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module Delfos
   module Neo4j
-    class ExecutionChainQuery
+    class CallStackQuery
       def initialize(call_sites, execution_count)
         @call_sites = call_sites
 
@@ -60,7 +60,7 @@ module Delfos
 
           (cs#{i}:CallSite {file: {file#{i}}, line_number: {line_number#{i}}})
 
-          MERGE (e#{i}:ExecutionChain{number: {execution_count#{i}}})
+          MERGE (e#{i}:CallStack{number: {execution_count#{i}}})
 
           MERGE (e#{i})
             -

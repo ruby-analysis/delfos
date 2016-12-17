@@ -3,15 +3,6 @@ module Delfos
     extend self
     attr_accessor :neo4j
 
-    def ensure_constraints!
-      require "delfos/setup/constraints"
-
-      Constraints.ensure!({
-        "Class"          => "name",
-        "ExecutionChain" => "number"
-      })
-    end
-
     def perform!(call_site_logger: nil, application_directories: nil)
       self.application_directories= application_directories
       self.call_site_logger= call_site_logger
@@ -65,11 +56,10 @@ module Delfos
       end
     end
 
-
     def reset!
-      if defined? Delfos::ExecutionChain
-        Delfos::ExecutionChain.pop_until_top!
-        Delfos::ExecutionChain.reset!
+      if defined? Delfos::CallStack
+        Delfos::CallStack.pop_until_top!
+        Delfos::CallStack.reset!
       end
 
       if defined? Delfos::Neo4j::Batch::Execution && neo4j.username

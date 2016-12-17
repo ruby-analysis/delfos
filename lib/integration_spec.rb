@@ -33,13 +33,13 @@ describe "integration" do
 
       MATCH (csA2B)-[:ARG]->(a)
 
-      MATCH (e:ExecutionChain) - [:STEP{number: 1}] -> (csA2B)
+      MATCH (e:CallStack) - [:STEP{number: 1}] -> (csA2B)
       MATCH (e) - [:STEP{number: 2}] -> (csB2A:CallSite)
 
-      MATCH (e2:ExecutionChain)  - [:STEP{number: 1}] -> (csA2C)
+      MATCH (e2:CallStack)  - [:STEP{number: 1}] -> (csA2C)
 
 
-      RETURN 
+      RETURN
         count(a),
         count(b),
         count(csA2B),

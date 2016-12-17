@@ -37,7 +37,7 @@ describe Delfos::Patching::MethodOverride do
     end
 
     allow(Delfos::MethodLogging).to receive(:log)
-    allow(Delfos::ExecutionChain).to receive(:pop)
+    allow(Delfos::CallStack).to receive(:pop)
   end
 
   after(:each) do

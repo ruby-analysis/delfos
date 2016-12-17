@@ -21,8 +21,8 @@ module Delfos
 
     def self.ensure_schema!
       Schema.ensure_constraints!(
-        "Class"          => "name",
-        "ExecutionChain" => "number"
+        "Class"     => "name",
+        "CallStack" => "number"
       )
     end
 

@@ -61,10 +61,10 @@ module Delfos
         return yield unless call_site
 
         begin
-          ExecutionChain.push(call_site)
+          CallStack.push(call_site)
           yield
         ensure
-          ExecutionChain.pop
+          CallStack.pop
         end
       end
 

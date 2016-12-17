@@ -6,9 +6,9 @@ module Delfos
     let(:call_site_logger) { double "call_site_logger" }
 
     before do
-      require "delfos/execution_chain"
-      allow(Delfos::ExecutionChain).to receive(:push)
-      allow(Delfos::ExecutionChain).to receive(:pop)
+      require "delfos/call_stack"
+      allow(Delfos::CallStack).to receive(:push)
+      allow(Delfos::CallStack).to receive(:pop)
 
       Delfos.call_site_logger = call_site_logger
       current_file = Pathname.new(File.expand_path(__FILE__))
