@@ -2,6 +2,7 @@
 
 require_relative "../method_logging"
 require_relative "method_calling_exception"
+require_relative "method_arguments"
 
 module Delfos
   module Patching
@@ -34,13 +35,13 @@ module Delfos
         cm = class_method
 
         method_defining_method.call(name) do |*args, **kw_args, &block|
-          arguments = MethodArguments.new(args, kw_args, block, cm)
+          arguments = MethodArguments.new(args, kw_args, block)
 
-          processor.call(self, caller.dup, binding.dup, arguments)
+          processor.call(self, caller.dup, binding.dup, arguments, cm)
         end
       end
 
-      def process(instance, stack, caller_binding, arguments)
+      def process(instance, stack, caller_binding, arguments, class_method)
         method_to_call = method_selector(instance)
 
         call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
@@ -66,21 +67,6 @@ module Delfos
           yield
         ensure
           CallStack.pop
-        end
-      end
-
-      MethodArguments = Struct.new(:args, :keyword_args, :block, :class_method) do
-        def apply_to(method)
-          if keyword_args.empty?
-            method.call(*args, &block)
-          else
-            method.call(*args, **keyword_args, &block)
-          end
-        rescue Exception => e
-          raise Delfos::MethodCallingException, method: method, args: args,
-                                                keyword_args: keyword_args,
-                                                block: block, class_method: class_method,
-                                                cause: e
         end
       end
 

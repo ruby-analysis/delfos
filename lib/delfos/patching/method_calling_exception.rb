@@ -2,11 +2,11 @@
 module Delfos
   module Patching
     class ::Delfos::MethodCallingException < RuntimeError
-      def initialize(method:, args:, keyword_args:, block:, class_method:, cause: e)
+      def initialize(method:, args:, keyword_args:, block:, initial_cause: )
         message = "Exception occurred whilst executing a Delfos intercepted method"
         message += "\n"
         message += format_args(method: method, args: args, keyword_args: keyword_args, block: block,
-                               class_method: class_method, cause: cause)
+                               initial_cause: initial_cause)
 
         super(message)
       end

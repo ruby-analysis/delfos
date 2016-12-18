@@ -40,13 +40,15 @@ module Delfos
           method = Delfos::MethodLogging::AddedMethods.find(klass, key)
           return unless method
           file = File.expand_path(__FILE__)
+          should_wrap_exception = false
 
           cm = class_method
           if cm
             method.unbind.bind(klass)
           else
             klass.send(:define_method, name) do |*args, **kw_args, &block|
-              arguments = Delfos::Patching::MethodOverride::MethodArguments.new(args, kw_args, block, cm)
+
+              arguments = Delfos::Patching::MethodArguments.new(args, kw_args, block, should_wrap_exception)
               arguments.apply_to(method.bind(self))
             end
           end

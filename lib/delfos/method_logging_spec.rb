@@ -46,7 +46,7 @@ describe Delfos::MethodLogging do
       def called_method(args, keyword_args, block)
         $called_line = __LINE__ - 1
         call_site = Delfos::MethodLogging::CallSiteParsing.new(caller.dup, binding.dup, stack_offset: MAGIC_OFFSET).perform
-        args = Delfos::Patching::MethodOverride::MethodArguments.new(args, keyword_args, block)
+        args = Delfos::Patching::MethodArguments.new(args, keyword_args, block, should_wrap_exception=true)
 
         Delfos.method_logging.log(
           call_site,
