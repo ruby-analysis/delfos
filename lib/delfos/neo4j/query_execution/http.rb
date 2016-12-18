@@ -30,7 +30,6 @@ module Delfos
           raise ConnectionError.new(e)
         end
 
-
         def build_post(body)
           build_request("Post") do |request|
             add_headers(request)

@@ -2,7 +2,7 @@
 require "json"
 require "uri"
 
-require_relative "http"
+require_relative "http_query"
 require_relative "errors"
 
 module Delfos

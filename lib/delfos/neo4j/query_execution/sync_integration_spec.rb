@@ -33,14 +33,14 @@ module Delfos
 
         def read_query
           <<-QUERY
-          MATCH (n:SomeNode{name:{node_name}})
-            -   [r:SOME_RELATIONSHIP]
-            ->  (o:OtherNode)
+            MATCH (n:SomeNode{name:{node_name}})
+              -   [r:SOME_RELATIONSHIP]
+              ->  (o:OtherNode)
 
-          RETURN
-            n.name,
-            r.rel_attribute,
-            o.name
+            RETURN
+              n.name,
+              r.rel_attribute,
+              o.name
           QUERY
         end
       end

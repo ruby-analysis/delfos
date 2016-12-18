@@ -36,7 +36,6 @@ module Delfos
           Http.new(uri).post(request_body)
 
         end
-
       end
     end
   end
