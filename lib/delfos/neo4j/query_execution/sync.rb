@@ -9,49 +9,23 @@ module Delfos
   module Neo4j
     module QueryExecution
       class Sync
-        attr_reader :query, :params
-
-        def initialize(query, params={})
-          @query, @params = query, params
-        end
+        include HttpQuery
 
         def perform
           if errors?
             raise InvalidQuery.new(json["errors"], query, params)
           end
 
-          strip_out_meta_data(json)
+          strip_out_meta_data
         end
 
         private
 
-        def errors?
-          json["errors"].length.positive?
-        end
-
-        def json
-          JSON.parse response.body
-        end
-
-        def strip_out_meta_data(result)
-          result["results"]
+        def strip_out_meta_data
+          json["results"]
           &.first
           &.[]("data")
           &.map { |r| r["row"] }
-        end
-
-        def response
-          @response ||= fetch
-        end
-
-        def fetch
-          Http.new(uri).post(request_body)
-        end
-
-        def request_body
-          {
-            "statements": [{"statement": query , "parameters": params}]
-          }.to_json
         end
 
         def uri
