@@ -34,7 +34,7 @@ describe Delfos::MethodLogging::Args do
         [["/some-unincluded-path/example.rb", 12]]
       end
     end
-    allow(Delfos::MethodLogging::AddedMethods).
+    allow(Delfos::MethodLogging::MethodCache).
       to receive(:all_method_sources_for, &definition)
 
     allow(Delfos).to receive(:method_logging).and_return method_logging

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-require_relative "./added_methods"
+require_relative "./method_cache"
 module Delfos
   module MethodLogging
-    describe AddedMethods do
+    describe MethodCache do
       class SuperKlass
         $instance_method_line = __LINE__ + 1
         def some_method

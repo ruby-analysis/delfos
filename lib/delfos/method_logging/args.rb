@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require_relative "../../delfos"
 require_relative "../common_path"
-require_relative "./added_methods"
+require_relative "./method_cache"
 
 module Delfos
   module MethodLogging
@@ -43,7 +43,7 @@ module Delfos
       end
 
       def source_files(klass)
-        AddedMethods.all_method_sources_for(klass).map(&:first)
+        MethodCache.all_method_sources_for(klass).map(&:first)
       end
 
       def record?(f)

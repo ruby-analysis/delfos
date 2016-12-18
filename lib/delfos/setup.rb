@@ -65,10 +65,11 @@ module Delfos
         Delfos::Neo4j::Batch::Execution.flush!
         Delfos::Neo4j::Batch::Execution.reset!
       end
-      # unstubbing depends upon AddedMethods being still defined
+
+      # unstubbing depends upon MethodCache being still defined
       # so this order is important
       unstub_all!
-      remove_added_methods!
+      remove_cached_methods!
 
       remove_patching!
 
@@ -81,16 +82,15 @@ module Delfos
 
     def unstub_all!
       if defined? Delfos::Patching::MethodOverride
-
         if Delfos::Patching::MethodOverride.respond_to?(:unstub_all!)
           Delfos::Patching::MethodOverride.unstub_all!
         end
       end
     end
 
-    def remove_added_methods!
-      if defined? Delfos::MethodLogging::AddedMethods
-        Delfos::MethodLogging::AddedMethods.instance_eval { @instance = nil }
+    def remove_cached_methods!
+      if defined? Delfos::MethodLogging::MethodCache
+        Delfos::MethodLogging::MethodCache.instance_eval { @instance = nil }
       end
     end
 

@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require "binding_of_caller"
+require_relative "call_site_parsing"
 
 module Delfos
   module MethodLogging
@@ -49,7 +49,7 @@ module Delfos
 
         if file[match]
           file = file.gsub(match, "").
-                 gsub(%r{^/}, "")
+            gsub(%r{^/}, "")
         end
 
         file
@@ -89,66 +89,9 @@ module Delfos
       end
 
       def method_definition
-        @method_definition ||= ::Delfos::MethodLogging::AddedMethods.method_source_for(klass, method_key)
+        @method_definition ||= MethodCache.method_source_for(klass, method_key)
       end
     end
 
-    class CallSiteParsing
-      # This magic number is based on the implementation within this file.
-      # If the line with `call_site_binding.of_caller(stack_index + STACK_OFFSET).receiver`
-      # is moved up or down the call stack a test fails and we have to change `STACK_OFFSET`
-      STACK_OFFSET = 5
-
-      attr_reader :stack, :call_site_binding
-
-      def initialize(stack, call_site_binding, stack_offset: nil)
-        @stack = stack
-        @call_site_binding = call_site_binding
-        @stack_offset = stack_offset
-      end
-
-      def perform
-        file, line_number, method_name = method_details
-        return unless current && file && line_number && method_name
-
-        CodeLocation.new(object, method_name.to_s, class_method, file, line_number)
-      end
-
-      private
-
-      def class_method
-        object.is_a? Module
-      end
-
-      def current
-        stack.detect do |s|
-          file = s.split(":")[0]
-          Delfos.method_logging.include_file_in_logging?(file)
-        end
-      end
-
-      def object
-        @object ||= call_site_binding.of_caller(stack_index + stack_offset).receiver
-      end
-
-      def stack_offset
-        @stack_offset ||= STACK_OFFSET
-      end
-
-      def stack_index
-        stack.index { |c| c == current }
-      end
-
-      def method_details
-        return unless current
-        file, line_number, rest = current.split(":")
-        method_name = rest[/`.*'$/]
-        return unless method_name && file && line_number
-
-        method_name.delete!("`").delete!("'")
-
-        [file, line_number.to_i, method_name]
-      end
-    end
   end
 end

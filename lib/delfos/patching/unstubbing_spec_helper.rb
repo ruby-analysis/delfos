@@ -37,7 +37,7 @@ module Delfos
 
         # This method is the inverse of `Delfos::Patching::MethodOverride#setup`
         def unstub!
-          method = Delfos::MethodLogging::AddedMethods.find(klass, key)
+          method = MethodLogging::MethodCache.find(klass, key)
           return unless method
           file = File.expand_path(__FILE__)
           should_wrap_exception = false
@@ -48,7 +48,7 @@ module Delfos
           else
             klass.send(:define_method, name) do |*args, **kw_args, &block|
 
-              arguments = Delfos::Patching::MethodArguments.new(args, kw_args, block, should_wrap_exception)
+              arguments = MethodArguments.new(args, kw_args, block, should_wrap_exception)
               arguments.apply_to(method.bind(self))
             end
           end

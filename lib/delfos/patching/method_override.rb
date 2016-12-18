@@ -84,12 +84,12 @@ module Delfos
         return true if bail?
         yield
 
-        Delfos::MethodLogging::AddedMethods.append(klass, key, original_method)
+        MethodLogging::MethodCache.append(klass, key, original_method)
       end
 
       def method_selector(instance)
         if class_method
-          m = Delfos::MethodLogging::AddedMethods.find(instance, "ClassMethod_#{name}")
+          m = MethodLogging::MethodCache.find(instance, "ClassMethod_#{name}")
           m.receiver == instance ? m : m.unbind.bind(instance)
         else
           original_method.bind(instance)
@@ -105,7 +105,7 @@ module Delfos
       end
 
       def method_has_been_added?
-        Delfos::MethodLogging::AddedMethods.find(klass, key)
+        MethodLogging::MethodCache.find(klass, key)
       end
 
       def private_method?
