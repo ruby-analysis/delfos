@@ -1,8 +1,8 @@
 module TimeoutHelpers
-  TIMEOUT_VALUE = 10
+  TIMEOUT_VALUE = (ENV["TIMEOUT"] || 10).to_f
 
   def timeout
-    return yield if TIMEOUT_VALUE == 0.5
+    return yield if TIMEOUT_VALUE == 0.0
 
     begin
       Timeout.timeout TIMEOUT_VALUE do

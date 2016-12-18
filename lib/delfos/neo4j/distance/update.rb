@@ -1,79 +1,37 @@
 # frozen_string_literal: true
 require "delfos/distance/calculation"
+require_relative "call_site_fetcher"
+require_relative "path_determination"
 
 module Delfos
   module Neo4j
     module Distance
       class Update
         def perform
-          update Neo4j.execute_sync(read_query)
-        end
+          results = CallSiteFetcher.perform
+          return if results.length.negative?
 
-        def determine_full_path(f)
-          f = strip_block_message(f)
-          f = Pathname.new f
-          return f.realpath if File.exist?(f)
-
-          Delfos.application_directories.map do |d|
-            path = try_path{ d + f }
-
-            path || try_path do
-              Pathname.new(d + f.to_s.gsub(%r{[^/]*/}, ""))
-            end
-          end.compact.first
-        end
-
-        private
-
-        def strip_block_message(f)
-          f.split(" in block").first
-        end
-
-        def try_path
-          path = yield
-          path if path.exist?
-        end
-
-        def read_query
-          <<-QUERY
-          MATCH
-            (call_site:CallSite) - [:CALLS] -> (called:Method)
-
-          RETURN
-            call_site.file, id(call_site),
-            called.file,    id(called)
-          QUERY
-        end
-
-        def update(results)
-          Array(results).compact.map do |start_file, call_site_id, finish_file, called_id|
-            start  = determine_full_path start_file
-            finish = determine_full_path finish_file
+          results.each do |start_file, call_site_id, finish_file, called_id|
+            start, finish  = PathDetermination.for(start_file, finish_file)
 
             calc = Delfos::Distance::Calculation.new(start, finish)
 
-            perform_query(calc.sum_traversals,
-                          calc.sum_possible_traversals,
-                          call_site_id,
-                          called_id)
+            update(call_site_id, called_id, calc)
           end
 
           Neo4j.flush!
         end
 
-        def perform_query(sum_traversals,
-                          sum_possible_traversals,
-                          call_site_id,
-                          called_id)
-          Neo4j.execute write_query, {
+        def update(call_site_id, called_id, calc)
+          Neo4j.execute query, {
             call_site_id:            call_site_id,
             called_id:               called_id,
-            sum_traversals:          sum_traversals,
-            sum_possible_traversals: sum_possible_traversals
-            }
+            sum_traversals:          calc.sum_traversals,
+            sum_possible_traversals: calc.sum_possible_traversals
+          }
         end
 
-        def write_query
+        def query
           <<-QUERY
             START call_site = node({call_site_id}),
                   called    = node({called_id})
@@ -87,7 +45,7 @@ module Delfos
                        }
                      ]
                   -> (called)
-            QUERY
+          QUERY
         end
       end
     end

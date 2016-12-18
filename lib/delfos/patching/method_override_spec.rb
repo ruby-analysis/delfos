@@ -32,12 +32,15 @@ describe Delfos::Patching::MethodOverride do
   let(:some_random_instance) { klass.new }
 
   before do
+    stub_const("Delfos::CallStack", double("CallStack class"))
+
     allow(Delfos::MethodLogging).to receive(:exclude?) do
       klass != SomeRandomClass
     end
 
     allow(Delfos::MethodLogging).to receive(:log)
     allow(Delfos::CallStack).to receive(:pop)
+    allow(Delfos::CallStack).to receive(:push)
   end
 
   after(:each) do
