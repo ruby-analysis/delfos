@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module Delfos
   module Patching
-    class ::Delfos::MethodCallingException < RuntimeError
+    class MethodCallingException < RuntimeError
       def initialize(method:, args:, keyword_args:, block:, initial_cause: )
         message = "Exception occurred whilst executing a Delfos intercepted method"
         message += "\n"

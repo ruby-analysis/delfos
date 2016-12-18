@@ -10,13 +10,16 @@ module Delfos
       let(:should_wrap_exception) { true }
       let(:instance) { described_class.new(args, keyword_args, block, should_wrap_exception)  }
 
+      class Bomb < StandardError
+      end
+
       describe "#apply_to" do
         context "with exception wrapping disabled" do
           let(:should_wrap_exception) { false }
-          let(:bomb) { lambda{raise "boom" } }
+          let(:bomb) { lambda{raise Bomb } }
 
           it do
-            expect(->{ instance.apply_to(bomb)}).to raise_error RuntimeError
+            expect(->{ instance.apply_to(bomb)}).to raise_error Bomb
           end
         end
         context "with exception wrapping enabled" do
@@ -26,7 +29,7 @@ module Delfos
           it do
             expect(->{
               instance.apply_to(bomb)
-            }).to raise_error Delfos::MethodCallingException
+            }).to raise_error MethodCallingException
           end
         end
       end

@@ -10,16 +10,15 @@ module Delfos
           method.call(*args, **keyword_args, &block)
         end
       rescue StandardError => e
-        if should_wrap_exception
-          raise Delfos::MethodCallingException, {
-            method: method,
-            args: args,
-            keyword_args: keyword_args,
-            block: block,
-            initial_cause: e}
-        else
-          raise
-        end
+        raise unless should_wrap_exception
+
+        raise MethodCallingException, {
+          method: method,
+          args: args,
+          keyword_args: keyword_args,
+          block: block,
+          initial_cause: e
+        }
       end
     end
   end
