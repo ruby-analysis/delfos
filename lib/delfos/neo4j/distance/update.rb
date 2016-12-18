@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 require "delfos/distance/calculation"
 require_relative "call_site_fetcher"
-require_relative "path_determination"
 
 module Delfos
   module Neo4j
@@ -12,9 +11,7 @@ module Delfos
           return if results.length.negative?
 
           results.each do |start_file, call_site_id, finish_file, called_id|
-            start, finish  = PathDetermination.for(start_file, finish_file)
-
-            calc = Delfos::Distance::Calculation.new(start, finish)
+            calc = Delfos::Distance::Calculation.new(start_file, finish_file)
 
             update(call_site_id, called_id, calc)
           end

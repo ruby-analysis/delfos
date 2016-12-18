@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require_relative "relation"
+require_relative "path_determination"
 
 module Delfos
   module Distance
@@ -7,8 +8,7 @@ module Delfos
       attr_reader :path_a, :path_b
 
       def initialize(path_a, path_b)
-        @path_a = path_a
-        @path_b = path_b
+        @path_a, @path_b  = PathDetermination.for(path_a, path_b)
       end
 
       attr_reader :traversal_a, :traversal_b
