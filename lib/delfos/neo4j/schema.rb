@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Delfos
   module Neo4j
     module Schema
@@ -32,7 +33,7 @@ module Delfos
         log(s, :error)
       end
 
-      def log(s, type=:debug)
+      def log(s, type = :debug)
         Delfos.logger.send(type, s)
       end
 
@@ -45,8 +46,8 @@ module Delfos
       def satisfies_constraints?(required)
         existing_constraints = fetch_existing_constraints
 
-        required.inject(true) do |result, (label, attribute)|
-          constraint = existing_constraints.find{|c| c["label"] == label }
+        required.inject(true) do |_result, (label, attribute)|
+          constraint = existing_constraints.find { |c| c["label"] == label }
 
           constraint && constraint["property_keys"].include?(attribute)
         end

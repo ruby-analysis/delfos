@@ -1,10 +1,10 @@
+# frozen_string_literal: true
 require "spec_helper"
 require_relative "execution"
 
 module Delfos
   module Neo4j
     module Batch
-
       RSpec.describe Execution, "integration" do
         before do
           Delfos.setup_neo4j!
@@ -20,7 +20,7 @@ module Delfos
               query = "MERGE (n:Node{name:{name}}) - [r:RELATIONSHIP] -> (o:Other)"
 
               node_names.each do |n|
-                described_class.execute!(query, {name: n}, size)
+                described_class.execute!(query, { name: n }, size)
               end
 
               result = perform_query("MATCH (n:Node) RETURN n.name")

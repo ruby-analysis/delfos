@@ -77,12 +77,10 @@ module Delfos
             method.call(*args, **keyword_args, &block)
           end
         rescue Exception => e
-          raise ::Delfos::MethodCallingException.new(
-            method: method, args: args,
-            keyword_args: keyword_args,
-            block: block, class_method: class_method,
-            cause: e
-          )
+          raise Delfos::MethodCallingException, method: method, args: args,
+                                                keyword_args: keyword_args,
+                                                block: block, class_method: class_method,
+                                                cause: e
         end
       end
 

@@ -16,7 +16,7 @@ module Delfos
       def common_parent(path_a, path_b)
         dirs = [
           File.expand_path(path_a.to_s),
-          File.expand_path(path_b.to_s)
+          File.expand_path(path_b.to_s),
         ]
 
         dir1, dir2 = dirs.minmax.map { |dir| dir.split(SEPARATOR) }

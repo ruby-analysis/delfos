@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 # These `Unstubbing` modules because we are testing something that redefines
 # methods.
 

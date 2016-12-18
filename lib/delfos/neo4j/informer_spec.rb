@@ -123,6 +123,4 @@ describe Delfos::Neo4j::Informer do
 
     expect(strip_whitespace(query)).to eq strip_whitespace(expected)
   end
-
-
 end

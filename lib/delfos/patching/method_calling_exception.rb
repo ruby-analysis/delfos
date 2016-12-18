@@ -1,11 +1,12 @@
+# frozen_string_literal: true
 module Delfos
   module Patching
-    class ::Delfos::MethodCallingException < Exception
-      def initialize(method:, args:, keyword_args:,block:,class_method:, cause: e)
+    class ::Delfos::MethodCallingException < RuntimeError
+      def initialize(method:, args:, keyword_args:, block:, class_method:, cause: e)
         message = "Exception occurred whilst executing a Delfos intercepted method"
-        message = message + "\n"
-        message = message + format_args({method: method, args: args, keyword_args: keyword_args, block: block, 
-                                         class_method: class_method, cause: cause})
+        message += "\n"
+        message += format_args(method: method, args: args, keyword_args: keyword_args, block: block,
+                               class_method: class_method, cause: cause)
 
         super(message)
       end
@@ -13,14 +14,12 @@ module Delfos
       def format_args(args)
         length = args.keys.map(&:to_s).map(&:length).max
 
-        args.map{  |k,v| format_arg(k,v,length) }.join("\n")
+        args.map { |k, v| format_arg(k, v, length) }.join("\n")
       end
 
-      def format_arg(k,v,length)
+      def format_arg(k, v, length)
         "#{k.to_s.ljust(length)}: #{v.inspect}"
       end
     end
   end
 end
-
-

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 require_relative "sync"
 
@@ -17,15 +18,15 @@ module Delfos
         describe "#perform" do
           context "with a successful response" do
             before do
-              data = [{"row"=>["some name", 2, "other name"]}]
-              body = {"results"=>[{"columns"=>["n.name", "r.rel_attribute", "o.name"], "data"=>data}], "errors"=>[]}.to_json
+              data = [{ "row" => ["some name", 2, "other name"] }]
+              body = { "results" => [{ "columns" => ["n.name", "r.rel_attribute", "o.name"], "data" => data }], "errors" => [] }.to_json
 
               stub_request(:post, Delfos.neo4j.uri_for("/db/data/transaction/commit")).
                 to_return(
-                  :status  => 200,
-                  :body    => body,
-                  :headers => {}
-              )
+                  status: 200,
+                  body: body,
+                  headers: {},
+                )
             end
 
             it do
@@ -38,18 +39,18 @@ module Delfos
 
           context "with an error response" do
             before do
-              body = {"results"=>[], "errors"=>[{code: "some error", message: "some message"}]}.to_json
+              body = { "results" => [], "errors" => [{ code: "some error", message: "some message" }] }.to_json
 
               stub_request(:post, Delfos.neo4j.uri_for("/db/data/transaction/commit")).
                 to_return(
-                  :status  => 200,
-                  :body    => body,
-                  :headers => {}
-              )
+                  status: 200,
+                  body: body,
+                  headers: {},
+                )
             end
 
             it do
-              expect(->{ described_class.new(anything, anything).perform }).
+              expect(-> { described_class.new(anything, anything).perform }).
                 to raise_error InvalidQuery
             end
           end
@@ -59,8 +60,8 @@ module Delfos
               allow(Net::HTTP).to receive(:new).and_raise EOFError
             end
 
-            it  do
-              expect(->{ described_class.new(anything, anything).perform }).to raise_error ConnectionError
+            it do
+              expect(-> { described_class.new(anything, anything).perform }).to raise_error ConnectionError
             end
           end
         end
@@ -74,7 +75,7 @@ module Delfos
         end
 
         def params
-          {node_name: "some name"}
+          { node_name: "some name" }
         end
 
         def read_query
@@ -89,8 +90,6 @@ module Delfos
             o.name
           QUERY
         end
-
-
       end
     end
   end

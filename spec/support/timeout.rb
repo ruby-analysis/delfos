@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module TimeoutHelpers
   TIMEOUT_VALUE = (ENV["TIMEOUT"] || 10).to_f
 
@@ -20,9 +21,6 @@ RSpec.configure do |c|
   c.include TimeoutHelpers
 
   c.around(:each) do |e|
-
     timeout { e.run }
   end
-
 end
-

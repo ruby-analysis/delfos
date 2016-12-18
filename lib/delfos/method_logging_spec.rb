@@ -26,7 +26,7 @@ describe Delfos::MethodLogging do
       expect_any_instance_of(Delfos::MethodLogging::AddedMethods).
         to receive(:added_methods).
         at_least(:once).
-        and_return("A" => { instance_method_some_method:  method_a },
+        and_return("A" => { instance_method_some_method: method_a },
                    "B" => { instance_method_another_method: method_b })
 
       Delfos.call_site_logger = call_site_logger
@@ -53,10 +53,10 @@ describe Delfos::MethodLogging do
           self,
           method(__method__),
           class_method = false,
-          args
+          args,
         )
 
-        #real method would do stuff here
+        # real method would do stuff here
       end
     end
 

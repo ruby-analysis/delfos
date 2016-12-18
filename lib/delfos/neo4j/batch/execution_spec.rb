@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 require "delfos/neo4j"
@@ -11,11 +12,11 @@ module Delfos
         let(:size)      { 10 }
         let(:batch)     { described_class.new(size: size, clock: clock) }
         let(:execution) { double("") }
-        let(:transaction_url)       { Delfos.neo4j.uri_for("/db/data/transaction/1") }
+        let(:transaction_url) { Delfos.neo4j.uri_for("/db/data/transaction/1") }
         let(:commit_url) { Delfos.neo4j.uri_for("/db/data/transaction/1/commit") }
 
-        let(:expires_string)    { "Wed, 14 Dec 2016 10:39:44 GMT" }
-        let(:expires)    { Time.parse(expires_string) }
+        let(:expires_string) { "Wed, 14 Dec 2016 10:39:44 GMT" }
+        let(:expires) { Time.parse(expires_string) }
         let(:now)       { Time.parse("Wed, 14 Dec 2016 10:33:44 GMT") }
         let(:clock)     { double "clock", now: now }
 
@@ -48,7 +49,6 @@ module Delfos
           allow(transactional).
             to receive(:perform).
             and_return([transaction_url, commit_url, expires])
-
         end
 
         after do
@@ -140,9 +140,8 @@ module Delfos
           context "beyond the expiry time" do
             let(:now)  { expires + 20 }
 
-
             it "resets the batch" do
-              expect(->{2.times{batch.execute!(anything, anything)}}).to raise_error Execution::ExpiredError
+              expect(-> { 2.times { batch.execute!(anything, anything) } }).to raise_error Execution::ExpiredError
 
               new_batch = described_class.new_batch(size)
 
@@ -155,7 +154,7 @@ module Delfos
           end
 
           context "expires soon time" do
-            let(:now)  { expires - 1.5 }
+            let(:now) { expires - 1.5 }
             before do
               allow(QueryExecution::Transactional).to receive(:flush!)
             end

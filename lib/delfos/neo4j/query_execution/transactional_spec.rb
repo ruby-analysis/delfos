@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 require_relative "transactional"
 
@@ -18,7 +19,6 @@ module Delfos
         let(:commit_url) { Delfos.neo4j.uri_for("/db/data/transaction/10/commit") }
         let(:expiry) { "Thu, 08 Dec 2016 11:13:49 +0000" }
 
-
         it do
           response = <<-RESPONSE
             {
@@ -36,10 +36,10 @@ module Delfos
 
           stub_request(:post, Delfos.neo4j.uri_for("/db/data/transaction")).
             to_return(
-              :status  => 200,
-              :body    => response,
-              :headers => {location: transaction_url}
-          )
+              status: 200,
+              body: response,
+              headers: { location: transaction_url },
+            )
 
           response_transaction_url, response_commit_url, response_expiry = described_class.new(anything, anything).perform
 
@@ -58,7 +58,7 @@ module Delfos
       end
 
       def params
-        {node_name: "some name"}
+        { node_name: "some name" }
       end
 
       def read_query
@@ -73,8 +73,6 @@ module Delfos
             o.name
         QUERY
       end
-
-
     end
   end
 end

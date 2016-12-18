@@ -12,9 +12,7 @@ module Delfos
         include HttpQuery
 
         def perform
-          if errors?
-            raise InvalidQuery.new(json["errors"], query, params)
-          end
+          raise InvalidQuery.new(json["errors"], query, params) if errors?
 
           strip_out_meta_data
         end

@@ -61,10 +61,10 @@ module Delfos
           end
 
           it "records the call_site details" do
-            files = parse_result(:call_site).map{|r| r["file"]}.uniq
-            lines = parse_result(:call_site).map{|r| r["line_number"]}.sort
+            files = parse_result(:call_site).map { |r| r["file"] }.uniq
+            lines = parse_result(:call_site).map { |r| r["line_number"] }.sort
             expect(files).to eq ["fixtures/ruby/efferent_coupling.rb"]
-            expect(lines).to eq [6,7,8,9,10,11,12]
+            expect(lines).to eq [6, 7, 8, 9, 10, 11, 12]
           end
         end
 
@@ -74,13 +74,12 @@ module Delfos
           calleds = parse_result(:called)
 
           expect(calleds).to match_array [
-            { "file" => file_path, "name" => "send_message",     "line_number" => 3,  "type"=>"ClassMethod" },
-            { "file" => file_path, "name" => "found_in_here",    "line_number" => 13, "type"=>"ClassMethod" },
-            { "file" => file_path, "name" => "for_good_measure", "line_number" => 17, "type"=>"ClassMethod" },
+            { "file" => file_path, "name" => "send_message",     "line_number" => 3,  "type" => "ClassMethod" },
+            { "file" => file_path, "name" => "found_in_here",    "line_number" => 13, "type" => "ClassMethod" },
+            { "file" => file_path, "name" => "for_good_measure", "line_number" => 17, "type" => "ClassMethod" },
           ]
         end
-
-              end
+      end
     end
   end
 end

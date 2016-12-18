@@ -7,11 +7,11 @@ require_relative "neo4j/distance/update"
 
 module Delfos
   module Neo4j
-    def self.execute_sync(query, params={})
+    def self.execute_sync(query, params = {})
       QueryExecution::Sync.new(query, params).perform
     end
 
-    def self.execute(query, params={})
+    def self.execute(query, params = {})
       Batch::Execution.execute!(query, params)
     end
 
@@ -22,7 +22,7 @@ module Delfos
     def self.ensure_schema!
       Schema.ensure_constraints!(
         "Class"     => "name",
-        "CallStack" => "number"
+        "CallStack" => "number",
       )
     end
 

@@ -27,7 +27,7 @@ module Delfos
 
           http.request(request)
         rescue *HTTP_ERRORS => e
-          raise ConnectionError.new(e)
+          raise ConnectionError, e
         end
 
         def build_post(body)
@@ -51,7 +51,7 @@ module Delfos
         end
 
         def add_headers(request)
-          request.initialize_http_header({"Accept" => "application/json; charset=UTF-8"})
+          request.initialize_http_header("Accept" => "application/json; charset=UTF-8")
           request.basic_auth(Delfos.neo4j.username, Delfos.neo4j.password)
           request.content_type = "application/json"
         end

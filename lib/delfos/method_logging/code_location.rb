@@ -68,8 +68,7 @@ module Delfos
         if method_definition
           method_definition[0].to_s
         else
-          byebug
-          #TODO fix edge case when block
+          # TODO: fix edge case when block
           "#{@file} in block"
         end
       end
@@ -78,7 +77,7 @@ module Delfos
         if method_definition
           method_definition[1].to_i
         else
-          #TODO fix edge case when block
+          # TODO: fix edge case when block
           0
         end
       end

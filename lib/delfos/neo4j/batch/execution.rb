@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "delfos/neo4j/query_execution/transactional"
 
 module Delfos
@@ -10,7 +11,7 @@ module Delfos
         BATCH_MUTEX = Mutex.new
 
         class << self
-          def execute!(query, params={}, size=nil)
+          def execute!(query, params = {}, size = nil)
             batch = @batch || new_batch(size || 1_000)
 
             batch.execute!(query, params)
@@ -21,7 +22,7 @@ module Delfos
           end
 
           def flush!
-            @batch.flush! if @batch
+            @batch&.flush!
           end
 
           def reset!
@@ -42,7 +43,7 @@ module Delfos
 
         attr_reader :size, :query_count, :current_transaction_url, :commit_url, :expires
 
-        def execute!(query, params={})
+        def execute!(query, params = {})
           BATCH_MUTEX.synchronize do
             check_for_expiry!
             transactional_query = QueryExecution::Transactional.new(query, params, url)
@@ -64,9 +65,7 @@ module Delfos
         private
 
         def url
-          if @commit_url && batch_full? || expires_soon?
-            return @commit_url
-          end
+          return @commit_url if @commit_url && batch_full? || expires_soon?
 
           current_transaction_url || new_transaction_url
         end
@@ -88,9 +87,7 @@ module Delfos
           check_for_expiry!
           @query_count += 1
 
-          if batch_full? || expires_soon?
-            flush!
-          end
+          flush! if batch_full? || expires_soon?
         end
 
         def batch_full?

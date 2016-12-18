@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ENV["NEO4J_HOST"]     ||= "http://localhost"
 ENV["NEO4J_PORT"]     ||= "7476"
 ENV["NEO4J_USERNAME"] ||= "neo4j"
@@ -19,7 +20,6 @@ module DelfosSpecNeo4jHelpers
     Delfos::Neo4j.execute_sync(q)
   end
 end
-
 
 RSpec.configure do |c|
   c.include DelfosSpecNeo4jHelpers

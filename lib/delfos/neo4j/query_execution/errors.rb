@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Delfos
   module Neo4j
     module QueryExecution
@@ -9,16 +10,16 @@ module Delfos
         Net::HTTPBadResponse,
         Net::HTTPHeaderSyntaxError,
         Net::ProtocolError,
-        Timeout::Error
-      ]
+        Timeout::Error,
+      ].freeze
 
-      class InvalidQuery  < IOError
+      class InvalidQuery < IOError
         def initialize(errors, query, params)
           message = errors.map do |e|
-            e.select{|k,_| %w(code message).include?(k) }.inspect
+            e.select { |k, _| %w(code message).include?(k) }.inspect
           end.join("\n")
 
-          super [message, {query: query, params: params.to_json}.to_json].join("\n\n")
+          super [message, { query: query, params: params.to_json }.to_json].join("\n\n")
         end
       end
 

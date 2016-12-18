@@ -1,8 +1,9 @@
+# frozen_string_literal: true
 module Delfos
   module Distance
     class PathDetermination
       def self.for(*files)
-        files.map{|f| new(f).full_path }
+        files.map { |f| new(f).full_path }
       end
 
       def initialize(file)
@@ -13,7 +14,7 @@ module Delfos
         return @file.realpath if File.exist?(@file)
 
         Delfos.application_directories.map do |d|
-          path = try_path{ d + @file }
+          path = try_path { d + @file }
 
           path || try_path do
             Pathname.new(d + @file.to_s.gsub(%r{[^/]*/}, ""))

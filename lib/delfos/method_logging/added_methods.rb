@@ -31,17 +31,13 @@ module Delfos
       def method_source_for(klass, key)
         meth = find(klass, key)
 
-        if meth
-          meth.source_location
-        end
+        meth&.source_location
       end
 
       def append(klass, key, original_method)
-        m = fetch(klass)[key] 
+        m = fetch(klass)[key]
 
-        if m.nil?
-          fetch(klass)[key]  = original_method
-        end
+        fetch(klass)[key] = original_method if m.nil?
       end
 
       def find(klass, key)

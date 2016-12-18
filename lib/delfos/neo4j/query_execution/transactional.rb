@@ -13,7 +13,7 @@ module Delfos
         include HttpQuery
 
         def self.flush!(commit_url)
-          response = Http.new(commit_url).post({statements: []}.to_json)
+          response = Http.new(commit_url).post({ statements: [] }.to_json)
 
           unless response.code == "200"
             raise InvalidCommit.new(commit_url, response)
@@ -21,9 +21,7 @@ module Delfos
         end
 
         def perform
-          if errors?
-            raise InvalidQuery.new(json["errors"], query, params)
-          end
+          raise InvalidQuery.new(json["errors"], query, params) if errors?
 
           transaction_url = URI.parse  header("location") if header("location")
           commit_url      = URI.parse  json["commit"]     if json["commit"]
@@ -35,7 +33,7 @@ module Delfos
         private
 
         def header(name)
-          response.each_header.to_a.find{|n,_| n == name}&.last
+          response.each_header.to_a.find { |n, _| n == name }&.last
         end
 
         def uri

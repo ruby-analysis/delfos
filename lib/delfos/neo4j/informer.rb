@@ -13,7 +13,7 @@ module Delfos
         assign_query_variables(args, call_site, called_code)
 
         params = query_variables.each_with_object({}) do |(klass, name), object|
-          object[name]=klass.to_s
+          object[name] = klass.to_s
         end
 
         params["m1_type"]        = call_site.method_type
@@ -35,7 +35,7 @@ module Delfos
       def query_for(args, call_site, called_code)
         assign_query_variables(args, call_site, called_code)
 
-        klasses_query = query_variables.map do |klass, name|
+        klasses_query = query_variables.map do |_klass, name|
           "MERGE (#{name}:Class {name: {#{name}}})"
         end.join("\n")
 
@@ -63,7 +63,7 @@ module Delfos
       end
 
       def assign_query_variables(args, call_site, called_code)
-        klasses = [call_site.klass, called_code.klass]  + args.args + args.keyword_args
+        klasses = [call_site.klass, called_code.klass] + args.args + args.keyword_args
 
         klasses.uniq.each do |k|
           query_variables.assign(k, "k")

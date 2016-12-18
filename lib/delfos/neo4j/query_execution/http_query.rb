@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Delfos
   module Neo4j
     module QueryExecution
@@ -8,15 +9,17 @@ module Delfos
           end
         end
 
-        def initialize(query, params, uri=nil)
-          @query, @params, @uri = query, params, uri
+        def initialize(query, params, uri = nil)
+          @query = query
+          @params = params
+          @uri = uri
         end
 
         private
 
         def request_body
           {
-            "statements": [{"statement": query , "parameters": params}]
+            "statements": [{ "statement": query, "parameters": params }],
           }.to_json
         end
 
@@ -34,10 +37,8 @@ module Delfos
 
         def fetch
           Http.new(uri).post(request_body)
-
         end
       end
     end
   end
 end
-

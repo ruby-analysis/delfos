@@ -69,12 +69,12 @@ describe Delfos::Patching::MethodOverride do
 
   describe ".perform" do
     let(:method_logging) do
-      exclusion = lambda{|m| 
+      exclusion = lambda do |m|
         ![:some_public_method, :some_externally_called_public_method].include?(m.name)
-      }
+      end
 
       m = double("MethodLogging")
-      allow(m).to receive(:include_file_in_logging?) {|f| f == __FILE__ }
+      allow(m).to receive(:include_file_in_logging?) { |f| f == __FILE__ }
       allow(m).to receive(:exclude?, &exclusion)
       m
     end
@@ -109,7 +109,7 @@ describe Delfos::Patching::MethodOverride do
       it "sends the correct args to the method call_site_logger" do
         call_count = 0
 
-        expect(method_logging).to receive(:log) do |call_site, object, called_method,  _class_method, _arguments|
+        expect(method_logging).to receive(:log) do |call_site, object, called_method, _class_method, _arguments|
           call_count += 1
           expect(object).to be_a SomeRandomClass
           expect(call_site).to be_a Delfos::MethodLogging::CodeLocation

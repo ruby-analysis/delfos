@@ -4,7 +4,7 @@ module Delfos
   module CallStack
     describe Stack do
       let(:call_stack_query) { double "execution chain query", query: query, params: params }
-      let(:params) { {some: "params"} }
+      let(:params) { { some: "params" } }
       let(:query) { "some query" }
 
       before do
@@ -69,7 +69,7 @@ module Delfos
 
         context "with a callback" do
           let(:callback) { double("callback", call: nil) }
-          subject{described_class.new(on_empty: callback)}
+          subject { described_class.new(on_empty: callback) }
 
           it "calls the callback on empty" do
             subject.push(anything)
@@ -79,11 +79,11 @@ module Delfos
             subject.pop
             expect(callback).not_to have_received(:call)
             subject.pop
-            expect(callback).to have_received(:call).with([anything, anything],1)
+            expect(callback).to have_received(:call).with([anything, anything], 1)
 
             subject.push(anything)
             subject.pop
-            expect(callback).to have_received(:call).with([anything],2)
+            expect(callback).to have_received(:call).with([anything], 2)
           end
         end
 

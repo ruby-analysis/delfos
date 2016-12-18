@@ -12,4 +12,3 @@ class BasicObject
     ::Delfos::Patching::MethodOverride.setup(self, name, private_methods, class_method: true)
   end
 end
-

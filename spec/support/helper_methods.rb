@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module DelfosSpecHelpers
   extend self
 
@@ -32,8 +33,6 @@ module DelfosSpecHelpers
   end
 end
 
-
 RSpec.configure do |c|
   c.include DelfosSpecHelpers
 end
-

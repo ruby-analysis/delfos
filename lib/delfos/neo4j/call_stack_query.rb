@@ -9,7 +9,7 @@ module Delfos
       end
 
       def query
-        map_call_sites do |c,i|
+        map_call_sites do |c, i|
           call_site_query(c, i)
         end.join("\n")
       end
@@ -17,7 +17,7 @@ module Delfos
       def params
         params = {}
 
-        map_call_sites do |c,i|
+        map_call_sites do |c, i|
           params.merge!(call_site_params(c, i))
         end
 
@@ -34,8 +34,8 @@ module Delfos
         end
       end
 
-      def call_site_query(cs, i)
-         <<-QUERY
+      def call_site_query(_cs, i)
+        <<-QUERY
           MERGE
 
           (
@@ -80,7 +80,7 @@ module Delfos
           "method_definition_line#{i}" => cs.method_definition_line,
           "file#{i}"                   => cs.file,
           "line_number#{i}"            => cs.line_number,
-          "step_number#{i}"            => i + 1
+          "step_number#{i}"            => i + 1,
         }
       end
     end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 require_relative "transactional"
 
@@ -36,7 +37,7 @@ module Delfos
       end
 
       def params
-        {node_name: "some name"}
+        { node_name: "some name" }
       end
 
       def read_query

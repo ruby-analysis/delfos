@@ -1,11 +1,12 @@
+# frozen_string_literal: true
 module Delfos
   module Setup
     extend self
     attr_accessor :neo4j
 
     def perform!(call_site_logger: nil, application_directories: nil)
-      self.application_directories= application_directories
-      self.call_site_logger= call_site_logger
+      self.application_directories = application_directories
+      self.call_site_logger = call_site_logger
 
       perform_patching!
     end
