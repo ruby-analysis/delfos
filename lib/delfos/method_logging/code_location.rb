@@ -89,7 +89,7 @@ module Delfos
       end
 
       def method_definition
-        @method_definition ||= MethodCache.method_source_for(klass, method_key)
+        @method_definition ||= Patching::MethodCache.method_source_for(klass, method_key)
       end
     end
 

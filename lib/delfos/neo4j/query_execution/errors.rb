@@ -19,7 +19,7 @@ module Delfos
             e.select { |k, _| %w(code message).include?(k) }.inspect
           end.join("\n")
 
-          super [message, { query: query, params: params.to_json }.to_json].join("\n\n")
+          super [message, { query: query, params: params }.to_json].join("\n\n")
         end
       end
 

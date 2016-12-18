@@ -55,12 +55,12 @@ module Delfos
         let(:method_b) { SomeRandomClass.method :some_class_method }
 
         it do
-          expect(MethodLogging::MethodCache.instance.added_methods).to eq({})
+          expect(MethodCache.instance.added_methods).to eq({})
 
           described_class.setup(klass, "some_public_method", klass.private_instance_methods, class_method: false)
           described_class.setup(klass, "some_class_method",  klass.private_methods,          class_method: true)
 
-          result = MethodLogging::MethodCache.instance.added_methods
+          result = MethodCache.instance.added_methods
 
           expect(result["Delfos::Patching::SomeRandomClass"]["InstanceMethod_some_public_method"].source_location).
             to eq [File.expand_path(__FILE__), $instance_method_line_number]

@@ -37,7 +37,7 @@ module Delfos
 
         # This method is the inverse of `Delfos::Patching::MethodOverride#setup`
         def unstub!
-          method = MethodLogging::MethodCache.find(klass, key)
+          method = MethodCache.find(klass, key)
           return unless method
           file = File.expand_path(__FILE__)
           should_wrap_exception = false

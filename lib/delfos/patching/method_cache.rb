@@ -2,7 +2,7 @@
 require "Forwardable" unless defined? Forwardable
 
 module Delfos
-  module MethodLogging
+  module Patching
     class MethodCache
       class << self
         extend Forwardable

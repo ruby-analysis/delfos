@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-require_relative "../method_logging"
+require "delfos/method_logging"
+require "delfos/call_stack"
+
 require_relative "method_calling_exception"
 require_relative "method_arguments"
 
@@ -84,12 +86,12 @@ module Delfos
         return true if bail?
         yield
 
-        MethodLogging::MethodCache.append(klass, key, original_method)
+        MethodCache.append(klass, key, original_method)
       end
 
       def method_selector(instance)
         if class_method
-          m = MethodLogging::MethodCache.find(instance, "ClassMethod_#{name}")
+          m = MethodCache.find(instance, "ClassMethod_#{name}")
           m.receiver == instance ? m : m.unbind.bind(instance)
         else
           original_method.bind(instance)
@@ -105,7 +107,7 @@ module Delfos
       end
 
       def method_has_been_added?
-        MethodLogging::MethodCache.find(klass, key)
+        MethodCache.find(klass, key)
       end
 
       def private_method?

@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 require_relative "./method_cache"
+
 module Delfos
-  module MethodLogging
+  module Patching
     describe MethodCache do
       class SuperKlass
         $instance_method_line = __LINE__ + 1
@@ -38,19 +39,19 @@ module Delfos
       describe "#append" do
         it "appends to the methods" do
           subject.append(SuperKlass, "B", "C")
-          expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include("B" => "C")
+          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => "C")
         end
 
         it "doesn't replace existing definitions" do
           subject.append(SuperKlass, "B", "C")
           subject.append(SuperKlass, "B", "D")
-          expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include("B" => "C")
+          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => "C")
         end
 
         it do
           subject.append(SuperKlass, "B", "C")
           subject.append(SuperKlass, "E", "F")
-          expect(subject.added_methods["Delfos::MethodLogging::SuperKlass"]).to include("B" => "C", "E" => "F")
+          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => "C", "E" => "F")
         end
       end
 

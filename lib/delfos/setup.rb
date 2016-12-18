@@ -89,8 +89,8 @@ module Delfos
     end
 
     def remove_cached_methods!
-      if defined? Delfos::MethodLogging::MethodCache
-        Delfos::MethodLogging::MethodCache.instance_eval { @instance = nil }
+      if defined? Delfos::Patching::MethodCache
+        Delfos::Patching::MethodCache.instance_eval { @instance = nil }
       end
     end
 

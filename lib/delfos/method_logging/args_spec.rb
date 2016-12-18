@@ -3,56 +3,60 @@ require_relative "args"
 require "./fixtures/b"
 require "./fixtures/a"
 
-describe Delfos::MethodLogging::Args do
-  let(:a) { A.new }
-  let(:b) { B.new }
-  let(:c) { 1 }
-  let(:d) { "" }
-  let(:a_path) { File.expand_path "./fixtures/a.rb" }
-  let(:b_path) { File.expand_path "./fixtures/b.rb" }
+module Delfos
+  module MethodLogging
+    describe Args do
+      let(:a) { A.new }
+      let(:b) { B.new }
+      let(:c) { 1 }
+      let(:d) { "" }
+      let(:a_path) { File.expand_path "./fixtures/a.rb" }
+      let(:b_path) { File.expand_path "./fixtures/b.rb" }
 
-  def f(*args, **keyword_args)
-    double("Arguments object", args: args, keyword_args: keyword_args, block: nil)
-  end
-
-  let(:method_logging) do
-    double("method_logging").tap do |m|
-      allow(m).to receive(:include_file_in_logging?) do |file|
-        [a_path, b_path].include?(file)
+      def f(*args, **keyword_args)
+        double("Arguments object", args: args, keyword_args: keyword_args, block: nil)
       end
-    end
-  end
 
-  before do
-    definition = lambda do |k|
-      case k.to_s
-      when "A"
-        [[a_path, 1], [a_path, 23]]
-      when "B"
-        [[b_path, 34]]
-      else
-        [["/some-unincluded-path/example.rb", 12]]
+      let(:method_logging) do
+        double("method_logging").tap do |m|
+          allow(m).to receive(:include_file_in_logging?) do |file|
+            [a_path, b_path].include?(file)
+          end
+        end
       end
-    end
-    allow(Delfos::MethodLogging::MethodCache).
-      to receive(:all_method_sources_for, &definition)
 
-    allow(Delfos).to receive(:method_logging).and_return method_logging
-    path = Pathname.new(File.expand_path(__FILE__)) + "../../../../fixtures"
-    Delfos.application_directories = [path]
-  end
+      before do
+        definition = lambda do |k|
+          case k.to_s
+          when "A"
+            [[a_path, 1], [a_path, 23]]
+          when "B"
+            [[b_path, 34]]
+          else
+            [["/some-unincluded-path/example.rb", 12]]
+          end
+        end
+        allow(Patching::MethodCache).
+          to receive(:all_method_sources_for, &definition)
 
-  subject { described_class.new(f(a, b, c, d, c: c, d: d)) }
+        allow(Delfos).to receive(:method_logging).and_return method_logging
+        path = Pathname.new(File.expand_path(__FILE__)) + "../../../../fixtures"
+        Delfos.application_directories = [path]
+      end
 
-  describe "#args" do
-    it do
-      expect(subject.args).to eq [A, B]
-    end
-  end
+      subject { described_class.new(f(a, b, c, d, c: c, d: d)) }
 
-  describe "#keyword_args" do
-    it "ignores non application defined classes" do
-      expect(subject.keyword_args).to eq []
+      describe "#args" do
+        it do
+          expect(subject.args).to eq [A, B]
+        end
+      end
+
+      describe "#keyword_args" do
+        it "ignores non application defined classes" do
+          expect(subject.keyword_args).to eq []
+        end
+      end
     end
   end
 end

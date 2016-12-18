@@ -24,7 +24,7 @@ module Delfos
       let(:method_b) { double "method b", source_location: [b_path, 2] }
 
       before do
-        expect_any_instance_of(MethodLogging::MethodCache).
+        expect_any_instance_of(Patching::MethodCache).
           to receive(:added_methods).
           at_least(:once).
           and_return("A" => { instance_method_some_method: method_a },
