@@ -17,10 +17,10 @@ module Delfos
       attr_reader :klass, :name, :private_methods, :class_method
 
       def initialize(klass, name, private_methods, class_method)
-        @klass = klass
-        @name = name
+        @klass           = klass
+        @name            = name
         @private_methods = private_methods
-        @class_method = class_method
+        @class_method    = class_method
         original_method # ensure memoized method is the original not the overridden one
       end
 
