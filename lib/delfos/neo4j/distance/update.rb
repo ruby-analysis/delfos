@@ -6,7 +6,7 @@ module Delfos
     module Distance
       class Update
         def perform
-          update read_query
+          update Neo4j.execute_sync(read_query)
         end
 
         def determine_full_path(f)
@@ -23,10 +23,6 @@ module Delfos
           end.compact.first
         end
 
-        def read_query
-          Neo4j.execute_sync(query)
-        end
-
         private
 
         def strip_block_message(f)
@@ -38,50 +34,60 @@ module Delfos
           path if path.exist?
         end
 
-        def query
+        def read_query
           <<-QUERY
           MATCH
-            (:Class)             -  [:OWNS]     -> (method:Method)
-                                 -  [:CONTAINS] -> (call_site:CallSite)
-                                 -  [:CALLS]    -> (called:Method)
-                                <-  [:OWNS]     -  (:Class)
+            (call_site:CallSite) - [:CALLS] -> (called:Method)
 
           RETURN
-            call_site, id(call_site),
-            called,    id(called)
+            call_site.file, id(call_site),
+            called.file,    id(called)
           QUERY
         end
 
         def update(results)
-          Array(results).compact.map do |call_site, call_site_id, called, called_id|
-            start  = determine_full_path call_site["file"]
-            finish = determine_full_path called["file"]
+          Array(results).compact.map do |start_file, call_site_id, finish_file, called_id|
+            start  = determine_full_path start_file
+            finish = determine_full_path finish_file
 
             calc = Delfos::Distance::Calculation.new(start, finish)
 
-            perform_query(calc, call_site_id, called_id)
+            perform_query(calc.sum_traversals,
+                          calc.sum_possible_traversals,
+                          call_site_id,
+                          called_id)
           end
 
           Neo4j.flush!
         end
 
-        def perform_query(calc, call_site_id, called_id)
-          Neo4j.execute <<-QUERY, {call_site_id: call_site_id, called_id: called_id, sum_traversals: calc.sum_traversals, sum_possible_traversals: calc.sum_possible_traversals}
-          START call_site = node({call_site_id}),
-                called    = node({called_id})
-
-           MERGE (call_site) - #{rel} -> (called)
-          QUERY
+        def perform_query(sum_traversals,
+                          sum_possible_traversals,
+                          call_site_id,
+                          called_id)
+          Neo4j.execute write_query, {
+            call_site_id:            call_site_id,
+            called_id:               called_id,
+            sum_traversals:          sum_traversals,
+            sum_possible_traversals: sum_possible_traversals
+            }
         end
 
-        def rel
-          <<-REL
-           [:EFFERENT_COUPLING{
-             distance:          {sum_traversals},
-             possible_distance: {sum_possible_traversals}
-             }
-           ]
-          REL
+        def write_query
+          <<-QUERY
+            START call_site = node({call_site_id}),
+                  called    = node({called_id})
+
+             MERGE (call_site)
+                   -
+                     [:EFFERENT_COUPLING
+                       {
+                         distance:          {sum_traversals},
+                         possible_distance: {sum_possible_traversals}
+                       }
+                     ]
+                  -> (called)
+            QUERY
         end
       end
     end

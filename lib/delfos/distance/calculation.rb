@@ -42,17 +42,6 @@ module Delfos
         siblings(path).select { |f| File.directory?(f) }
       end
 
-      def in_start_directory?(path)
-        return false if path.directory?
-        path_a.dirname == path
-      end
-
-      def in_finish_directory?(path)
-        return false if path.directory?
-
-        path_b.dirname == path
-      end
-
       def traversal_path
         TraversalPathCalculator.new(path_a, path_b).path
       end
