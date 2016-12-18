@@ -4,15 +4,27 @@ module Delfos
   module Neo4j
     module Distance
       describe PathDetermination do
-        describe ".for" do
-          before do
-            Delfos.setup! application_directories: ["fixtures/ruby"]
+        before do
+          Delfos.setup! application_directories: ["fixtures/path_determination"]
+        end
+
+        describe "#full_path" do
+          let(:result) { described_class.new(search).full_path }
+
+          context do
+            let(:search) { "lib/example.rb" }
+
+            it do
+              expect(result.to_s).to eq File.expand_path("fixtures/path_determination/lib/example.rb").to_s
+            end
           end
 
-          it do
-            result = described_class.new("/ruby/this.rb").full_path
+          context "with a fully specified path" do
+            let(:search) { File.expand_path("fixtures/path_determination/lib/example.rb") }
 
-            expect(result.to_s).to eq File.expand_path("fixtures/ruby/this.rb").to_s
+            it do
+              expect(result.to_s).to eq File.expand_path("fixtures/path_determination/lib/example.rb").to_s
+            end
           end
         end
       end

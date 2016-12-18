@@ -4,7 +4,7 @@ require_relative "code_location"
 describe Delfos::MethodLogging::CodeLocation do
   describe "#file" do
     let(:code_location) { described_class.new(anything, anything, anything, filename, (1..1000).to_a.sample) }
-    let(:dir) { "/Users/mark/code/some_app/" }
+    let(:dir) { "/Users/mark/code/some_app" }
 
     before do
       expect(Delfos).to receive(:application_directories).and_return [
@@ -14,7 +14,7 @@ describe Delfos::MethodLogging::CodeLocation do
     end
 
     context "with a file in one of the defined directories" do
-      let(:filename) { "#{dir}app/models/user.rb" }
+      let(:filename) { "#{dir}/app/models/user.rb" }
 
       it do
         expect(code_location.file).to eq "app/models/user.rb"
@@ -22,7 +22,7 @@ describe Delfos::MethodLogging::CodeLocation do
     end
 
     context "with a file in another directory" do
-      let(:filename) { "#{dir}lib/some_file.rb" }
+      let(:filename) { "#{dir}/lib/some_file.rb" }
 
       it do
         expect(code_location.file).to eq "lib/some_file.rb"
@@ -33,7 +33,7 @@ describe Delfos::MethodLogging::CodeLocation do
       let(:filename) { "/some_big/long/path/lib/any_file.rb" }
 
       it do
-        expect(code_location.file).to eq "/some_big/long/path/lib/any_file.rb"
+        expect(code_location.file).to eq filename
       end
     end
   end

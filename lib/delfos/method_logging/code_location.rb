@@ -24,12 +24,12 @@ module Delfos
       attr_reader :object, :method_name, :class_method, :method_type, :file, :line_number
 
       def initialize(object, method_name, class_method, file, line_number)
-        @object = object
-        @method_name = method_name
+        @object       = object
+        @method_name  = method_name
         @class_method = class_method
-        @method_type = self.class.method_type_from class_method
-        @line_number = line_number.to_i
-        @file = file
+        @method_type  = self.class.method_type_from class_method
+        @line_number  = line_number.to_i
+        @file         = file
       end
 
       def file
