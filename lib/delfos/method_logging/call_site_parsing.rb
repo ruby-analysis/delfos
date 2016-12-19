@@ -11,9 +11,9 @@ module Delfos
       attr_reader :stack, :call_site_binding
 
       def initialize(stack, call_site_binding, stack_offset: nil)
-        @stack = stack
+        @stack             = stack
         @call_site_binding = call_site_binding
-        @stack_offset = stack_offset
+        @stack_offset      = stack_offset
       end
 
       def perform

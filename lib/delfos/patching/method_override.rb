@@ -8,18 +8,31 @@ require_relative "method_arguments"
 
 module Delfos
   module Patching
+    MUTEX = Mutex.new
+
     #containers for the individual modules created to log each method call
     module ClassMethodLogging
     end
 
     module InstanceMethodLogging
     end
+
     class MethodOverride
       class << self
         def setup(klass, name, private_methods, class_method:)
+          MUTEX.synchronize do
+            return if Thread.current[:__delfos_disable_patching]
+          end
+
+            instance = new(klass, name, private_methods, class_method)
+
+            instance.ensure_method_recorded_once!
+        end
+
+        def unsetup(klass, name, private_methods, class_method:)
           instance = new(klass, name, private_methods, class_method)
 
-          instance.ensure_method_recorded_once!
+          instance.unsetup
         end
       end
 
@@ -37,54 +50,28 @@ module Delfos
         record_method! { setup }
       end
 
-      # Redefine the method (only once) at runtime to enabling logging to Neo4j
-      def setup
-        add_namespace = lambda{|ns, code|
-          "module #{ns}\n#{code}\nend"
-        }
+      def unsetup
+        method_name = name()
+        meth = method_defining_method
 
-        nesting = lambda do |n, code|
-          n.split("::").reverse.each do |ns|
-            code = add_namespace.call(ns, code)
+        module_definition.instance_eval do
+          begin
+            remove_method :"#{method_name}" 
+          rescue NameError => e
+            raise unless e.message["method `#{method_name}' not defined in"]
           end
-
-          code
         end
 
-        module_definition =
-          if class_method
-            eval <<-RUBY
-              module ClassMethodLogging
-               #{nesting.call klass.name , <<-CODE
-                  module #{camelize(name.to_s)}
-                  end
-                CODE
-               }
-              end
-            RUBY
-
-            eval "ClassMethodLogging::#{klass.name}::#{camelize(name.to_s)}"
-          else
-            eval <<-RUBY
-              module InstanceMethodLogging
-               #{nesting.call klass.name , <<-CODE
-                  module #{camelize(name.to_s)}
-                  end
-                CODE
-               }
-              end
-            RUBY
-
-            eval "InstanceMethodLogging::#{klass.name}::#{camelize(name.to_s)}"
-          end
-
+      end
+      # Redefine the method (only once) at runtime to enabling logging to Neo4j
+      def setup
         cm = class_method
         with_stack = method(:with_stack)
         method_name = name()
         om = original_method()
 
         if class_method
-          module_definition.class_eval do
+          m = module_definition.class_eval do
             define_singleton_method(method_name) do |*args, **kw_args, &block|
               stack, caller_binding = caller.dup, binding.dup
               should_wrap_exceptions = true
@@ -105,32 +92,78 @@ module Delfos
 
               end
             end
+
+            self
           end
 
-          klass.extend module_definition
+          klass.instance_eval{prepend m}
         else
-          module_definition.send(:define_method, method_name) do |*args, **kw_args, &block|
-            stack, caller_binding = caller.dup, binding.dup
-            should_wrap_exceptions = true
-            arguments = MethodArguments.new(args, kw_args, block, should_wrap_exceptions)
+          m = module_definition.class_eval do
+            define_method(method_name) do |*args, **kw_args, &block|
+              stack, caller_binding = caller.dup, binding.dup
+              should_wrap_exceptions = true
+              arguments = MethodArguments.new(args, kw_args, block, should_wrap_exceptions)
 
-            call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
+              call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
 
-            if call_site
-              Delfos.method_logging.log(call_site, self, om, cm, arguments)
-            end
+              if call_site
+                Delfos.method_logging.log(call_site, self, om, cm, arguments)
+              end
 
-            with_stack.call(call_site) do
-              if kw_args.empty?
-                super(*args, &block)
-              else
-                super(*args, **kw_args, &block)
+              with_stack.call(call_site) do
+                if kw_args.empty?
+                  super(*args, &block)
+                else
+                  super(*args, **kw_args, &block)
+                end
               end
             end
+
+            self
           end
 
-          klass.prepend module_definition
+          klass.prepend m
         end
+      end
+
+      def module_definition
+        if class_method
+          eval <<-RUBY
+            module ClassMethodLogging
+             #{nesting klass.name , <<-CODE
+                module #{camelize(name.to_s)}
+                end
+              CODE
+             }
+            end
+          RUBY
+
+          eval "ClassMethodLogging::#{klass.name}::#{camelize(name.to_s)}"
+        else
+          eval <<-RUBY
+            module InstanceMethodLogging
+             #{nesting klass.name , <<-CODE
+                module #{camelize(name.to_s)}
+                end
+              CODE
+             }
+            end
+          RUBY
+
+          eval "InstanceMethodLogging::#{klass.name}::#{camelize(name.to_s)}"
+        end
+      end
+
+      def nesting(n, code)
+        add_namespace = lambda do |ns, code|
+          "module #{ns}\n#{code}\nend"
+        end
+
+        n.split("::").reverse.each do |ns|
+          code = add_namespace.call(ns, code)
+        end
+
+        code
       end
 
       def camelize(string, uppercase_first_letter = true)

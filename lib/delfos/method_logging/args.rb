@@ -9,9 +9,9 @@ module Delfos
       attr_reader :block
 
       def initialize(arguments)
-        @raw_args = arguments.args
+        @raw_args         = arguments.args
         @raw_keyword_args = arguments.keyword_args
-        @block = arguments.block
+        @block            = arguments.block
       end
 
       def args

@@ -109,11 +109,6 @@ module Delfos
             instance.some_externally_called_public_method
           end
 
-          it "includes public methods" do
-            expect(method_logging).to receive(:log)
-            instance.some_externally_called_public_method
-          end
-
           it "excludes private methods" do
             expect(method_logging).not_to receive(:log)
 
