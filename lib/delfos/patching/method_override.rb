@@ -8,6 +8,12 @@ require_relative "method_arguments"
 
 module Delfos
   module Patching
+    #containers for the individual modules created to log each method call
+    module ClassMethodLogging
+    end
+
+    module InstanceMethodLogging
+    end
     class MethodOverride
       class << self
         def setup(klass, name, private_methods, class_method:)
@@ -33,32 +39,104 @@ module Delfos
 
       # Redefine the method (only once) at runtime to enabling logging to Neo4j
       def setup
-        processor = method(:process)
+        add_namespace = lambda{|ns, code|
+          "module #{ns}\n#{code}\nend"
+        }
+
+        nesting = lambda do |n, code|
+          n.split("::").reverse.each do |ns|
+            code = add_namespace.call(ns, code)
+          end
+
+          code
+        end
+
+        module_definition =
+          if class_method
+            eval <<-RUBY
+              module ClassMethodLogging
+               #{nesting.call klass.name , <<-CODE
+                  module #{camelize(name.to_s)}
+                  end
+                CODE
+               }
+              end
+            RUBY
+
+            eval "ClassMethodLogging::#{klass.name}::#{camelize(name.to_s)}"
+          else
+            eval <<-RUBY
+              module InstanceMethodLogging
+               #{nesting.call klass.name , <<-CODE
+                  module #{camelize(name.to_s)}
+                  end
+                CODE
+               }
+              end
+            RUBY
+
+            eval "InstanceMethodLogging::#{klass.name}::#{camelize(name.to_s)}"
+          end
+
         cm = class_method
+        with_stack = method(:with_stack)
+        method_name = name()
+        om = original_method()
 
-        method_defining_method.call(name) do |*args, **kw_args, &block|
-          arguments = MethodArguments.new(args, kw_args, block)
+        if class_method
+          module_definition.class_eval do
+            define_singleton_method(method_name) do |*args, **kw_args, &block|
+              stack, caller_binding = caller.dup, binding.dup
+              should_wrap_exceptions = true
+              arguments = MethodArguments.new(args, kw_args, block, should_wrap_exceptions)
 
-          processor.call(self, caller.dup, binding.dup, arguments, cm)
+              call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
+
+              if call_site
+                Delfos.method_logging.log(call_site, self, om, cm, arguments)
+              end
+
+              with_stack(call_site) do
+                if kw_args.empty?
+                  super(*args, &block)
+                else
+                  super(*args, **kw_args, &block)
+                end
+
+              end
+            end
+          end
+
+          klass.extend module_definition
+        else
+          module_definition.send(:define_method, method_name) do |*args, **kw_args, &block|
+            stack, caller_binding = caller.dup, binding.dup
+            should_wrap_exceptions = true
+            arguments = MethodArguments.new(args, kw_args, block, should_wrap_exceptions)
+
+            call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
+
+            if call_site
+              Delfos.method_logging.log(call_site, self, om, cm, arguments)
+            end
+
+            with_stack.call(call_site) do
+              if kw_args.empty?
+                super(*args, &block)
+              else
+                super(*args, **kw_args, &block)
+              end
+            end
+          end
+
+          klass.prepend module_definition
         end
       end
 
-      def process(instance, stack, caller_binding, arguments, class_method)
-        method_to_call = method_selector(instance)
+      def camelize(string, uppercase_first_letter = true)
+        string = string.sub(/^[a-z\d]*/) { $&.capitalize }
 
-        call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
-
-        with_logging(call_site, instance, method_to_call, class_method, arguments) do
-          arguments.apply_to(method_to_call)
-        end
-      end
-
-      def with_logging(call_site, instance, method_to_call, class_method, arguments)
-        Delfos.method_logging.log(call_site, instance, method_to_call, class_method, arguments) if call_site
-
-        with_stack(call_site) do
-          yield
-        end
+        string.gsub(/(?:_|(\/))([a-z\d]*)/) { "#{$1}#{$2.capitalize}" }.gsub('/', '::')
       end
 
       def with_stack(call_site)
