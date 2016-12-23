@@ -15,8 +15,9 @@ unless ENV["CI"]
     def o.error(s); puts s; end
   end
 
-  require_relative "support/timeout"
 end
+
+require_relative "support/timeout" if ENV["TIMEOUT"]
 
 require_relative "support/neo4j"
 require_relative "support/web_mock"
