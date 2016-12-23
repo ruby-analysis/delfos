@@ -47,7 +47,7 @@ module Delfos
       end
 
       def record?(f)
-        Delfos.method_logging.include_file_in_logging?(f)
+        Delfos::MethodLogging.include_file?(f)
       end
     end
   end

@@ -226,7 +226,7 @@ module Delfos
       end
 
       def exclude?
-        ::Delfos.method_logging.exclude?(original_method)
+        ::Delfos::MethodLogging.exclude?(original_method)
       end
 
       def key

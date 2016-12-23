@@ -71,26 +71,27 @@ module Delfos
       end
 
       describe ".perform" do
-        let(:method_logging) do
+        let(:call_site_logger) { double "Call Site Logger" }
+
+        before do
           exclusion = lambda do |m|
             ![:some_public_method, :some_externally_called_public_method].include?(m.name)
           end
 
-          m = double("MethodLogging")
-          allow(m).to receive(:include_file_in_logging?) { |f| f == __FILE__ }
-          allow(m).to receive(:exclude?, &exclusion)
-          m
+          allow(MethodLogging).to receive(:include_file?) { |f| f == __FILE__ }
+          allow(MethodLogging).to receive(:exclude?, &exclusion)
+
+          Delfos.call_site_logger = call_site_logger
         end
 
         context "with a class with a private method" do
           before do
-            Delfos.method_logging = method_logging
             setup_method("some_externally_called_public_method")
             setup_method("some_public_method")
           end
 
           it "sends the correct args to the method call_site_logger" do
-            expect(method_logging).to receive(:log) do |call_site, object, called_method, _class_method, _arguments|
+            expect(Delfos::MethodLogging).to receive(:log) do |call_site, object, called_method, _class_method, _arguments|
               expect(object).to be_a SomeRandomClass
               expect(call_site).to be_a Delfos::MethodLogging::CodeLocation
 

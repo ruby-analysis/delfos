@@ -17,42 +17,19 @@ module Delfos
       Delfos.application_directories = Array(dirs).map { |f| Pathname.new(File.expand_path(f.to_s)) }
     end
 
+    def call_site_logger
+      @call_site_logger ||= default_call_site_logger
+    end
+
     def call_site_logger=(call_site_logger)
-      unless call_site_logger
-        setup_neo4j!
-
-        require "delfos/neo4j/informer"
-        call_site_logger = Delfos:: Neo4j::Informer.new
-      end
-
-      Delfos.call_site_logger = call_site_logger
+       @call_site_logger = call_site_logger || default_call_site_logger
     end
 
-    def neo4j
-      @neo4j ||= setup_neo4j!
-    end
+    def default_call_site_logger
+      Delfos.setup_neo4j!
 
-    def setup_neo4j!
-      host     ||= ENV["NEO4J_HOST"]     || "http://localhost"
-      port     ||= ENV["NEO4J_PORT"]     || "7474"
-      username ||= ENV["NEO4J_USERNAME"] || "neo4j"
-      password ||= ENV["NEO4J_PASSWORD"] || "password"
-
-      Neo4jOptions.new(host, port, username, password)
-    end
-
-    Neo4jOptions = Struct.new(:host, :port, :username, :password) do
-      def url
-        "#{host}:#{port}"
-      end
-
-      def uri_for(path)
-        URI.parse("#{url}#{path}")
-      end
-
-      def to_s
-        "  host: #{host}\n  port: #{port}\n  username: #{username}\n  password: #{password}"
-      end
+      require "delfos/neo4j/informer"
+      Delfos:: Neo4j::Informer.new
     end
 
     def reset!
@@ -74,10 +51,12 @@ module Delfos
       remove_patching!
 
       Delfos.application_directories = []
-      Delfos.method_logging = nil
       Delfos.call_site_logger = nil
+      if defined? Delfos::MethodLogging
+        Delfos::MethodLogging.reset!
+      end
 
-      self.neo4j = nil
+      Delfos.neo4j = nil
     end
 
     def unstub_all!

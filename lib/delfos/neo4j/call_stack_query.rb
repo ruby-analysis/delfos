@@ -72,7 +72,7 @@ module Delfos
 
       def call_site_params(cs, i)
         {
-          "klass#{i}"                  => cs.klass,
+          "klass#{i}"                  => cs.klass.to_s,
           "method_name#{i}"            => cs.method_name,
           "method_type#{i}"            => cs.method_type,
           "method_definition_file#{i}" => cs.method_definition_file,

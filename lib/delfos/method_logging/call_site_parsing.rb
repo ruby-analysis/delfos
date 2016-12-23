@@ -32,7 +32,7 @@ module Delfos
       def current
         stack.detect do |s|
           file = s.split(":")[0]
-          Delfos.method_logging.include_file_in_logging?(file)
+          Delfos::MethodLogging.include_file?(file)
         end
       end
 

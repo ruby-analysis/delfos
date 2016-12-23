@@ -34,14 +34,13 @@ module Delfos
                   called    = node({called_id})
 
              MERGE (call_site)
-                   -
-                     [:EFFERENT_COUPLING
-                       {
-                         distance:          {sum_traversals},
-                         possible_distance: {sum_possible_traversals}
-                       }
-                     ]
-                  -> (called)
+               -
+                 [:EFFERENT_COUPLING {
+                     distance:          {sum_traversals},
+                     possible_distance: {sum_possible_traversals}
+                   }
+                 ]
+               -> (called)
           QUERY
         end
       end

@@ -4,10 +4,10 @@ require "delfos/setup"
 module Delfos
   class << self
     attr_accessor :application_directories, :call_site_logger
-    attr_writer :method_logging, :logger
+    attr_writer :logger, :neo4j
 
-    def method_logging
-      @method_logging ||= ::Delfos::MethodLogging
+    def call_site_logger
+      @call_site_logger ||= Delfos::Setup.call_site_logger
     end
 
     def logger
@@ -19,12 +19,12 @@ module Delfos
       Delfos::Setup.perform!(call_site_logger: call_site_logger, application_directories: application_directories)
     end
 
-    def setup_neo4j!
-      Delfos::Setup.setup_neo4j!
+    def neo4j
+      setup_neo4j!
     end
 
-    def neo4j
-      Delfos::Setup.neo4j
+    def setup_neo4j!
+      @neo4j ||= Delfos::Neo4j.config
     end
 
     def reset!

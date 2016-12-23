@@ -6,7 +6,6 @@ require_relative "method_logging/args"
 module Delfos
   module MethodLogging
     extend self
-
     def log(call_site, called_object, called_method, class_method, arguments)
       return if skip_meta_programming_defined_method?
       arguments = Args.new(arguments)
@@ -19,18 +18,32 @@ module Delfos
       file, _ = method.source_location
       return true unless file
 
-      exclude_file_from_logging?(File.expand_path(file))
+      exclude_file?(File.expand_path(file))
     end
 
-    def exclude_file_from_logging?(file)
-      !CommonPath.included_in?(File.expand_path(file), Delfos.application_directories)
+    def include_file?(file)
+      !exclude_file?(file)
     end
 
-    def include_file_in_logging?(file)
-      !exclude_file_from_logging?(file)
+    def exclude_file?(file)
+      with_cache(file) do
+        !CommonPath.included_in?(File.expand_path(file), Delfos.application_directories)
+      end
+    end
+
+    def reset!
+      @cache = nil
     end
 
     private
+
+    def with_cache(key)
+      cache.include?(key) ? cache[key] : cache[key] = yield
+    end
+
+    def cache
+      @cache ||= {}
+    end
 
     def skip_meta_programming_defined_method?
       i = caller.index do |l|
