@@ -25,7 +25,8 @@ For the code in files [fixtures/a.rb](fixtures/a.rb) and [fixtures/b.rb](fixture
 
 
 ## Dependencies
-Only one explicit gem dependency on `binding_of_caller` (and one implicit dependency on its `debug_inspector`)
+Only one explicit gem dependency on `binding_of_caller` (and one implicit dependency on its `debug_inspector`).
+
 Delfos by default depends upon an _optional_ connection to a Neo4j instance for recording data.
 
 ## Usage
@@ -112,6 +113,12 @@ projects which have large numbers of files per directory are also penalised.
 This scoring system is quite likely to change as it is used against more
 systems to record sample data sets.
 
+
+
+## Examples
+
+Snapshot of the delfos codebase:
+
 ```
 ▾ lib/
   ▾ delfos/
@@ -148,7 +155,6 @@ systems to record sample data sets.
     delfos_spec.rb
 ```
 
-## Examples
 In the example above, if a call site in `remove_patching.rb` were to call a
 site in `common_path.rb` in the same directory it would receives 'penalty'
 points for crossing the 11 files in between, but no penalty points for
