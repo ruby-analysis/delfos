@@ -5,7 +5,7 @@ AllCops:
     - 'vendor/**/*'
     - 'db/**/*'
 Rails:
-  Enabled: true
+  Enabled: false
 
 Metrics/LineLength:
   Max: 120

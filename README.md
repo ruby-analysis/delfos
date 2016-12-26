@@ -23,6 +23,22 @@ For the code in files [fixtures/a.rb](fixtures/a.rb) and [fixtures/b.rb](fixture
 
 ![screenshot](examples/neo4j-sample.png)
 
+## Neo4j example recorded data model
+
+```cypher
+(CallStack) - [:STEP{number: 1}]
+            -> (cs:CallSite{file: "file.rb", line_number: 1})
+
+(cs) <- [:CONTAINS] - (m:Method{type:"InstanceMethod"})
+
+(:Class{name: "A"}) - [:CONTAINS] -> (m)
+
+
+(cs)-[:CALLS] 
+    -> (m2:Method)
+
+    <-[:OWNS]-(:Class{name:"B"})
+```
 
 ## Dependencies
 Only one explicit gem dependency on `binding_of_caller` (and one implicit dependency on its `debug_inspector`).
