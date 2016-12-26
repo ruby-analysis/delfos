@@ -16,7 +16,7 @@ module Delfos
     end
 
     def call_site_logger=(call_site_logger)
-      Delfos::Setup.call_site_logger=call_site_logger
+      Delfos::Setup.call_site_logger = call_site_logger
     end
 
     def logger

@@ -14,7 +14,7 @@ module Delfos
     end
 
     def exclude?(method)
-      file, _ = method.source_location
+      file, = method.source_location
       return true unless file
 
       exclude_file?(File.expand_path(file))

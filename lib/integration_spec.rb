@@ -3,10 +3,10 @@ require "delfos"
 require "delfos/neo4j"
 
 describe "integration" do
-  let(:result) {
+  let(:result) do
     Delfos::Neo4j.flush!
     Delfos::Neo4j.execute_sync(query).first
-  }
+  end
 
   before(:each) do
     wipe_db!
@@ -97,7 +97,6 @@ describe "integration" do
     end
   end
 
-
   context "recording instance methods" do
     let(:query) do
       <<-QUERY
@@ -119,7 +118,7 @@ describe "integration" do
       a_method_count, method_a, b_method_count, method_b, c_method_count, method_c = result
 
       expect(a_method_count).to eq 1
-      #expect(method_a).to eq({file: "some_file", line_number: 1})
+      # expect(method_a).to eq({file: "some_file", line_number: 1})
       expect(b_method_count).to eq 1
       expect(c_method_count).to eq 1
     end

@@ -1,25 +1,25 @@
+# frozen_string_literal: true
 module ShowClassInstanceVariables
   def self.variables_for(n)
-    return unless (n.is_a?(Class) || n.is_a?(Module))
+    return unless n.is_a?(Class) || n.is_a?(Module)
 
     display(n)
 
     n.constants.each do |c|
-      next if n==c
+      next if n == c
 
       klass = n.const_get(c)
 
-      if klass.is_a?(Class) || klass.is_a?(Module)
-        next unless klass.name[n.name]
+      next unless klass.is_a?(Class) || klass.is_a?(Module)
+      next unless klass.name[n.name]
 
-        display(klass)
+      display(klass)
 
-        klass.constants.each do |s|
-          s = klass.const_get(s)
-          next if s == klass || s == n
+      klass.constants.each do |s|
+        s = klass.const_get(s)
+        next if s == klass || s == n
 
-          variables_for(s)
-        end
+        variables_for(s)
       end
     end
   end

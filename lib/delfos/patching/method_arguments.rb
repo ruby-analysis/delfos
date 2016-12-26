@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "method_calling_exception"
 
 module Delfos
@@ -12,15 +13,14 @@ module Delfos
       rescue StandardError => e
         raise unless should_wrap_exception
 
-        raise MethodCallingException, {
+        raise(MethodCallingException,
           method: method,
           args: args,
           keyword_args: keyword_args,
           block: block,
           initial_cause: e
-        }
+        )
       end
     end
   end
 end
-

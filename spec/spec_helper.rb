@@ -7,12 +7,23 @@ require "delfos"
 require "ostruct"
 
 unless ENV["CI"]
-  #only log errors in dev
+  # only log errors in dev
   $delfos_test_logger = Object.new.tap do |o|
-    def o.debug(s); nil; end
-    def o.info(s); nil; end
-    def o.log(s); nil; end
-    def o.error(s); puts s; end
+    def o.debug(_s)
+      nil
+    end
+
+    def o.info(_s)
+      nil
+    end
+
+    def o.log(_s)
+      nil
+    end
+
+    def o.error(s)
+      puts s
+    end
   end
 end
 
@@ -29,7 +40,6 @@ RSpec.configure do |c|
   end
 
   c.example_status_persistence_file_path = ".rspec-failed-examples"
-
 
   c.mock_with :rspec do |c|
     c.syntax = :expect

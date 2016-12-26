@@ -37,10 +37,10 @@ module Delfos
           result = MethodCache.instance.added_methods
 
           expect(result["SomeRandomClass"]["InstanceMethod_some_public_method"]).
-            to eq({file: "fixtures/method_override/some_random_class.rb", line_number: $instance_method_line_number})
+            to eq(file: "fixtures/method_override/some_random_class.rb", line_number: $instance_method_line_number)
 
           expect(result["SomeRandomClass"]["ClassMethod_some_class_method"]).
-            to eq({file: "fixtures/method_override/some_random_class.rb", line_number: $class_method_line_number})
+            to eq(file: "fixtures/method_override/some_random_class.rb", line_number: $class_method_line_number)
         end
       end
 
@@ -73,7 +73,6 @@ module Delfos
               when 2
                 expect(object).to be_a SomeRandomClass
                 expect(call_site).to be_a Delfos::MethodLogging::CodeLocation
-
 
                 expect(call_site.method_name).to eq "some_externally_called_public_method"
                 expect(call_site.class_method).to eq false

@@ -20,12 +20,13 @@ module Delfos
         end
 
         def update(call_site_id, called_id, calc)
-          Neo4j.execute query, {
+          Neo4j.execute(
+            query,
             call_site_id:            call_site_id,
             called_id:               called_id,
             sum_traversals:          calc.sum_traversals,
             sum_possible_traversals: calc.sum_possible_traversals
-          }
+          )
         end
 
         def query

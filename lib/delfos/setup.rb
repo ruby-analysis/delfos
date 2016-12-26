@@ -50,7 +50,7 @@ module Delfos
 
       remove_patching!
 
-      Delfos::MethodLogging.reset!  if defined? Delfos::MethodLogging
+      Delfos::MethodLogging.reset! if defined? Delfos::MethodLogging
 
       Delfos.neo4j                   = nil
       Delfos.logger                  = nil
@@ -73,7 +73,6 @@ module Delfos
     end
 
     def remove_module_methods!
-
     end
 
     def remove_patching!

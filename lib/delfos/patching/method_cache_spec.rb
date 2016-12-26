@@ -39,26 +39,26 @@ module Delfos
       describe "#append" do
         it "appends to the methods" do
           subject.append(SuperKlass, "B", "C", 23)
-          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => {file: "C", line_number: 23})
+          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => { file: "C", line_number: 23 })
         end
 
         it "doesn't replace existing definitions" do
           subject.append(SuperKlass, "B", "C", 1)
           subject.append(SuperKlass, "B", "D", 2)
-          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => {file: "C", line_number: 1})
+          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => { file: "C", line_number: 1 })
         end
 
         it do
           subject.append(SuperKlass, "B", "C", 1)
           subject.append(SuperKlass, "E", "F", 2)
-          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => {file: "C", line_number: 1}, "E" => {file: "F", line_number: 2})
+          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => { file: "C", line_number: 1 }, "E" => { file: "F", line_number: 2 })
         end
       end
 
       describe "#find" do
         def to_h(m)
           file, line_number = m
-          {file: file, line_number: line_number}
+          { file: file, line_number: line_number }
         end
 
         it "handles ordinary method recording" do

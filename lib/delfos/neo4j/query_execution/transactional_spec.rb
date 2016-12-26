@@ -51,7 +51,6 @@ module Delfos
         end
       end
 
-
       def write_query
         strip_whitespace <<-QUERY
             MERGE (n:SomeNode{name:{node_name}})

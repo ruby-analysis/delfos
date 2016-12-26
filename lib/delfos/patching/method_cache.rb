@@ -29,7 +29,7 @@ module Delfos
       attr_reader :added_methods
 
       def all_method_sources_for(klass)
-        fetch(klass).values.map{|s| [s[:file], s[:line_number]] }
+        fetch(klass).values.map { |s| [s[:file], s[:line_number]] }
       end
 
       def files_for(klass)
@@ -50,7 +50,7 @@ module Delfos
       def append(klass, key, file, line_number)
         m = fetch(klass)[key]
 
-        fetch(klass)[key] = {file: file, line_number: line_number} if m.nil?
+        fetch(klass)[key] = { file: file, line_number: line_number } if m.nil?
       end
 
       def find(klass, key)

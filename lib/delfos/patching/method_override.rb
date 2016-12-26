@@ -27,8 +27,6 @@ module Delfos
 
           instance.ensure_method_recorded_once!
         end
-
-
       end
 
       attr_reader :klass, :name, :private_methods, :class_method
@@ -49,12 +47,13 @@ module Delfos
       def setup
         cm = class_method
         with_stack = method(:with_stack)
-        method_name = name()
-        om = original_method()
+        method_name = name
+        om = original_method
 
         mod = module_definition do
           define_method(method_name) do |*args, **kw_args, &block|
-            stack, caller_binding = caller.dup, binding.dup
+            stack = caller.dup
+            caller_binding = binding.dup
             should_wrap_exceptions = true
             arguments = MethodArguments.new(args, kw_args, block, should_wrap_exceptions)
 
@@ -65,7 +64,7 @@ module Delfos
             end
 
             with_stack.call(call_site) do
-              if kw_args.length > 0
+              if !kw_args.empty?
                 super(*args, **kw_args, &block)
               else
                 super(*args, &block)

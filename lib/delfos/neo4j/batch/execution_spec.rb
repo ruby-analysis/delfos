@@ -85,7 +85,7 @@ module Delfos
               allow(QueryExecution::Transactional).
                 to receive(:flush!)
 
-              executions.times.map { batch.execute!(anything, anything) }
+              Array.new(executions) { batch.execute!(anything, anything) }
             end
 
             context "with fewer queries than the batch size" do

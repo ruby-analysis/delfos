@@ -1,6 +1,7 @@
+# frozen_string_literal: true
 module Delfos
   module Patching
-    #containers for the individual modules created to log each method call
+    # containers for the individual modules created to log each method call
     module ClassMethodLogging
     end
 
@@ -17,7 +18,7 @@ module Delfos
       end
 
       def find_or_create(container, module_name)
-        module_name = module_name.gsub(":", "_")
+        module_name = module_name.tr(":", "_")
 
         result = container.const_get(module_name)
 
@@ -59,7 +60,7 @@ module Delfos
         end
       end
 
-      def add_namespace ns, code
+      def add_namespace(ns, code)
         "module #{ns}\n#{code}\nend"
       end
 
@@ -71,25 +72,25 @@ module Delfos
         code
       end
 
-      def module_safe_name(string, uppercase_first_letter = true)
+      def module_safe_name(string, _uppercase_first_letter = true)
         string = string.sub(/^[a-z\d]*/) { $&.capitalize }
 
-        string
-          .gsub(/(?:_|(\/))([a-z\d]*)/) { "#{$1}#{$2.capitalize}" }
-          .gsub('/', '::')
-          .gsub(/\=/, "Equals")
-          .gsub(/\<\=\>/, "Spaceship")
-          .gsub(/\<\=/, "LessThanOrEqualTo")
-          .gsub(/\>\=/, "GreaterThanOrEqualTo")
-          .gsub(/\#\<Class\:0x(.*)\>/){"AnonymousClass_#{$1}"}
-          .gsub(/\>/, "GreaterThan")
-          .gsub(/\</, "LessThan")
-          .gsub(/!\~/, "NotMatchOperator")
-          .gsub(/\~/, "MatchOperator")
-          .gsub(/\?/, "QuestionMark")
-          .gsub(/\!$/, "Bang")
-          .gsub(/\+/, "Plus")
-          .gsub(/\[\]/, "SquareBrackets")
+        string.
+          gsub(/(?:_|(\/))([a-z\d]*)/) { "#{Regexp.last_match(1)}#{Regexp.last_match(2).capitalize}" }.
+          gsub("/", "::").
+          gsub(/\=/, "Equals").
+          gsub(/\<\=\>/, "Spaceship").
+          gsub(/\<\=/, "LessThanOrEqualTo").
+          gsub(/\>\=/, "GreaterThanOrEqualTo").
+          gsub(/\#\<Class\:0x(.*)\>/) { "AnonymousClass_#{Regexp.last_match(1)}" }.
+          gsub(/\>/, "GreaterThan").
+          gsub(/\</, "LessThan").
+          gsub(/!\~/, "NotMatchOperator").
+          gsub(/\~/, "MatchOperator").
+          gsub(/\?/, "QuestionMark").
+          gsub(/\!$/, "Bang").
+          gsub(/\+/, "Plus").
+          gsub(/\[\]/, "SquareBrackets")
       end
     end
 
@@ -97,11 +98,11 @@ module Delfos
     # instances of these modules are prepended
     class MethodCachingModule < Module
       def prepend_features(other)
-        #method_sources = other.instance_methods(false).map{|m| other.instance_method(m) }.map{|m| ["InstanceMethod_#{m.name}", *m.source_location]}
+        # method_sources = other.instance_methods(false).map{|m| other.instance_method(m) }.map{|m| ["InstanceMethod_#{m.name}", *m.source_location]}
 
-        #method_sources.each do |key, file, line_number|
+        # method_sources.each do |key, file, line_number|
         #  MethodCache.append(klass, key, file, line_number)
-        #end
+        # end
 
         super
       end
@@ -112,9 +113,5 @@ module Delfos
         end
       end
     end
-
-
-
   end
 end
-

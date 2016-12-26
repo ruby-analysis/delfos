@@ -1,14 +1,15 @@
+# frozen_string_literal: true
 require "spec_helper"
 require_relative "method_arguments"
 
 module Delfos
   module Patching
-    describe MethodArguments  do
+    describe MethodArguments do
       let(:block) { nil }
       let(:keyword_args) { {} }
       let(:args) { [] }
       let(:should_wrap_exception) { true }
-      let(:instance) { described_class.new(args, keyword_args, block, should_wrap_exception)  }
+      let(:instance) { described_class.new(args, keyword_args, block, should_wrap_exception) }
 
       class Bomb < StandardError
       end
@@ -16,24 +17,23 @@ module Delfos
       describe "#apply_to" do
         context "with exception wrapping disabled" do
           let(:should_wrap_exception) { false }
-          let(:bomb) { lambda{raise Bomb } }
+          let(:bomb) { -> { raise Bomb } }
 
           it do
-            expect(->{ instance.apply_to(bomb)}).to raise_error Bomb
+            expect(-> { instance.apply_to(bomb) }).to raise_error Bomb
           end
         end
         context "with exception wrapping enabled" do
           let(:should_wrap_exception) { true }
-          let(:bomb) { lambda{raise "boom" } }
+          let(:bomb) { -> { raise "boom" } }
 
           it do
-            expect(->{
+            expect(lambda do
               instance.apply_to(bomb)
-            }).to raise_error MethodCallingException
+            end).to raise_error MethodCallingException
           end
         end
       end
     end
   end
 end
-
