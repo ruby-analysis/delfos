@@ -26,7 +26,7 @@ For the code in files [fixtures/a.rb](fixtures/a.rb) and [fixtures/b.rb](fixture
 
 ## Dependencies
 Only one explicit gem dependency on `binding_of_caller` (and one implicit dependency on its `debug_inspector`)
-Delfos by default depends upon a connection to a Neo4j instance for recording data.
+Delfos by default depends upon an _optional_ connection to a Neo4j instance for recording data.
 
 ## Usage
 
