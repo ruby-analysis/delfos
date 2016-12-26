@@ -17,6 +17,8 @@ module Delfos
 
       class << self
         def setup(klass, name, private_methods, class_method:)
+          return if Delfos::MethodLogging.skip_meta_programming_defined_method?
+
           MUTEX.synchronize do
             return if Thread.current[:__delfos_disable_patching]
           end
@@ -50,7 +52,7 @@ module Delfos
         method_name = name()
         om = original_method()
 
-        m = module_definition do |m|
+        mod = module_definition do |m|
           m.class_eval do
             define_method(method_name) do |*args, **kw_args, &block|
               stack, caller_binding = caller.dup, binding.dup
@@ -64,25 +66,26 @@ module Delfos
               end
 
               with_stack.call(call_site) do
-                begin
+                #begin
                   if kw_args.length > 0
                     super(*args, **kw_args, &block)
                   else
                     super(*args, &block)
                   end
-                rescue TypeError => e
-                  byebug
-                end
+                #rescue TypeError => e
+                #  #byebug
+                #  raise
+                #end
               end
             end
           end
         end
-        return unless m
+        return unless mod
 
         if class_method
-          klass.prepend m
+          klass.prepend mod
         else
-          klass.instance_eval { prepend m }
+          klass.instance_eval { prepend mod }
         end
       end
 

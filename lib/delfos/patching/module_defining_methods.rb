@@ -17,10 +17,12 @@ module Delfos
       end
 
       def find_or_create(container, module_name)
+        module_name = module_name.gsub(":", "_")
+
         result = container.const_get(module_name)
 
         # E.g. finding `::A' instead of Delfos::Patching::InstanceMethodLogging::A
-        if result == klass
+        if result == klass || result.name[module_name] == result.name
           create(container, module_name)
         else
           result

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "delfos/neo4j"
 
 module Delfos
   module Neo4j

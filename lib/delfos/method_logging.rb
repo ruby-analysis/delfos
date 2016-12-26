@@ -7,7 +7,6 @@ module Delfos
   module MethodLogging
     extend self
     def log(call_site, called_object, called_method, class_method, arguments)
-      return if skip_meta_programming_defined_method?
       arguments = Args.new(arguments)
       called_code = CodeLocation.from_called(called_object, called_method, class_method)
 
@@ -35,6 +34,18 @@ module Delfos
       @cache = nil
     end
 
+    META_PROGRAMMING_REGEX = /`define_method'\z|`attr_accessor'\z|`attr_reader'\z|`attr_writer'\z/
+
+    def skip_meta_programming_defined_method?
+      stack = caller.dup
+
+      i = stack.index do |l|
+        l["delfos/patching/basic_object.rb"]
+      end
+
+      stack[i + 1][META_PROGRAMMING_REGEX] if i
+    end
+
     private
 
     def with_cache(key)
@@ -43,14 +54,6 @@ module Delfos
 
     def cache
       @cache ||= {}
-    end
-
-    def skip_meta_programming_defined_method?
-      i = caller.index do |l|
-        l["delfos/patching/basic_object.rb"]
-      end
-
-      l[i + 1][/`define_method'\z/] if i
     end
   end
 end
