@@ -52,30 +52,23 @@ module Delfos
         method_name = name()
         om = original_method()
 
-        mod = module_definition do |m|
-          m.class_eval do
-            define_method(method_name) do |*args, **kw_args, &block|
-              stack, caller_binding = caller.dup, binding.dup
-              should_wrap_exceptions = true
-              arguments = MethodArguments.new(args, kw_args, block, should_wrap_exceptions)
+        mod = module_definition do
+          define_method(method_name) do |*args, **kw_args, &block|
+            stack, caller_binding = caller.dup, binding.dup
+            should_wrap_exceptions = true
+            arguments = MethodArguments.new(args, kw_args, block, should_wrap_exceptions)
 
-              call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
+            call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
 
-              if call_site
-                Delfos::MethodLogging.log(call_site, self, om, cm, arguments)
-              end
+            if call_site
+              Delfos::MethodLogging.log(call_site, self, om, cm, arguments)
+            end
 
-              with_stack.call(call_site) do
-                #begin
-                  if kw_args.length > 0
-                    super(*args, **kw_args, &block)
-                  else
-                    super(*args, &block)
-                  end
-                #rescue TypeError => e
-                #  #byebug
-                #  raise
-                #end
+            with_stack.call(call_site) do
+              if kw_args.length > 0
+                super(*args, **kw_args, &block)
+              else
+                super(*args, &block)
               end
             end
           end

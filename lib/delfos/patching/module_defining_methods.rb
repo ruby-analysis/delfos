@@ -41,7 +41,7 @@ module Delfos
         m
       end
 
-      def module_definition
+      def module_definition(&block)
         safe_method_name = safe_method_name()
         safe_class_name = safe_class_name()
         module_type = class_method ? "ClassMethodLogging" : "InstanceMethodLogging"
@@ -53,10 +53,10 @@ module Delfos
 
           m = find_or_create.call(namespace, safe_method_name)
 
-          yield m
-        end
+          m.class_eval(&block) if block_given?
 
-        m
+          m
+        end
       end
 
       def add_namespace ns, code
