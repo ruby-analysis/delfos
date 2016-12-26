@@ -6,29 +6,9 @@ require "delfos"
 
 require "ostruct"
 
-unless ENV["CI"]
-  # only log errors in dev
-  $delfos_test_logger = Object.new.tap do |o|
-    def o.debug(_s)
-      nil
-    end
-
-    def o.info(_s)
-      nil
-    end
-
-    def o.log(_s)
-      nil
-    end
-
-    def o.error(s)
-      puts s
-    end
-  end
-end
-
 require_relative "support/timeout" if ENV["TIMEOUT"]
 
+require_relative "support/logging"
 require_relative "support/neo4j"
 require_relative "support/web_mock"
 require_relative "support/helper_methods"
@@ -52,6 +32,6 @@ RSpec.configure do |c|
   c.before(:each) do
     Delfos.reset!
     ShowClassInstanceVariables.variables_for(Delfos)
-    Delfos.logger = $delfos_test_logger
+    Delfos.logger = $delfos_test_logger if defined? $delfos_test_logger
   end
 end
