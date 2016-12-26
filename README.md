@@ -17,6 +17,13 @@ For more on the background behind this project see [SOLID](solid.md) or [This ta
     * highlight dependency issues across large file system distances
     * suggest potential domain concept file system organisations to simplify app structure
 
+## Example output to neo4j
+
+For the code in files [fixtures/a.rb](fixtures/a.rb) and [fixtures/b.rb](fixtures/b.rb).
+
+![screenshot](examples/neo4j-sample.png)
+
+
 ## Dependencies
 Only one explicit gem dependency on `binding_of_caller` (and one implicit dependency on its `debug_inspector`)
 Delfos by default depends upon a connection to a Neo4j instance for recording data.
