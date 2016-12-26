@@ -3,8 +3,18 @@ require "delfos"
 require "delfos/neo4j"
 
 describe "integration" do
-  before do
+  let(:result) {
+    Delfos::Neo4j.flush!
+    Delfos::Neo4j.execute_sync(query).first
+  }
+
+  before(:each) do
+    puts "-"*200
+    puts "before"
+    puts "-"*200
+
     wipe_db!
+    Delfos.reset!
 
     Delfos.setup!(
       application_directories: ["fixtures"],
@@ -12,58 +22,119 @@ describe "integration" do
 
     load "fixtures/a.rb"
     load "fixtures/b.rb"
-  end
 
-  it do
     a = A.new
     b = B.new
     a.some_method(1, "", a, something: b)
+    Delfos::Neo4j.flush!
+  end
 
-    query = <<-QUERY
-      MATCH (a:Class{name: "A"})  -  [:OWNS]  -> (ma:Method{type: "InstanceMethod", name: "some_method"})
+  after do
+    puts "-"*80
+    puts "start after block"
+    Delfos.reset!
+    puts "-"*80
+    puts "after flush and reset"
+  end
 
-      MATCH (b:Class{name: "B"})  -  [:OWNS] ->  (mb:Method{type: "InstanceMethod", name: "another_method"})
+  context "recording call stacks" do
+    let(:query) do
+      <<-QUERY
+       MATCH (e:CallStack) - [:STEP{number: 1}] -> (:CallSite) -[:CALLS]->(:Method)<-[:OWNS]-(:Class{name:"B"})
+       MATCH (e)           - [:STEP{number: 2}] -> (:CallSite) -[:CALLS]->(:Method)<-[:OWNS]-(:Class{name:"A"})
+       MATCH (e2:CallStack)- [:STEP{number: 1}] -> (:CallSite) -[:CALLS]->(:Method)<-[:OWNS]-(:Class{name:"C"})
+       RETURN count(e), count(e2)
+      QUERY
+    end
 
-      MATCH (c:Class{name: "C"})  -  [:OWNS] ->  (mc:Method{type: "InstanceMethod", name: "method_with_no_more_method_calls"})
+    it do
+      puts "-"*80
+      e_count, e2_count = result
 
-      MATCH (ma)-[:CONTAINS]->(csA2B:CallSite)-[:CALLS]->(mb)
-      MATCH (mb)-[:CONTAINS]->(csB2C:CallSite)-[:CALLS]->(mc)
+      expect(e_count).to eq 1
+      expect(e2_count).to eq 1
+      puts "-"*80
+    end
+  end
 
-      MATCH (ma)-[:CONTAINS]->(csA2C:CallSite)-[:CALLS]->(mc)
+  context "records arguments" do
+    let(:query) do
+      <<-QUERY
+        MATCH (:CallSite)-[arg:ARG]->(a:Class{name: "A"})
 
-      MATCH (csA2B)-[:ARG]->(a)
+        RETURN count(arg)
+      QUERY
+    end
 
-      MATCH (e:CallStack) - [:STEP{number: 1}] -> (csA2B)
-      MATCH (e) - [:STEP{number: 2}] -> (csB2A:CallSite)
+    it do
+      puts "-"*80
+      arg_count = result.first
 
-      MATCH (e2:CallStack)  - [:STEP{number: 1}] -> (csA2C)
+      expect(arg_count).to eq 1
+    end
+  end
 
+  context "records call sites" do
+    let(:query) do
+      <<-QUERY
+      MATCH (b:Class{name: "B"})  -  [:OWNS]
+        ->  (mb:Method{type: "InstanceMethod", name: "another_method"})
+        -[:CONTAINS]->(csB2C:CallSite)-[:CALLS]->(mc)
+
+      MATCH (a:Class{name: "A"})  -  [:OWNS]
+        -> (ma:Method{name: "some_method"}) -[:CONTAINS]
+        ->(csA2B:CallSite)-[:CALLS]
+        ->(mb)
+
+      MATCH (ma)-[:CONTAINS]
+        ->(csA2C:CallSite)
+        -[:CALLS]
+        -> (mc:Method{type: "InstanceMethod", name: "method_with_no_more_method_calls"})
+        <- [:OWNS] - (c:Class{name: "C"})
 
       RETURN
-        count(a),
-        count(b),
         count(csA2B),
         count(csB2C),
-        count(csA2C),
-        count(mb),
-        count(e)
+        count(csA2C)
+      QUERY
+    end
+
+    it do
+      call_site_1_count, call_site_2_count, call_site_3_count =
+        result
+
+      expect(call_site_1_count).to eq 1
+      expect(call_site_2_count).to eq 1
+      expect(call_site_3_count).to eq 1
+    end
+  end
 
 
-    QUERY
+  context "recording instance methods" do
+    let(:query) do
+      <<-QUERY
+      MATCH (a:Class{name: "A"})  -  [:OWNS]
+        -> (ma:Method{type: "InstanceMethod", name: "some_method"})
+      MATCH (b:Class{name: "B"})  -  [:OWNS]
+        ->  (mb:Method{type: "InstanceMethod", name: "another_method"})
+      MATCH (c:Class{name: "C"})  -  [:OWNS]
+        ->  (mc:Method{type: "InstanceMethod", name: "method_with_no_more_method_calls"})
 
-    Delfos::Neo4j.flush!
+      RETURN
+        count(ma), ma,
+        count(mb), mb,
+        count(mc), mc
+      QUERY
+    end
 
-    a_klass_count, b_klass_count, call_site_1_count, call_site_2_count,
-      instance_method_1_count, instance_method_2_count, execution_count =
-      Delfos::Neo4j.execute_sync(query).first
+    it do
+      a_method_count, method_a, b_method_count, method_b, c_method_count, method_c = result
 
-    expect(b_klass_count).to eq 1
-    expect(a_klass_count).to eq 1
-    expect(call_site_1_count).to eq 1
-    expect(call_site_2_count).to eq 1
-    expect(instance_method_1_count).to eq 1
-    expect(instance_method_2_count).to eq 1
-    expect(execution_count).to eq 1
+      expect(a_method_count).to eq 1
+      #expect(method_a).to eq({file: "some_file", line_number: 1})
+      expect(b_method_count).to eq 1
+      expect(c_method_count).to eq 1
+    end
   end
 
   context "with a call to super inside new" do
@@ -87,7 +158,7 @@ describe "integration" do
 
     context "with Delfos enabled" do
       before do
-        Delfos.setup! application_directories: ["./fixtures/sub_classes"]
+        Delfos.setup!(application_directories: ["./fixtures/sub_classes"])
 
         load "./fixtures/sub_classes/sub_classes.rb"
       end

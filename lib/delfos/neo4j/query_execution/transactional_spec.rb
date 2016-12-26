@@ -15,6 +15,8 @@ module Delfos
       end
 
       describe "#perform" do
+        let(:some_params) { {} }
+        let(:some_query) { "some query" }
         let(:transaction_url) { Delfos.neo4j.uri_for("/db/data/transaction/10") }
         let(:commit_url) { Delfos.neo4j.uri_for("/db/data/transaction/10/commit") }
         let(:expiry) { "Thu, 08 Dec 2016 11:13:49 +0000" }
@@ -41,13 +43,14 @@ module Delfos
               headers: { location: transaction_url },
             )
 
-          response_transaction_url, response_commit_url, response_expiry = described_class.new(anything, anything).perform
+          response_transaction_url, response_commit_url, response_expiry = described_class.new(some_query, some_params).perform
 
           expect(response_transaction_url).to eq transaction_url
           expect(response_commit_url).to eq commit_url
           expect(response_expiry).to eq Time.parse expiry
         end
       end
+
 
       def write_query
         strip_whitespace <<-QUERY

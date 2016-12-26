@@ -66,8 +66,9 @@ module Delfos
 
       def method_definition_file
         if method_definition
-          method_definition[0].to_s
+          method_definition[:file]
         else
+          raise
           # TODO: fix edge case when block
           "#{@file} in block"
         end
@@ -75,8 +76,9 @@ module Delfos
 
       def method_definition_line
         if method_definition
-          method_definition[1].to_i
+          method_definition[:line_number].to_i
         else
+          raise
           # TODO: fix edge case when block
           0
         end
@@ -89,7 +91,7 @@ module Delfos
       end
 
       def method_definition
-        @method_definition ||= Patching::MethodCache.method_source_for(klass, method_key)
+        @method_definition ||= Patching::MethodCache.find(klass, method_key)
       end
     end
 

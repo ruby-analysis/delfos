@@ -16,6 +16,9 @@ module Delfos
         end
 
         describe "#perform" do
+          let(:some_params) { {} }
+          let(:some_query) { "some query" }
+
           context "with a successful response" do
             before do
               data = [{ "row" => ["some name", 2, "other name"] }]
@@ -50,7 +53,7 @@ module Delfos
             end
 
             it do
-              expect(-> { described_class.new(anything, anything).perform }).
+              expect(-> { described_class.new(some_query, some_params).perform }).
                 to raise_error InvalidQuery
             end
           end
@@ -61,7 +64,7 @@ module Delfos
             end
 
             it do
-              expect(-> { described_class.new(anything, anything).perform }).to raise_error ConnectionError
+              expect(-> { described_class.new(some_query, some_params).perform }).to raise_error ConnectionError
             end
           end
         end

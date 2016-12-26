@@ -48,10 +48,17 @@ module Delfos
         stack.index { |c| c == current }
       end
 
+      METHOD_NAME_REGEX = /`.*'$/
       def method_details
         return unless current
-        file, line_number, rest = current.split(":")
-        method_name = rest[/`.*'$/]
+        file, line_number, rest, more = current.split(":")
+
+        method_name = if more.nil?
+                        rest[METHOD_NAME_REGEX]
+                      else
+                        "#{rest}:#{more}"[METHOD_NAME_REGEX]
+                      end
+
         return unless method_name && file && line_number
 
         method_name.delete!("`").delete!("'")

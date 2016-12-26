@@ -19,7 +19,7 @@ module Delfos
 
         def unstub_all!
           instances_to_unstub.each(&:unstub!)
-          @instances_to_unstub = []
+          @instances_to_unstub = nil
         end
 
         private

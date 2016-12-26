@@ -8,7 +8,7 @@ describe Delfos::Neo4j::Informer do
   class D; end
   class E; end
 
-  let(:args) { double "args", args: [B], keyword_args: [C, D] }
+  let(:args) { double "args", argument_classes: [B,C,D] }
 
   before do
     wipe_db!

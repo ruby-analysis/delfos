@@ -22,7 +22,7 @@ module Delfos
     end
 
     def call_site_logger=(call_site_logger)
-       @call_site_logger = call_site_logger || default_call_site_logger
+      @call_site_logger = call_site_logger || default_call_site_logger
     end
 
     def default_call_site_logger
@@ -50,27 +50,30 @@ module Delfos
 
       remove_patching!
 
-      Delfos.application_directories = []
-      Delfos.call_site_logger = nil
-      if defined? Delfos::MethodLogging
-        Delfos::MethodLogging.reset!
-      end
+      Delfos::MethodLogging.reset!  if defined? Delfos::MethodLogging
 
-      Delfos.neo4j = nil
+      Delfos.neo4j                   = nil
+      Delfos.logger                  = nil
+      Delfos.application_directories = nil
+      Delfos.call_site_logger        = nil
+      @call_site_logger              = nil
+      Delfos.neo4j                   = nil
     end
 
     def unstub_all!
-      if defined? Delfos::Patching::MethodOverride
-        if Delfos::Patching::MethodOverride.respond_to?(:unstub_all!)
-          Delfos::Patching::MethodOverride.unstub_all!
-        end
+      if defined? Delfos::Patching::Unstubber
+        Delfos::Patching::Unstubber.unstub_all!
       end
     end
 
     def remove_cached_methods!
       if defined? Delfos::Patching::MethodCache
-        Delfos::Patching::MethodCache.instance_eval { @instance = nil }
+        Delfos::Patching::MethodCache.reset!
       end
+    end
+
+    def remove_module_methods!
+
     end
 
     def remove_patching!

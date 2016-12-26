@@ -66,7 +66,7 @@ module Delfos
       private
 
       def constraints_uri
-        @constraints_uri ||= Delfos.neo4j.uri_for("/db/data/schema/constraint")
+        Delfos.neo4j.uri_for("/db/data/schema/constraint")
       end
     end
   end

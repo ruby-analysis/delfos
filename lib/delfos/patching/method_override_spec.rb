@@ -9,32 +9,11 @@ module Delfos
       described_class.extend  Unstubbing::ClassMethods
       described_class.prepend Unstubbing::InstanceMethods
 
-      class SomeRandomClass
-        $class_method_line_number = __LINE__ + 1
-        def self.some_class_method
-        end
-
-        def some_externally_called_public_method
-          $call_site_line_number = __LINE__ + 1
-          some_public_method
-        end
-
-        $instance_method_line_number = __LINE__ + 1
-        def some_public_method
-          some_private_method
-        end
-
-        private
-
-        def some_private_method
-          "private"
-        end
-      end
-
       let(:klass) { SomeRandomClass }
       let(:instance) { klass.new }
 
       before do
+        load "fixtures/method_override/some_random_class.rb"
         stub_const("Delfos::CallStack", double("CallStack class"))
 
         allow(MethodLogging).to receive(:exclude?) do
@@ -47,7 +26,7 @@ module Delfos
       end
 
       after(:each) do
-        described_class.unstub_all!
+        Delfos::Patching::Unstubber.unstub_all!
       end
 
       describe "Adding to the method cache" do
@@ -62,11 +41,11 @@ module Delfos
 
           result = MethodCache.instance.added_methods
 
-          expect(result["Delfos::Patching::SomeRandomClass"]["InstanceMethod_some_public_method"].source_location).
-            to eq [File.expand_path(__FILE__), $instance_method_line_number]
+          expect(result["SomeRandomClass"]["InstanceMethod_some_public_method"]).
+            to eq({file: "fixtures/method_override/some_random_class.rb", line_number: $instance_method_line_number})
 
-          expect(result["Delfos::Patching::SomeRandomClass"]["ClassMethod_some_class_method"].source_location).
-            to eq [File.expand_path(__FILE__), $class_method_line_number]
+          expect(result["SomeRandomClass"]["ClassMethod_some_class_method"]).
+            to eq({file: "fixtures/method_override/some_random_class.rb", line_number: $class_method_line_number})
         end
       end
 
@@ -91,27 +70,31 @@ module Delfos
           end
 
           it "sends the correct args to the method call_site_logger" do
+            calls = 0
             expect(Delfos::MethodLogging).to receive(:log) do |call_site, object, called_method, _class_method, _arguments|
-              expect(object).to be_a SomeRandomClass
-              expect(call_site).to be_a Delfos::MethodLogging::CodeLocation
+              calls += 1
+
+              case calls
+              when 2
+                expect(object).to be_a SomeRandomClass
+                expect(call_site).to be_a Delfos::MethodLogging::CodeLocation
 
 
-              expect(call_site.method_name).to eq "some_externally_called_public_method"
-              expect(call_site.class_method).to eq false
-              expect(call_site.method_type).to eq "InstanceMethod"
-              expect(call_site.line_number).to eq $call_site_line_number
-              expect(call_site.object).to be_a SomeRandomClass
+                expect(call_site.method_name).to eq "some_externally_called_public_method"
+                expect(call_site.class_method).to eq false
+                expect(call_site.method_type).to eq "InstanceMethod"
+                expect(call_site.line_number).to eq $call_site_line_number
+                expect(call_site.object).to be_a SomeRandomClass
 
-              expect(called_method.name).to eq :some_public_method
+                expect(called_method.name).to eq :some_public_method
+              end
             end
-            setup_method("some_public_method")
-            setup_method("some_externally_called_public_method")
 
             instance.some_externally_called_public_method
           end
 
           it "excludes private methods" do
-            expect(method_logging).not_to receive(:log)
+            expect(Delfos::MethodLogging).not_to receive(:log)
 
             setup_method("some_private_method")
 

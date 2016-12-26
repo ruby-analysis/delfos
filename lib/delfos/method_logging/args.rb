@@ -18,6 +18,10 @@ module Delfos
         @args ||= calculate_args(@raw_args)
       end
 
+      def argument_classes
+        (args + keyword_args).uniq
+      end
+
       def keyword_args
         @keyword_args ||= calculate_args(@raw_keyword_args.values)
       end
