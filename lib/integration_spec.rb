@@ -9,10 +9,6 @@ describe "integration" do
   }
 
   before(:each) do
-    puts "-"*200
-    puts "before"
-    puts "-"*200
-
     wipe_db!
 
     Delfos.setup!(
@@ -29,11 +25,7 @@ describe "integration" do
   end
 
   after do
-    puts "-"*80
-    puts "start after block"
     Delfos.reset!
-    puts "-"*80
-    puts "after flush and reset"
   end
 
   context "recording call stacks" do
@@ -47,12 +39,10 @@ describe "integration" do
     end
 
     it do
-      puts "-"*80
       e_count, e2_count = result
 
       expect(e_count).to eq 1
       expect(e2_count).to eq 1
-      puts "-"*80
     end
   end
 
@@ -66,7 +56,6 @@ describe "integration" do
     end
 
     it do
-      puts "-"*80
       arg_count = result.first
 
       expect(arg_count).to eq 1

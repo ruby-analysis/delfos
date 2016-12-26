@@ -4,11 +4,6 @@ require_relative "method_override"
 module Delfos
   module Patching
     describe MethodOverride do
-      require_relative "unstubbing_spec_helper"
-      # HACK: this is awful - see unstubbing_spec_helper
-      described_class.extend  Unstubbing::ClassMethods
-      described_class.prepend Unstubbing::InstanceMethods
-
       let(:klass) { SomeRandomClass }
       let(:instance) { klass.new }
 
