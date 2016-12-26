@@ -47,7 +47,7 @@ module Delfos
       end
 
       def source_files(klass)
-        Patching::MethodCache.all_method_sources_for(klass).map(&:first)
+        Patching::MethodCache.files_for(klass)
       end
 
       def record?(f)

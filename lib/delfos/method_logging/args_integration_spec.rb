@@ -21,10 +21,10 @@ module Delfos
       before do
         path = Pathname.new(File.expand_path(__FILE__)) + "../../../../fixtures"
         Delfos.application_directories = [path]
-        Delfos::Patching::MethodCache.append(A, "some_method", a_path, 1)
-        Delfos::Patching::MethodCache.append(A, "some_other_method", a_path, 2)
-        Delfos::Patching::MethodCache.append(B, "another_method", b_path, 3)
-        Delfos::Patching::MethodCache.append(B, "yet_another_method", b_path, 15)
+        Delfos::Patching::MethodCache.append(A, "some_method", A.instance_method("some_method"))
+        Delfos::Patching::MethodCache.append(A, "to_s", A.instance_method("to_s"))
+        Delfos::Patching::MethodCache.append(B, "another_method", B.instance_method("another_method"))
+        Delfos::Patching::MethodCache.append(B, "cyclic_dependency", B.instance_method("cyclic_dependency"))
       end
 
       subject { described_class.new(f(a, b, c, d, c: c, d: d)) }

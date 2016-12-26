@@ -8,7 +8,7 @@ module Delfos
         extend Forwardable
 
         def_delegators :instance,
-          :all_method_sources_for,
+          :files_for,
           :added_methods,
           :append,
           :find
@@ -28,29 +28,22 @@ module Delfos
 
       attr_reader :added_methods
 
-      def all_method_sources_for(klass)
-        fetch(klass).values.map { |s| [s[:file], s[:line_number]] }
-      end
-
       def files_for(klass)
-        source_files(klass).
-          flatten.
+        fetch(klass).
+          values.
+          map(&:source_location).
           compact.
-          uniq
-      end
-
-      def source_files(klass)
-        all_method_sources_for(klass).map(&:first)
+          map(&:first)
       end
 
       def method_source_for(klass, key)
         find(klass, key)
       end
 
-      def append(klass, key, file, line_number)
+      def append(klass, key, method)
         m = fetch(klass)[key]
 
-        fetch(klass)[key] = { file: file, line_number: line_number } if m.nil?
+        fetch(klass)[key] = method if m.nil?
       end
 
       def find(klass, key)

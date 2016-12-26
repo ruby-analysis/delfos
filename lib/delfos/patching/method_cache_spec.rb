@@ -24,41 +24,40 @@ module Delfos
         end
       end
 
-      let(:instance_method)           { SuperKlass.instance_method(:some_method).source_location }
-      let(:class_method)              { SuperKlass.method(:some_class_method).source_location }
-      let(:sub_klass_instance_method) { SubKlass.instance_method(:method_not_in_super_klass).source_location }
-      let(:sub_klass_class_method)    { SubKlass.method(:method_not_in_super_klass).source_location }
+      let(:instance_method)           { SuperKlass.instance_method(:some_method) }
+      let(:class_method)              { SuperKlass.method(:some_class_method) }
+      let(:sub_klass_instance_method) { SubKlass.instance_method(:method_not_in_super_klass) }
+      let(:sub_klass_class_method)    { SubKlass.method(:method_not_in_super_klass) }
 
       before do
-        subject.append(SuperKlass, "ClassMethod_some_class_method", *class_method)
-        subject.append(SuperKlass, "InstanceMethod_some_method", *instance_method)
-        subject.append(SubKlass, "ClassMethod_method_not_in_super_klass", *sub_klass_class_method)
-        subject.append(SubKlass, "InstanceMethod_method_not_in_super_klass", *sub_klass_instance_method)
+        subject.append(SuperKlass, "ClassMethod_some_class_method", class_method)
+        subject.append(SuperKlass, "InstanceMethod_some_method", instance_method)
+        subject.append(SubKlass, "ClassMethod_method_not_in_super_klass", sub_klass_class_method)
+        subject.append(SubKlass, "InstanceMethod_method_not_in_super_klass", sub_klass_instance_method)
       end
 
       describe "#append" do
         it "appends to the methods" do
-          subject.append(SuperKlass, "B", "C", 23)
-          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => { file: "C", line_number: 23 })
+          subject.append(SuperKlass, "B", "C")
+          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => "C")
         end
 
         it "doesn't replace existing definitions" do
-          subject.append(SuperKlass, "B", "C", 1)
-          subject.append(SuperKlass, "B", "D", 2)
-          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => { file: "C", line_number: 1 })
+          subject.append(SuperKlass, "B", "C")
+          subject.append(SuperKlass, "B", "D")
+          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => "C")
         end
 
         it do
-          subject.append(SuperKlass, "B", "C", 1)
-          subject.append(SuperKlass, "E", "F", 2)
-          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => { file: "C", line_number: 1 }, "E" => { file: "F", line_number: 2 })
+          subject.append(SuperKlass, "B", "C")
+          subject.append(SuperKlass, "E", "F")
+          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => "C", "E" => "F")
         end
       end
 
       describe "#find" do
         def to_h(m)
-          file, line_number = m
-          { file: file, line_number: line_number }
+          m
         end
 
         it "handles ordinary method recording" do
@@ -77,12 +76,9 @@ module Delfos
         end
       end
 
-      describe "#method_sources_for" do
+      describe "#files_for" do
         it do
-          expect(subject.all_method_sources_for(SubKlass)).to include([__FILE__, $class_method_line])
-          expect(subject.all_method_sources_for(SubKlass)).to include([__FILE__, $instance_method_line])
-          expect(subject.all_method_sources_for(SubKlass)).to include([__FILE__, $sub_klass_method_not_in_super_klass_line])
-          expect(subject.all_method_sources_for(SubKlass)).to include([__FILE__, $sub_klass_class_method_not_in_super_klass_line])
+          expect(subject.files_for(SubKlass)).to include(__FILE__)
         end
       end
     end

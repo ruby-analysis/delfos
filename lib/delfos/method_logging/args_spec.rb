@@ -29,15 +29,16 @@ module Delfos
         definition = lambda do |k|
           case k.to_s
           when "A"
-            [[a_path, 1], [a_path, 23]]
+            [a_path]
           when "B"
-            [[b_path, 34]]
+            [b_path]
           else
-            [["/some-unincluded-path/example.rb", 12]]
+            ["/some-unincluded-path/example.rb", ]
           end
         end
+
         allow(Patching::MethodCache).
-          to receive(:all_method_sources_for, &definition)
+          to receive(:files_for, &definition)
 
         allow(Delfos).to receive(:method_logging).and_return method_logging
         path = Pathname.new(File.expand_path(__FILE__)) + "../../../../fixtures"

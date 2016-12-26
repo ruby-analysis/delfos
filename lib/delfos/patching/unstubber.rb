@@ -2,45 +2,22 @@
 module Delfos
   module Patching
     class Unstubber
-      include ModuleDefiningMethods
-      attr_reader :klass, :name, :class_method
+      extend ModuleDefiningMethods
 
       def self.unstub_all!
-        # TODO: change the way we cache methods so we don't have to unpick them
-        # like this. Also remove unstubbing from this class
-        # We can also remove the `module_definition` from this class so it can
-        # be easily reused for stubbing/unstubbing
-
         MUTEX.synchronize do
           Thread.current[:__delfos_disable_patching] = true
         end
 
-        MethodCache.added_methods.each do |klass, v|
-          next if v.empty?
+        MethodCache.added_methods.each do |klass, methods|
+          next if methods.empty?
 
-          klass = begin
-                    eval klass
-                  rescue NameError => e
-                    raise unless e.message["AnonymousClass"]
-                  end
+          klass = eval(klass)
 
-          class_methods, instance_methods = v.partition { |key, _| key[/^ClassMethod_/] }
+          class_methods, instance_methods = methods.partition{|key, _|key[/^ClassMethod_/]}
 
-          instance_methods.each do |key, _method_source|
-            name = key.split("InstanceMethod_").last
-            class_method = false
-            instance = new(klass, name, class_method)
-
-            instance.unstub!
-          end
-
-          class_methods.each do |key, _method_source|
-            name = key.split("ClassMethod_").last
-            class_method = true
-            instance = new(klass, name, class_method)
-
-            instance.unstub!
-          end
+          unstub_methods(klass, class_methods, true)
+          unstub_methods(klass, instance_methods, false)
         end
 
         MUTEX.synchronize do
@@ -48,22 +25,18 @@ module Delfos
         end
       end
 
-      def initialize(klass, name, class_method)
-        @klass           = klass
-        @name            = name
-        @class_method    = class_method
+      def self.unstub_methods(klass, methods, class_method)
+        methods.each do |method_name, _|
+          unstub!(klass, method_name, class_method)
+        end
       end
 
-      def unstub!
-        method_name = name
-
-        module_definition do |m|
-          m.class_eval do
-            begin
-              remove_method :"#{method_name}"
-            rescue NameError => e
-              raise unless e.message["method `#{method_name}' not defined in"]
-            end
+      def self.unstub!(klass, method_name, class_method)
+        module_definition(klass, method_name, class_method) do |m|
+          begin
+            remove_method :"#{method_name}"
+          rescue NameError => e
+            raise unless e.message["method `#{method_name}' not defined in"]
           end
         end
       end

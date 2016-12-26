@@ -50,7 +50,7 @@ module Delfos
         method_name = name
         om = original_method
 
-        mod = module_definition do
+        mod = module_definition(klass, name, class_method) do
           define_method(method_name) do |*args, **kw_args, &block|
             stack = caller.dup
             caller_binding = binding.dup
@@ -104,7 +104,7 @@ module Delfos
 
       def record_method!
         return true if bail?
-        MethodCache.append(klass, key, *original_method.source_location)
+        MethodCache.append(klass, key, original_method)
 
         yield
       end
