@@ -32,6 +32,14 @@ module Delfos
 
             instance.unstub!
           end
+
+          class_methods.each do |key, method_source|
+            name = key.split("ClassMethod_").last
+            class_method = true
+            instance = new(klass, name, class_method)
+
+            instance.unstub!
+          end
         end
 
         MUTEX.synchronize do
