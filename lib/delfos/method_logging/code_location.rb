@@ -21,7 +21,7 @@ module Delfos
         end
       end
 
-      attr_reader :object, :method_name, :class_method, :method_type, :file, :line_number
+      attr_reader :object, :method_name, :class_method, :method_type, :line_number
 
       def initialize(object, method_name, class_method, file, line_number)
         @object       = object
@@ -66,18 +66,16 @@ module Delfos
 
       def method_definition_file
         if method_definition
-          method_definition[0].to_s
+          method_definition[:file]
         else
-          # TODO: fix edge case when block
-          "#{@file} in block"
+          "#{@file} method definition not found"
         end
       end
 
       def method_definition_line
         if method_definition
-          method_definition[1].to_i
+          method_definition[:line_number].to_i
         else
-          # TODO: fix edge case when block
           0
         end
       end
@@ -89,7 +87,7 @@ module Delfos
       end
 
       def method_definition
-        @method_definition ||= Patching::MethodCache.method_source_for(klass, method_key)
+        @method_definition ||= Patching::MethodCache.find(klass, method_key)
       end
     end
 

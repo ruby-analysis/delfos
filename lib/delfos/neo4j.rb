@@ -7,27 +7,52 @@ require_relative "neo4j/distance/update"
 
 module Delfos
   module Neo4j
-    def self.execute_sync(query, params = {})
+    extend self
+
+    def execute_sync(query, params = {})
       QueryExecution::Sync.new(query, params).perform
     end
 
-    def self.execute(query, params = {})
+    def execute(query, params = {})
       Batch::Execution.execute!(query, params)
     end
 
-    def self.flush!
+    def flush!
       Batch::Execution.flush!
     end
 
-    def self.ensure_schema!
+    def ensure_schema!
       Schema.ensure_constraints!(
         "Class"     => "name",
         "CallStack" => "number",
       )
     end
 
-    def self.update_distance!
+    def update_distance!
       Distance::Update.new.perform
+    end
+
+    def config
+      host     ||= ENV["NEO4J_HOST"]     || "http://localhost"
+      port     ||= ENV["NEO4J_PORT"]     || "7476"
+      username ||= ENV["NEO4J_USERNAME"] || "neo4j"
+      password ||= ENV["NEO4J_PASSWORD"] || "password"
+
+      Neo4jConfig.new(host, port, username, password)
+    end
+
+    Neo4jConfig = Struct.new(:host, :port, :username, :password) do
+      def url
+        "#{host}:#{port}"
+      end
+
+      def uri_for(path)
+        URI.parse("#{url}#{path}")
+      end
+
+      def to_s
+        "  host: #{host}\n  port: #{port}\n  username: #{username}\n  password: #{password}"
+      end
     end
   end
 end

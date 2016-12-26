@@ -19,7 +19,7 @@ module Delfos
 
         def unstub_all!
           instances_to_unstub.each(&:unstub!)
-          @instances_to_unstub = []
+          @instances_to_unstub = nil
         end
 
         private
@@ -39,18 +39,11 @@ module Delfos
         def unstub!
           method = MethodCache.find(klass, key)
           return unless method
-          file = File.expand_path(__FILE__)
-          should_wrap_exception = false
 
-          cm = class_method
-          if cm
-            method.unbind.bind(klass)
+          if class_method
+            ::Delfos::Patching::MethodOverride.unsetup(klass, name, klass.private_methods, class_method: true)
           else
-            klass.send(:define_method, name) do |*args, **kw_args, &block|
-
-              arguments = MethodArguments.new(args, kw_args, block, should_wrap_exception)
-              arguments.apply_to(method.bind(self))
-            end
+            ::Delfos::Patching::MethodOverride.unsetup(klass, name, klass.private_instance_methods, class_method: false)
           end
         end
       end

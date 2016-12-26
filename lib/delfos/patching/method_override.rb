@@ -5,16 +5,30 @@ require "delfos/call_stack"
 
 require_relative "method_calling_exception"
 require_relative "method_arguments"
+require_relative "module_defining_methods"
+require_relative "unstubber"
 
 module Delfos
   module Patching
+    MUTEX = Mutex.new
+
     class MethodOverride
+      include ModuleDefiningMethods
+
       class << self
         def setup(klass, name, private_methods, class_method:)
+          return if Delfos::MethodLogging.skip_meta_programming_defined_method?
+
+          MUTEX.synchronize do
+            return if Thread.current[:__delfos_disable_patching]
+          end
+
           instance = new(klass, name, private_methods, class_method)
 
           instance.ensure_method_recorded_once!
         end
+
+
       end
 
       attr_reader :klass, :name, :private_methods, :class_method
@@ -31,33 +45,40 @@ module Delfos
         record_method! { setup }
       end
 
-      # Redefine the method (only once) at runtime to enabling logging to Neo4j
+      # Redefine the method at runtime to enabling logging to Neo4j
       def setup
-        processor = method(:process)
         cm = class_method
+        with_stack = method(:with_stack)
+        method_name = name()
+        om = original_method()
 
-        method_defining_method.call(name) do |*args, **kw_args, &block|
-          arguments = MethodArguments.new(args, kw_args, block)
+        mod = module_definition do
+          define_method(method_name) do |*args, **kw_args, &block|
+            stack, caller_binding = caller.dup, binding.dup
+            should_wrap_exceptions = true
+            arguments = MethodArguments.new(args, kw_args, block, should_wrap_exceptions)
 
-          processor.call(self, caller.dup, binding.dup, arguments, cm)
+            call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
+
+            if call_site
+              Delfos::MethodLogging.log(call_site, self, om, cm, arguments)
+            end
+
+            with_stack.call(call_site) do
+              if kw_args.length > 0
+                super(*args, **kw_args, &block)
+              else
+                super(*args, &block)
+              end
+            end
+          end
         end
-      end
+        return unless mod
 
-      def process(instance, stack, caller_binding, arguments, class_method)
-        method_to_call = method_selector(instance)
-
-        call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
-
-        with_logging(call_site, instance, method_to_call, class_method, arguments) do
-          arguments.apply_to(method_to_call)
-        end
-      end
-
-      def with_logging(call_site, instance, method_to_call, class_method, arguments)
-        Delfos.method_logging.log(call_site, instance, method_to_call, class_method, arguments) if call_site
-
-        with_stack(call_site) do
-          yield
+        if class_method
+          klass.prepend mod
+        else
+          klass.instance_eval { prepend mod }
         end
       end
 
@@ -84,9 +105,9 @@ module Delfos
 
       def record_method!
         return true if bail?
-        yield
+        MethodCache.append(klass, key, *original_method.source_location)
 
-        MethodCache.append(klass, key, original_method)
+        yield
       end
 
       def method_selector(instance)
@@ -115,7 +136,7 @@ module Delfos
       end
 
       def exclude?
-        ::Delfos.method_logging.exclude?(original_method)
+        ::Delfos::MethodLogging.exclude?(original_method)
       end
 
       def key

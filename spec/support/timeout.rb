@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module TimeoutHelpers
-  TIMEOUT_VALUE = (ENV["TIMEOUT"] || 10).to_f
+  TIMEOUT_VALUE = ENV["TIMEOUT"].to_f
 
   def timeout
     return yield if TIMEOUT_VALUE == 0.0

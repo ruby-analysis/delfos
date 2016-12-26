@@ -12,6 +12,7 @@ module Delfos
 
       Delfos.call_site_logger = call_site_logger
       current_file = Pathname.new(File.expand_path(__FILE__))
+
       Delfos.application_directories = [
         current_file + "../../../../fixtures",
       ]

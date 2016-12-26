@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "delfos/neo4j"
 
 module Delfos
   module Neo4j
@@ -65,7 +64,7 @@ module Delfos
       end
 
       def assign_query_variables(args, call_site, called_code)
-        klasses = [call_site.klass, called_code.klass] + args.args + args.keyword_args
+        klasses = [call_site.klass, called_code.klass] + args.argument_classes
 
         klasses.uniq.each do |k|
           query_variables.assign(k, "k")
@@ -86,10 +85,12 @@ module Delfos
       end
 
       def args_query(args)
-        (args.args + args.keyword_args).map do |k|
+        query_text = args.argument_classes.map do |k|
           name = query_variable(k)
           "MERGE (cs) - [:ARG] -> (#{name})"
-        end.join("\n")
+        end
+
+        query_text.join("\n")
       end
 
       def query_variable(k)

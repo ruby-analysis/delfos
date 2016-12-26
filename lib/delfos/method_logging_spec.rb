@@ -27,8 +27,8 @@ module Delfos
         expect_any_instance_of(Patching::MethodCache).
           to receive(:added_methods).
           at_least(:once).
-          and_return("A" => { instance_method_some_method: method_a },
-                     "B" => { instance_method_another_method: method_b })
+          and_return("A" => { instance_method_some_method: {file: a_path, line_number: 4} },
+                     "B" => { instance_method_another_method: {file: b_path, line_number: 2} })
 
         Delfos.call_site_logger = call_site_logger
         path_fixtures = Pathname.new(File.expand_path(__FILE__)) + "../../../fixtures"
@@ -47,9 +47,9 @@ module Delfos
         def called_method(args, keyword_args, block)
           $called_line = __LINE__ - 1
           call_site = MethodLogging::CallSiteParsing.new(caller.dup, binding.dup, stack_offset: MAGIC_OFFSET).perform
-          args =Patching::MethodArguments.new(args, keyword_args, block, should_wrap_exception=true)
+          args = Patching::MethodArguments.new(args, keyword_args, block, should_wrap_exception=true)
 
-          Delfos.method_logging.log(
+          Delfos::MethodLogging.log(
             call_site,
             self,
             method(__method__),

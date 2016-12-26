@@ -9,13 +9,17 @@ module Delfos
       attr_reader :block
 
       def initialize(arguments)
-        @raw_args = arguments.args
+        @raw_args         = arguments.args
         @raw_keyword_args = arguments.keyword_args
-        @block = arguments.block
+        @block            = arguments.block
       end
 
       def args
         @args ||= calculate_args(@raw_args)
+      end
+
+      def argument_classes
+        (args + keyword_args).uniq
       end
 
       def keyword_args
@@ -47,7 +51,7 @@ module Delfos
       end
 
       def record?(f)
-        Delfos.method_logging.include_file_in_logging?(f)
+        Delfos::MethodLogging.include_file?(f)
       end
     end
   end

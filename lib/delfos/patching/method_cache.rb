@@ -9,9 +9,13 @@ module Delfos
 
         def_delegators :instance,
           :all_method_sources_for,
-          :method_source_for,
+          :added_methods,
           :append,
           :find
+
+        def reset!
+          @instance = nil
+        end
 
         def instance
           @instance ||= new
@@ -25,23 +29,33 @@ module Delfos
       attr_reader :added_methods
 
       def all_method_sources_for(klass)
-        fetch(klass).values.map(&:source_location)
+        fetch(klass).values.map{|s| [s[:file], s[:line_number]] }
+      end
+
+      def files_for(klass)
+        source_files(klass).
+          flatten.
+          compact.
+          uniq
+      end
+
+      def source_files(klass)
+        all_method_sources_for(klass).map(&:first)
       end
 
       def method_source_for(klass, key)
-        meth = find(klass, key)
-
-        meth&.source_location
+        find(klass, key)
       end
 
-      def append(klass, key, original_method)
+      def append(klass, key, file, line_number)
         m = fetch(klass)[key]
 
-        fetch(klass)[key] = original_method if m.nil?
+        fetch(klass)[key] = {file: file, line_number: line_number} if m.nil?
       end
 
       def find(klass, key)
-        fetch(klass)[key]
+        result = fetch(klass)[key]
+        result
       end
 
       private

@@ -6,9 +6,7 @@ require_relative "method_logging/args"
 module Delfos
   module MethodLogging
     extend self
-
     def log(call_site, called_object, called_method, class_method, arguments)
-      return if skip_meta_programming_defined_method?
       arguments = Args.new(arguments)
       called_code = CodeLocation.from_called(called_object, called_method, class_method)
 
@@ -19,25 +17,43 @@ module Delfos
       file, _ = method.source_location
       return true unless file
 
-      exclude_file_from_logging?(File.expand_path(file))
+      exclude_file?(File.expand_path(file))
     end
 
-    def exclude_file_from_logging?(file)
-      !CommonPath.included_in?(File.expand_path(file), Delfos.application_directories)
+    def include_file?(file)
+      !exclude_file?(file)
     end
 
-    def include_file_in_logging?(file)
-      !exclude_file_from_logging?(file)
+    def exclude_file?(file)
+      with_cache(file) do
+        !CommonPath.included_in?(File.expand_path(file), Delfos.application_directories)
+      end
+    end
+
+    def reset!
+      @cache = nil
+    end
+
+    META_PROGRAMMING_REGEX = /`define_method'\z|`attr_accessor'\z|`attr_reader'\z|`attr_writer'\z/
+
+    def skip_meta_programming_defined_method?
+      stack = caller.dup
+
+      i = stack.index do |l|
+        l["delfos/patching/basic_object.rb"]
+      end
+
+      stack[i + 1][META_PROGRAMMING_REGEX] if i
     end
 
     private
 
-    def skip_meta_programming_defined_method?
-      i = caller.index do |l|
-        l["delfos/patching/basic_object.rb"]
-      end
+    def with_cache(key)
+      cache.include?(key) ? cache[key] : cache[key] = yield
+    end
 
-      l[i + 1][/`define_method'\z/] if i
+    def cache
+      @cache ||= {}
     end
   end
 end

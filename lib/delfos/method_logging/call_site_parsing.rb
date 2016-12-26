@@ -11,9 +11,9 @@ module Delfos
       attr_reader :stack, :call_site_binding
 
       def initialize(stack, call_site_binding, stack_offset: nil)
-        @stack = stack
+        @stack             = stack
         @call_site_binding = call_site_binding
-        @stack_offset = stack_offset
+        @stack_offset      = stack_offset
       end
 
       def perform
@@ -32,7 +32,7 @@ module Delfos
       def current
         stack.detect do |s|
           file = s.split(":")[0]
-          Delfos.method_logging.include_file_in_logging?(file)
+          Delfos::MethodLogging.include_file?(file)
         end
       end
 
@@ -48,10 +48,17 @@ module Delfos
         stack.index { |c| c == current }
       end
 
+      METHOD_NAME_REGEX = /`.*'$/
       def method_details
         return unless current
-        file, line_number, rest = current.split(":")
-        method_name = rest[/`.*'$/]
+        file, line_number, rest, more = current.split(":")
+
+        method_name = if more.nil?
+                        rest[METHOD_NAME_REGEX]
+                      else
+                        "#{rest}:#{more}"[METHOD_NAME_REGEX]
+                      end
+
         return unless method_name && file && line_number
 
         method_name.delete!("`").delete!("'")
