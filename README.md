@@ -6,7 +6,7 @@
 [![Gem Version](http://img.shields.io/gem/v/delfos.svg?style=flat-square)](https://rubygems.org/gems/delfos)
 
 # Background
-For more on the background behind this project see [SOLID](solid.md)
+For more on the background behind this project see [SOLID](solid.md) or [This talk](http://slides.com/markburns-1/fitting-code-on-screen)
 
 # Functionality
   * Record runtime type information and call site file locations in every method call of your application for most ruby programs
