@@ -14,7 +14,6 @@ describe "integration" do
     puts "-"*200
 
     wipe_db!
-    Delfos.reset!
 
     Delfos.setup!(
       application_directories: ["fixtures"],

@@ -8,7 +8,7 @@ require "ostruct"
 
 unless ENV["CI"]
   #only log errors in dev
-  $delfos_logger = Object.new.tap do |o|
+  $delfos_test_logger = Object.new.tap do |o|
     def o.debug(s); nil; end
     def o.info(s); nil; end
     def o.log(s); nil; end
@@ -42,6 +42,6 @@ RSpec.configure do |c|
   c.before(:each) do
     Delfos.reset!
     ShowClassInstanceVariables.variables_for(Delfos)
-    Delfos.logger = $delfos_logger
+    Delfos.logger = $delfos_test_logger
   end
 end

@@ -36,6 +36,7 @@ module Delfos
     end
 
     def default_logger
+      byebug
       require "logger"
       Logger.new(STDOUT)
     end

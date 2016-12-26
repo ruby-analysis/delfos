@@ -7,8 +7,6 @@ module Delfos
     module Distance
       describe Update do
         def preload_graph!
-          wipe_db!
-          Delfos.reset!
           Delfos.setup_neo4j!
           perform_query File.read "fixtures/cypher/coupling.cypher"
         end
