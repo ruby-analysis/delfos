@@ -26,11 +26,11 @@ RSpec.configure do |c|
   end
 
   c.before(:suite) do
-    Delfos.reset!
+    Delfos.reset! if Delfos.respond_to?(:reset!)
   end
 
   c.before(:each) do
-    Delfos.reset!
+    Delfos.reset! if Delfos.respond_to?(:reset!)
     ShowClassInstanceVariables.variables_for(Delfos)
     Delfos.logger = $delfos_test_logger if defined? $delfos_test_logger
   end
