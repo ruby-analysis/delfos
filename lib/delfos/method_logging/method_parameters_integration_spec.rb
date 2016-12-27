@@ -1,22 +1,18 @@
 # frozen_string_literal: true
-require_relative "args"
+require_relative "method_parameters"
 require "./fixtures/b"
 require "./fixtures/a"
 require "delfos/method_logging"
 
 module Delfos
   module MethodLogging
-    describe Args, "Integration" do
+    describe MethodParameters, "Integration" do
       let(:a) { A.new }
       let(:b) { B.new }
       let(:c) { 1 }
       let(:d) { "" }
       let(:a_path) { File.expand_path "./fixtures/a.rb" }
       let(:b_path) { File.expand_path "./fixtures/b.rb" }
-
-      def f(*args, **keyword_args)
-        double("Arguments object", args: args, keyword_args: keyword_args, block: nil)
-      end
 
       before do
         path = Pathname.new(File.expand_path(__FILE__)) + "../../../../fixtures"
@@ -28,7 +24,7 @@ module Delfos
         Delfos::Patching::MethodCache.append(klass: B, method: B.instance_method("cyclic_dependency"))
       end
 
-      subject { described_class.new(f(a, b, c, d, c: c, d: d)) }
+      subject { described_class.new([a, b, c, d], c: c, d: d) }
 
       describe "#args" do
         it do

@@ -1,16 +1,15 @@
 # frozen_string_literal: true
 require_relative "common_path"
 require_relative "method_logging/code_location"
-require_relative "method_logging/args"
+require_relative "method_logging/method_parameters"
 
 module Delfos
   module MethodLogging
     extend self
-    def log(call_site, called_object, called_method, class_method, arguments)
-      arguments = Args.new(arguments)
+    def log(call_site, called_object, called_method, class_method, parameters)
       called_code = CodeLocation.from_called(called_object, called_method, class_method)
 
-      Delfos.call_site_logger.log(arguments, call_site, called_code)
+      Delfos.call_site_logger.log(parameters, call_site, called_code)
     end
 
     def exclude?(method)

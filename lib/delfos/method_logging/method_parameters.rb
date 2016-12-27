@@ -8,10 +8,10 @@ module Delfos
     class MethodParameters
       attr_reader :block
 
-      def initialize(arguments)
-        @raw_args         = arguments.args
-        @raw_keyword_args = arguments.keyword_args
-        @block            = arguments.block
+      def initialize(args=[], keyword_args=nil, block=nil)
+        @raw_args         = args
+        @raw_keyword_args = keyword_args
+        @block            = block
       end
 
       def args
@@ -40,13 +40,6 @@ module Delfos
       end
 
       def files_for(klass)
-        source_files(klass).
-          flatten.
-          compact.
-          uniq
-      end
-
-      def source_files(klass)
         Patching::MethodCache.files_for(klass)
       end
 

@@ -9,7 +9,6 @@ require_relative "unstubber"
 module Delfos
   module Patching
     MUTEX = Mutex.new
-    MethodArguments = Struct.new(:args, :keyword_args, :block)
 
     class MethodOverride
       include ModuleDefiningMethods
@@ -75,13 +74,12 @@ module Delfos
           define_method(method_name) do |*args, **kw_args, &block|
             stack = caller.dup
             caller_binding = binding.dup
-            arguments = MethodArguments.new(args, kw_args, block)
+            parameters = Delfos::MethodLogging::MethodParameters.new(args, kw_args, block)
 
-            call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
             call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
 
             if call_site
-              Delfos::MethodLogging.log(call_site, self, om, cm, arguments)
+              Delfos::MethodLogging.log(call_site, self, om, cm, parameters)
             end
 
             with_stack.call(call_site) do

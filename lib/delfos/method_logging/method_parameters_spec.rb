@@ -1,21 +1,17 @@
 # frozen_string_literal: true
-require_relative "args"
+require_relative "method_parameters"
 require "./fixtures/b"
 require "./fixtures/a"
 
 module Delfos
   module MethodLogging
-    describe Args do
+    describe MethodParameters do
       let(:a) { A.new }
       let(:b) { B.new }
       let(:c) { 1 }
       let(:d) { "" }
       let(:a_path) { File.expand_path "./fixtures/a.rb" }
       let(:b_path) { File.expand_path "./fixtures/b.rb" }
-
-      def f(*args, **keyword_args)
-        double("Arguments object", args: args, keyword_args: keyword_args, block: nil)
-      end
 
       let(:method_logging) do
         double("method_logging").tap do |m|
@@ -45,7 +41,7 @@ module Delfos
         Delfos.application_directories = [path]
       end
 
-      subject { described_class.new(f(a, b, c, d, c: c, d: d)) }
+      subject { described_class.new([a, b, c, d], c: c, d: d) }
 
       describe "#args" do
         it do

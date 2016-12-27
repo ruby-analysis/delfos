@@ -39,7 +39,9 @@ module Delfos
           values.
           map(&:source_location).
           compact.
-          map(&:first)
+          map(&:first).
+          compact.
+          uniq
       end
 
       def append(klass:, method:)

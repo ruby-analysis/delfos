@@ -17,18 +17,14 @@ module Delfos
               class_method: class_method, file: file, line_number: line_number)
         end
 
-        def method_type_from(class_method)
-          class_method ? "ClassMethod" : "InstanceMethod"
-        end
       end
 
-      attr_reader :object, :method_name, :class_method, :method_type, :line_number
+      attr_reader :object, :method_name, :class_method, :line_number
 
       def initialize(object:, method_name:, class_method:, file:, line_number:)
         @object       = object
         @method_name  = method_name
         @class_method = class_method
-        @method_type  = self.class.method_type_from class_method
         @line_number  = line_number.to_i
         @file         = file
       end
@@ -47,6 +43,10 @@ module Delfos
 
       def method_definition_line
         method_definition&.last&.to_i || fallback_method_definition_line_number
+      end
+
+      def method_type
+        class_method ? "ClassMethod" : "InstanceMethod"
       end
 
       private
