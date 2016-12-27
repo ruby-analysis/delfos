@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module Delfos
-  module Distance
+  module FileSystem
     class Relation
       attr_reader :start_path, :finish_path
 

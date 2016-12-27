@@ -1,6 +1,4 @@
 # frozen_string_literal: true
-require_relative "../../delfos"
-require_relative "../common_path"
 require "delfos/patching/method_cache"
 
 module Delfos

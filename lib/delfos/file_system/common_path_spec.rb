@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require_relative "common_path"
 
-describe Delfos::CommonPath do
+describe Delfos::FileSystem::CommonPath do
   def pathname(path, directory:)
     path = double "path: #{path}", to_s: path, directory?: directory
     allow(path).to receive(:+) do |other|

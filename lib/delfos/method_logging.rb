@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-require_relative "common_path"
+require "delfos/file_system/common_path"
+
 require_relative "method_logging/code_location"
 require_relative "method_logging/method_parameters"
 
@@ -25,7 +26,7 @@ module Delfos
 
     def exclude_file?(file)
       with_cache(file) do
-        !CommonPath.included_in?(File.expand_path(file), Delfos.application_directories)
+        !FileSystem::CommonPath.included_in?(File.expand_path(file), Delfos.application_directories)
       end
     end
 

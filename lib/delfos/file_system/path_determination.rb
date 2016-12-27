@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module Delfos
-  module Distance
+  module FileSystem
     class PathDetermination
       def self.for(*files)
         files.map { |f| new(f).full_path }

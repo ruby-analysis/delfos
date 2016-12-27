@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require "delfos/distance/calculation"
+require "delfos/file_system/distance_calculation"
 require_relative "call_site_fetcher"
 
 module Delfos
@@ -11,7 +11,7 @@ module Delfos
           return if results.length.negative?
 
           results.each do |start_file, call_site_id, finish_file, called_id|
-            calc = Delfos::Distance::Calculation.new(start_file, finish_file)
+            calc = FileSystem::DistanceCalculation.new(start_file, finish_file)
 
             update(call_site_id, called_id, calc)
           end

@@ -2,7 +2,7 @@
 require_relative "path_determination"
 
 module Delfos
-  module Distance
+  module FileSystem
     describe PathDetermination do
       before do
         Delfos.setup! application_directories: ["fixtures/path_determination"]
