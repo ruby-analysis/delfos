@@ -5,7 +5,7 @@ require "delfos/patching/method_cache"
 
 module Delfos
   module MethodLogging
-    class Args
+    class MethodParameters
       attr_reader :block
 
       def initialize(arguments)
