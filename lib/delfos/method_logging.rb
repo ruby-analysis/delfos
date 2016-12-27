@@ -34,18 +34,6 @@ module Delfos
       @cache = nil
     end
 
-    META_PROGRAMMING_REGEX = /`define_method'\z|`attr_accessor'\z|`attr_reader'\z|`attr_writer'\z/
-
-    def skip_meta_programming_defined_method?
-      stack = caller.dup
-
-      i = stack.index do |l|
-        l["delfos/patching/basic_object.rb"]
-      end
-
-      stack[i + 1][META_PROGRAMMING_REGEX] if i
-    end
-
     private
 
     def with_cache(key)

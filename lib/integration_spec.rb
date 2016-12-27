@@ -56,7 +56,6 @@ describe "integration" do
     end
 
     it do
-      byebug
       arg_count = result.first
 
       expect(arg_count).to eq 1
@@ -119,7 +118,14 @@ describe "integration" do
       a_method_count, method_a, b_method_count, method_b, c_method_count, method_c = result
 
       expect(a_method_count).to eq 1
-      # expect(method_a).to eq({file: "some_file", line_number: 1})
+
+      expect(method_a).to eq({
+        "file" => "fixtures/a.rb",
+        "line_number" => 3,
+        "name" => "some_method",
+        "type" => "InstanceMethod"
+      })
+
       expect(b_method_count).to eq 1
       expect(c_method_count).to eq 1
     end

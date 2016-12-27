@@ -3,21 +3,20 @@
 require "delfos/method_logging"
 require "delfos/call_stack"
 
-require_relative "method_calling_exception"
-require_relative "method_arguments"
 require_relative "module_defining_methods"
 require_relative "unstubber"
 
 module Delfos
   module Patching
     MUTEX = Mutex.new
+    MethodArguments = Struct.new(:args, :keyword_args, :block)
 
     class MethodOverride
       include ModuleDefiningMethods
 
       class << self
         def setup(klass, name, private_methods, class_method:)
-          return if Delfos::MethodLogging.skip_meta_programming_defined_method?
+          return if skip_meta_programming_defined_method?
 
           MUTEX.synchronize do
             return if Thread.current[:__delfos_disable_patching]
@@ -27,6 +26,27 @@ module Delfos
 
           instance.ensure_method_recorded_once!
         end
+
+        META_PROGRAMMING_REGEX = /`define_method'\z|`attr_accessor'\z|`attr_reader'\z|`attr_writer'\z/
+
+        def skip_meta_programming_defined_method?
+          stack = caller.dup
+
+          i = stack.index do |l|
+            l["delfos/patching/basic_object.rb"]
+          end
+
+          return unless i
+
+          result = stack[i + 1][META_PROGRAMMING_REGEX]
+
+          return unless result
+
+          Delfos.logger.debug "Skipping setting up delfos logging of method defined by #{result} #{stack[i+1]}"
+          true
+        end
+
+
       end
 
       attr_reader :klass, :name, :private_methods, :class_method
@@ -43,6 +63,7 @@ module Delfos
         record_method! { setup }
       end
 
+
       # Redefine the method at runtime to enabling logging to Neo4j
       def setup
         cm = class_method
@@ -54,9 +75,9 @@ module Delfos
           define_method(method_name) do |*args, **kw_args, &block|
             stack = caller.dup
             caller_binding = binding.dup
-            should_wrap_exceptions = true
-            arguments = MethodArguments.new(args, kw_args, block, should_wrap_exceptions)
+            arguments = MethodArguments.new(args, kw_args, block)
 
+            call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
             call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
 
             if call_site
@@ -104,22 +125,9 @@ module Delfos
 
       def record_method!
         return true if bail?
-        MethodCache.append(klass, key, original_method)
+        MethodCache.append(klass: klass, method: original_method)
 
         yield
-      end
-
-      def method_selector(instance)
-        if class_method
-          m = MethodCache.find(instance, "ClassMethod_#{name}")
-          m.receiver == instance ? m : m.unbind.bind(instance)
-        else
-          original_method.bind(instance)
-        end
-      end
-
-      def method_defining_method
-        class_method ? klass.method(:define_singleton_method) : klass.method(:define_method)
       end
 
       def bail?
@@ -127,7 +135,7 @@ module Delfos
       end
 
       def method_has_been_added?
-        MethodCache.find(klass, key)
+        MethodCache.find(klass: klass, class_method: class_method, method_name: name)
       end
 
       def private_method?
@@ -136,14 +144,6 @@ module Delfos
 
       def exclude?
         ::Delfos::MethodLogging.exclude?(original_method)
-      end
-
-      def key
-        "#{type}_#{name}"
-      end
-
-      def type
-        class_method ? "ClassMethod" : "InstanceMethod"
       end
     end
   end

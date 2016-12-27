@@ -21,7 +21,11 @@ module Delfos
         file, line_number, method_name = method_details
         return unless current && file && line_number && method_name
 
-        CodeLocation.new(object, method_name.to_s, class_method, file, line_number)
+        CodeLocation.new(object: object,
+                         method_name: method_name.to_s,
+                         class_method: class_method,
+                         file: file,
+                         line_number: line_number)
       end
 
       private
@@ -49,20 +53,19 @@ module Delfos
         stack.index { |c| c == current }
       end
 
-      METHOD_NAME_REGEX = /`.*'$/
+      METHOD_NAME_REGEX = /`(.*)'$/
+
       def method_details
         return unless current
         file, line_number, rest, more = current.split(":")
 
-        method_name = if more.nil?
-                        rest[METHOD_NAME_REGEX]
-                      else
-                        "#{rest}:#{more}"[METHOD_NAME_REGEX]
-                      end
+        rest = more.nil? ?  rest : "#{rest}:#{more}"
+        method_name = rest.match(METHOD_NAME_REGEX)&.[](1)
 
         return unless method_name && file && line_number
 
-        method_name.delete!("`").delete!("'")
+        method_name = method_name.delete("`")
+        method_name = method_name.delete("'")
 
         [file, line_number.to_i, method_name]
       end

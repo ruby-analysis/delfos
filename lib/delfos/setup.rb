@@ -38,7 +38,7 @@ module Delfos
         Delfos::CallStack.reset!
       end
 
-      if defined? Delfos::Neo4j::Batch::Execution && neo4j.username
+      if defined? Delfos::Neo4j::Batch::Execution
         Delfos::Neo4j::Batch::Execution.flush!
         Delfos::Neo4j::Batch::Execution.reset!
       end
@@ -50,7 +50,7 @@ module Delfos
 
       remove_patching!
 
-      Delfos::MethodLogging.reset! if defined? Delfos::MethodLogging
+      Delfos::MethodLogging.reset! if defined?(Delfos::MethodLogging) && Delfos::MethodLogging.respond_to?(:reset!)
 
       Delfos.neo4j                   = nil
       Delfos.logger                  = nil
@@ -61,18 +61,15 @@ module Delfos
     end
 
     def unstub_all!
-      if defined? Delfos::Patching::Unstubber
-        Delfos::Patching::Unstubber.unstub_all!
-      end
+      return unless defined? Delfos::Patching::Unstubber
+
+      Delfos::Patching::Unstubber.unstub_all!
     end
 
     def remove_cached_methods!
-      if defined? Delfos::Patching::MethodCache
-        Delfos::Patching::MethodCache.reset!
-      end
-    end
+      return unless defined? Delfos::Patching::MethodCache
 
-    def remove_module_methods!
+      Delfos::Patching::MethodCache.reset!
     end
 
     def remove_patching!

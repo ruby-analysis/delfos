@@ -13,7 +13,8 @@ module Delfos
           file, line_number = called_method.source_location
           return unless file && line_number
 
-          new(object, called_method.name.to_s, class_method, file, line_number)
+          new(object: object, method_name: called_method.name.to_s,
+              class_method: class_method, file: file, line_number: line_number)
         end
 
         def method_type_from(class_method)
@@ -23,7 +24,7 @@ module Delfos
 
       attr_reader :object, :method_name, :class_method, :method_type, :line_number
 
-      def initialize(object, method_name, class_method, file, line_number)
+      def initialize(object:, method_name:, class_method:, file:, line_number:)
         @object       = object
         @method_name  = method_name
         @class_method = class_method
@@ -33,12 +34,29 @@ module Delfos
       end
 
       def file
-        file = @file.to_s
+        relative_filename @file
+      end
 
-        if file
-          Delfos.application_directories.map do |d|
-            file = relative_path(file, d)
-          end
+      def klass
+        object.is_a?(Class) ? object : object.class
+      end
+
+      def method_definition_file
+        relative_filename(method_definition&.first || fallback_method_definition_file)
+      end
+
+      def method_definition_line
+        method_definition&.last&.to_i || fallback_method_definition_line_number
+      end
+
+      private
+
+      def relative_filename(f)
+        return unless f
+        file = f.to_s
+
+        Delfos.application_directories.map do |d|
+          file = relative_path(file, d)
         end
 
         file
@@ -55,39 +73,16 @@ module Delfos
         file
       end
 
-      def klass
-        object.is_a?(Class) ? object : object.class
+      def fallback_method_definition_file
+        @file
       end
 
-      def klass_name
-        name = klass.name || "__AnonymousClass"
-        name.tr ":", "_"
-      end
-
-      def method_definition_file
-        if method_definition
-          method_definition[:file]
-        else
-          "#{@file} method definition not found"
-        end
-      end
-
-      def method_definition_line
-        if method_definition
-          method_definition[:line_number].to_i
-        else
-          0
-        end
-      end
-
-      private
-
-      def method_key
-        "#{method_type}_#{method_name}"
+      def fallback_method_definition_line_number
+        0
       end
 
       def method_definition
-        @method_definition ||= Patching::MethodCache.find(klass, method_key)
+        @method_definition ||= Patching::MethodCache.find(klass: klass, method_name: method_name, class_method: class_method)&.source_location
       end
     end
   end

@@ -9,25 +9,14 @@ module Delfos
           Thread.current[:__delfos_disable_patching] = true
         end
 
-        MethodCache.added_methods.each do |klass, methods|
-          next if methods.empty?
-
+        MethodCache.each_method do |klass, method, class_method|
           klass = eval(klass)
 
-          class_methods, instance_methods = methods.partition{|key, _|key[/^ClassMethod_/]}
-
-          unstub_methods(klass, class_methods, true)
-          unstub_methods(klass, instance_methods, false)
+          unstub!(klass, method.name, class_method)
         end
 
         MUTEX.synchronize do
           Thread.current[:__delfos_disable_patching] = false
-        end
-      end
-
-      def self.unstub_methods(klass, methods, class_method)
-        methods.each do |method_name, _|
-          unstub!(klass, method_name, class_method)
         end
       end
 

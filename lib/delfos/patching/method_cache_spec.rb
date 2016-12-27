@@ -29,55 +29,54 @@ module Delfos
       let(:sub_klass_instance_method) { SubKlass.instance_method(:method_not_in_super_klass) }
       let(:sub_klass_class_method)    { SubKlass.method(:method_not_in_super_klass) }
 
-      before do
-        subject.append(SuperKlass, "ClassMethod_some_class_method", class_method)
-        subject.append(SuperKlass, "InstanceMethod_some_method", instance_method)
-        subject.append(SubKlass, "ClassMethod_method_not_in_super_klass", sub_klass_class_method)
-        subject.append(SubKlass, "InstanceMethod_method_not_in_super_klass", sub_klass_instance_method)
-      end
-
       describe "#append" do
         it "appends to the methods" do
-          subject.append(SuperKlass, "B", "C")
-          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => "C")
+          subject.append(klass: SuperKlass, method: instance_method)
+          result = subject.find(klass: SuperKlass, method_name: "some_method", class_method: false)
+          expect(result).to eq instance_method
         end
 
         it "doesn't replace existing definitions" do
-          subject.append(SuperKlass, "B", "C")
-          subject.append(SuperKlass, "B", "D")
-          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => "C")
-        end
+          subject.append(klass: SuperKlass, method: instance_method)
+          result = subject.find(klass: SuperKlass, method_name: "some_method", class_method: false)
+          expect(result).to eq instance_method
 
-        it do
-          subject.append(SuperKlass, "B", "C")
-          subject.append(SuperKlass, "E", "F")
-          expect(subject.added_methods["Delfos::Patching::SuperKlass"]).to include("B" => "C", "E" => "F")
+          dummy_instance_method = double "Dummy Instance Method", name: "some_method", class_method: false
+          subject.append(klass: SuperKlass, method: dummy_instance_method)
+
+          result = subject.find(klass: SuperKlass, method_name: "some_method", class_method: false)
+          expect(result).to eq instance_method
         end
       end
 
+
       describe "#find" do
-        def to_h(m)
-          m
+        before do
+          subject.append(klass: SuperKlass, method: class_method)
+          subject.append(klass: SuperKlass, method: instance_method)
+          subject.append(klass: SubKlass,   method: sub_klass_class_method)
+          subject.append(klass: SubKlass,   method: sub_klass_instance_method)
         end
 
         it "handles ordinary method recording" do
-          expect(subject.find(SuperKlass, "InstanceMethod_some_method")).to eq to_h instance_method
-          expect(subject.find(SuperKlass, "ClassMethod_some_class_method")).to eq to_h class_method
+          expect(subject.find(klass: SuperKlass, class_method: false, method_name: "some_method")).to eq instance_method
+          expect(subject.find(klass: SuperKlass, class_method: true, method_name: "some_class_method")).to eq class_method
         end
 
         it "returns the super class methods for sub classes" do
-          expect(subject.find(SubKlass, "InstanceMethod_some_method")).to eq to_h instance_method
-          expect(subject.find(SubKlass, "ClassMethod_some_class_method")).to eq to_h class_method
+          expect(subject.find(klass: SubKlass, class_method: false, method_name: "some_method")).to eq instance_method
+          expect(subject.find(klass: SubKlass, class_method: true, method_name: "some_class_method")).to eq class_method
         end
 
         it "returns sub class methods for sub classes" do
-          expect(subject.find(SubKlass, "InstanceMethod_method_not_in_super_klass")).to eq to_h sub_klass_instance_method
-          expect(subject.find(SubKlass, "ClassMethod_method_not_in_super_klass")).to eq to_h sub_klass_class_method
+          expect(subject.find(klass: SubKlass, class_method: false, method_name: "method_not_in_super_klass")).to eq sub_klass_instance_method
+          expect(subject.find(klass: SubKlass, class_method: true, method_name: "method_not_in_super_klass")).to eq sub_klass_class_method
         end
       end
 
       describe "#files_for" do
         it do
+          subject.append(klass: SubKlass,   method: sub_klass_instance_method)
           expect(subject.files_for(SubKlass)).to include(__FILE__)
         end
       end

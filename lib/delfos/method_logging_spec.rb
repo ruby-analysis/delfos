@@ -24,6 +24,8 @@ module Delfos
       let(:method_b) { double "method b", source_location: [b_path, 2] }
 
       before do
+        # TODO replace this leaky abstraction. Stub out `.find'
+        # instead of `#added_methods'
         expect_any_instance_of(Patching::MethodCache).
           to receive(:added_methods).
           at_least(:once).
@@ -47,7 +49,7 @@ module Delfos
         def called_method(args, keyword_args, block)
           $called_line = __LINE__ - 1
           call_site = MethodLogging::CallSiteParsing.new(caller.dup, binding.dup, stack_offset: MAGIC_OFFSET).perform
-          args = Patching::MethodArguments.new(args, keyword_args, block, should_wrap_exception = true)
+          args = Patching::MethodArguments.new(args, keyword_args, block)
 
           Delfos::MethodLogging.log(
             call_site,

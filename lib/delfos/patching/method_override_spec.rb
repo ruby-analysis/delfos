@@ -29,12 +29,12 @@ module Delfos
         let(:method_b) { SomeRandomClass.method :some_class_method }
 
         it do
-          expect(MethodCache.instance.added_methods).to eq({})
+          expect(MethodCache.instance.send(:added_methods)).to eq({})
 
           described_class.setup(klass, "some_public_method", klass.private_instance_methods, class_method: false)
           described_class.setup(klass, "some_class_method",  klass.private_methods,          class_method: true)
 
-          result = MethodCache.instance.added_methods
+          result = MethodCache.instance.send(:added_methods)
 
           expect(result["SomeRandomClass"]["InstanceMethod_some_public_method"].source_location).
             to eq(["fixtures/method_override/some_random_class.rb", $instance_method_line_number])

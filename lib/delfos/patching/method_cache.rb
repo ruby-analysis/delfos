@@ -9,7 +9,6 @@ module Delfos
 
         def_delegators :instance,
           :files_for,
-          :added_methods,
           :append,
           :find
 
@@ -20,13 +19,20 @@ module Delfos
         def instance
           @instance ||= new
         end
+
+        def each_method
+          instance.send(:added_methods).each do |klass, methods|
+            methods.each do |k, m|
+              class_method = !!(k[/^ClassMethod_/])
+              yield klass, m, class_method
+            end
+          end
+        end
       end
 
       def initialize
         @added_methods = {}
       end
-
-      attr_reader :added_methods
 
       def files_for(klass)
         fetch(klass).
@@ -36,22 +42,27 @@ module Delfos
           map(&:first)
       end
 
-      def method_source_for(klass, key)
-        find(klass, key)
-      end
-
-      def append(klass, key, method)
+      def append(klass:, method:)
+        class_method = method.respond_to?(:receiver) && method.receiver.is_a?(Class)
+        key = key_for(class_method, method.name)
         m = fetch(klass)[key]
 
         fetch(klass)[key] = method if m.nil?
       end
 
-      def find(klass, key)
-        result = fetch(klass)[key]
-        result
+      def find(klass:, method_name:, class_method:)
+        key = key_for(class_method, method_name)
+
+        fetch(klass)[key]
       end
 
       private
+
+      attr_reader :added_methods
+
+      def key_for(class_method, method_name)
+        class_method ? "ClassMethod_#{method_name}" : "InstanceMethod_#{method_name}"
+      end
 
       def fetch(klass)
         # Find method definitions defined in klass or its ancestors
