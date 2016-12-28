@@ -103,7 +103,7 @@ end
 ### call_site_logger
 You can supply an object for the `call_site_logger` that responds to `#log` and `#save_call_sites`
 
-#### `call_site_logger#log"
+#### `call_site_logger#log`
 `#log` receives the following objects : `(arguments, call_site, called_code)`
 
 Where:
@@ -118,7 +118,7 @@ Where:
       * for call sites - true if the call site is defined in a class method
       * for called_code if the called method is a class method
 
-#### `call_site_logger#save_call_sites"
+#### `call_site_logger#save_call_sites`
 `#save_call_sites` receives the following objects : `(call_sites, execution_count)`
   * `call_sites`  An ordered array of call sites
   * `execution_count`  The number of this execution count during this run of `Delfos` # TODO: make this universally unique.
