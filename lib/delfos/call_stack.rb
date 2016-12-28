@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require_relative "neo4j"
 require_relative "neo4j/call_stack_query"
 require_relative "call_stack/stack"
 
@@ -32,8 +33,7 @@ module Delfos
     end
 
     def save!(call_sites, execution_number)
-      q = Neo4j::CallStackQuery.new(call_sites, execution_number)
-      Neo4j.execute(q.query, q.params)
+      Delfos::MethodLogging.save_call_stack(call_sites, execution_number)
     end
   end
 end

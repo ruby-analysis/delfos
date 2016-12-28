@@ -7,6 +7,11 @@ require_relative "method_logging/method_parameters"
 module Delfos
   module MethodLogging
     extend self
+
+    def save_call_stack(call_sites, execution_number)
+      Delfos.call_site_logger.save_call_stack(call_sites, execution_number)
+    end
+
     def log(call_site, called_object, called_method, class_method, parameters)
       called_code = CodeLocation.from_called(called_object, called_method, class_method)
 

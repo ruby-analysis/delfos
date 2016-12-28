@@ -9,8 +9,8 @@ module Delfos
           Thread.current[:__delfos_disable_patching] = true
         end
 
-        MethodCache.each_method do |klass, method, class_method|
-          klass = eval(klass)
+        MethodCache.each_method do |klass_name, method, class_method|
+          klass = eval(klass_name)
 
           unstub!(klass, method.name, class_method)
         end

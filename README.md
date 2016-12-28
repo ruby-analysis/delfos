@@ -34,7 +34,7 @@ For the code in files [fixtures/a.rb](fixtures/a.rb) and [fixtures/b.rb](fixture
 (:Class{name: "A"}) - [:CONTAINS] -> (m)
 
 
-(cs)-[:CALLS] 
+(cs)-[:CALLS]
     -> (m2:Method)
 
     <-[:OWNS]-(:Class{name:"B"})
@@ -98,7 +98,13 @@ end
 
 * `application_directories` An array of application directories. Defaults to `app` and `lib`
 * `logger` For outputing debug information during method recording.
-* `call_site_logger` Defaults to recording to neo4j. You can supply an object that responds to `log` and receives the following objects : `(arguments, call_site, called_code)`
+* `call_site_logger` Defaults to recording to neo4j.
+
+### call_site_logger
+You can supply an object for the `call_site_logger` that responds to `#log` and `#save_call_sites`
+
+#### `call_site_logger#log"
+`#log` receives the following objects : `(arguments, call_site, called_code)`
 
 Where:
   * `arguments` has the following methods defined:
@@ -111,6 +117,25 @@ Where:
     * `class_method` - boolean
       * for call sites - true if the call site is defined in a class method
       * for called_code if the called method is a class method
+
+#### `call_site_logger#save_call_sites"
+`#save_call_sites` receives the following objects : `(call_sites, execution_count)`
+  * `call_sites`  An ordered array of call sites
+  * `execution_count`  The number of this execution count during this run of `Delfos` # TODO: make this universally unique.
+
+Where:
+  * `arguments` has the following methods defined:
+   * `args` An array of classes referencing the type of the argument (if the argument is an instance - it refers to the class of that instance)
+   * `keyword_args` as above but for the keyword arguments in the method call
+  * `call_site` & `called_code` have the following methods defined:
+    * `file`
+    * `line_number`
+    * `object` - refers to the self defined at that line during runtime
+    * `class_method` - boolean
+      * for call sites - true if the call site is defined in a class method
+      * for called_code if the called method is a class method
+
+
 
 
 # Recorded data

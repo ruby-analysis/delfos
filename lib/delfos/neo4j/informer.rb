@@ -3,6 +3,11 @@
 module Delfos
   module Neo4j
     class Informer
+      def save_call_stack(call_sites, execution_number)
+        q = Neo4j::CallStackQuery.new(call_sites, execution_number)
+        Neo4j.execute(q.query, q.params)
+      end
+
       def log(args, call_site, called_code)
         query = query_for(args, call_site, called_code)
         params = params_for(args, call_site, called_code)
