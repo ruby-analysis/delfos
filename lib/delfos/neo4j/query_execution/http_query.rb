@@ -52,7 +52,11 @@ module Delfos
           statement = strip_whitespace(query)
 
           if statement
+            begin
             params.each { |k, v| statement = statement.gsub("{#{k}}", v.inspect) }
+            rescue
+            byebug
+            end
             Delfos.logger.debug "sending query: "
             Delfos.logger.debug statement.gsub(/^/, "    ")
           end

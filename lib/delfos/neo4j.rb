@@ -14,7 +14,7 @@ module Delfos
     end
 
     def execute(query, params = {})
-      Batch::Execution.execute!(query, params)
+      Batch::Execution.execute!(query, params: params)
     end
 
     def flush!

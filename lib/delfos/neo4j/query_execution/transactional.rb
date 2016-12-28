@@ -15,17 +15,31 @@ module Delfos
         def self.flush!(commit_url)
           response = Http.new(commit_url).post({ statements: [] }.to_json)
 
-          unless response.code == "200"
-            raise InvalidCommit.new(commit_url, response)
+          check_for_error(commit_url, response)
+
+          response.code == "200"
+        end
+
+        VALID_RESPONSE_MATCHER = /\A2\d\d\z/
+
+        def self.check_for_error(uri, response)
+          return if response.code[VALID_RESPONSE_MATCHER]
+
+          if response.code == "404"
+            raise ExpiredTransaction.new(uri, response)
           end
+
+          raise InvalidCommit.new(uri, response)
         end
 
         def perform
+          self.class.check_for_error(uri, response)
+
           raise InvalidQuery.new(json["errors"], query, params) if errors?
 
           transaction_url = URI.parse  header("location") if header("location")
           commit_url      = URI.parse  json["commit"]     if json["commit"]
-          expires         = Time.parse json["transaction"]["expires"]
+          expires         = Time.parse json["transaction"]["expires"] if json["transaction"]
 
           [transaction_url, commit_url, expires]
         end
@@ -43,8 +57,11 @@ module Delfos
 
       class InvalidCommit < IOError
         def initialize(commit_url, response)
-          super ["URL:", commit_url, response].join("\n")
+          super ["URL:", commit_url, "response:", response].join("\n  ")
         end
+      end
+
+      class ExpiredTransaction < InvalidCommit
       end
     end
   end

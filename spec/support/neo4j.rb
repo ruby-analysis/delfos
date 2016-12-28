@@ -59,6 +59,10 @@ RSpec.configure do |c|
 
   c.after(:suite) do
     require "delfos/neo4j"
-    Delfos::Neo4j.flush!
+    begin
+      Delfos::Neo4j.flush!
+    rescue Delfos::Neo4j::QueryExecution::ExpiredTransaction
+      # no-op
+    end
   end
 end

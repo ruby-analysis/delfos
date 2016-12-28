@@ -5,16 +5,13 @@ module Delfos
   module Neo4j
     module Batch
       class Execution
-        class ExpiredError < ::ArgumentError
-        end
-
         BATCH_MUTEX = Mutex.new
 
         class << self
-          def execute!(query, params = {}, size = nil)
+          def execute!(query, params: {}, size: nil)
             batch = @batch || new_batch(size || 1_000)
 
-            batch.execute!(query, params)
+            batch.execute!(query, params: params)
           end
 
           def new_batch(size)
@@ -23,6 +20,8 @@ module Delfos
 
           def flush!
             @batch&.flush!
+          rescue
+            reset!
           end
 
           def reset!
@@ -35,34 +34,71 @@ module Delfos
         def initialize(size:, clock: Time)
           @size                    = size
           @clock                   = clock
-          @query_count             = 0
+          @queries                 = []
           @expires                 = nil
           @commit_url              = nil
           @current_transaction_url = nil
         end
 
-        attr_reader :size, :query_count, :current_transaction_url, :commit_url, :expires
+        attr_reader :size, :current_transaction_url, :commit_url, :expires, :queries
 
-        def execute!(query, params = {})
-          BATCH_MUTEX.synchronize do
-            check_for_expiry!
-            transactional_query = QueryExecution::Transactional.new(query, params, url)
-            transaction_url, @commit_url, @expires = transactional_query.perform
-            @current_transaction_url ||= transaction_url # the transaction_url is only returned with the first request
+        def execute!(query, params: {}, retrying: false)
+          queries.push([query, params]) unless retrying
 
-            flush_if_required!
+          with_retry(retrying) do
+            BATCH_MUTEX.synchronize do
+              check_for_expiry!
+
+              perform_query(query, params)
+              flush_if_required!
+            end
           end
         end
 
         def flush!
-          return unless @query_count.positive?
+          return unless query_count.positive?
           return unless @commit_url
           QueryExecution::Transactional.flush!(@commit_url)
-        ensure
+
           reset!
         end
 
+        def query_count
+          queries.length
+        end
+
         private
+
+        def perform_query(query, params)
+          transactional_query = QueryExecution::Transactional.new(query, params, url)
+          transaction_url, @commit_url, @expires = transactional_query.perform
+          @current_transaction_url ||= transaction_url # the transaction_url is only returned with the first request
+        end
+
+        def with_retry(retrying)
+          yield
+        rescue QueryExecution::ExpiredTransaction
+          @retry_count ||= 0
+
+          if retrying
+            @retry_count += 1
+
+            if @retry_count > 5
+              @retry_count = 0
+              raise
+            end
+          end
+
+          Delfos.logger.error "Transaction expired - retrying batch. #{query_count} queries retry_count: #{@retry_count}"
+          reset_transaction!
+          retry_batch!
+        end
+
+        def retry_batch!
+          queries.each do |q, p|
+            execute!(q, params: p, retrying: true)
+          end
+        end
 
         def url
           return @commit_url if @commit_url && batch_full? || expires_soon?
@@ -79,13 +115,12 @@ module Delfos
 
           if @clock.now > @expires
             self.class.batch = nil
-            raise ExpiredError
+            raise QueryExecution::ExpiredTransaction.new(@comit_url, "")
           end
         end
 
         def flush_if_required!
           check_for_expiry!
-          @query_count += 1
 
           flush! if batch_full? || expires_soon?
         end
@@ -99,7 +134,11 @@ module Delfos
         end
 
         def reset!
-          @query_count = 0
+          @queries = []
+          reset_transaction!
+        end
+
+        def reset_transaction!
           @current_transaction_url = nil
           @commit_url = nil
           @expires = nil

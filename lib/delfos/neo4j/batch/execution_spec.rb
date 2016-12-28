@@ -64,14 +64,12 @@ module Delfos
           end
 
           it "calls execute on the batch returning the url and expiry" do
-            args = [anything, {}]
-
             expect(batch).
               to receive(:execute!).
-              with(*args).
+              with(anything, params: {}).
               and_return([transaction_url, commit_url, expires])
 
-            returned_url, commit_url, returned_expiry = described_class.execute!(*args, size)
+            returned_url, commit_url, returned_expiry = described_class.execute!(anything, params: {}, size: size)
 
             expect(returned_url)    .to eq transaction_url
             expect(commit_url)      .to eq commit_url
@@ -85,7 +83,7 @@ module Delfos
               allow(QueryExecution::Transactional).
                 to receive(:flush!)
 
-              Array.new(executions) { batch.execute!(anything, anything) }
+              Array.new(executions) { batch.execute!(anything, params: {}) }
             end
 
             context "with fewer queries than the batch size" do
@@ -131,7 +129,7 @@ module Delfos
               end
 
               it "starts the next batch" do
-                batch.execute!(anything, anything)
+                batch.execute!(anything, params: {})
                 expect(batch.query_count).to eq 2
               end
             end
@@ -141,7 +139,7 @@ module Delfos
             let(:now)  { expires + 20 }
 
             it "resets the batch" do
-              expect(-> { 2.times { batch.execute!(anything, anything) } }).to raise_error Execution::ExpiredError
+              expect(-> { 2.times { batch.execute!(anything, params: anything) } }).to raise_error QueryExecution::ExpiredTransaction
 
               new_batch = described_class.new_batch(size)
 
@@ -160,7 +158,7 @@ module Delfos
             end
 
             it "flushes next transaction" do
-              batch.execute!(anything, anything)
+              batch.execute!(anything, params: {})
               expect(QueryExecution::Transactional).to have_received(:flush!).with commit_url
             end
           end

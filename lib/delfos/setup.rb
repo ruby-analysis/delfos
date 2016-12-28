@@ -39,7 +39,12 @@ module Delfos
       end
 
       if defined? Delfos::Neo4j::Batch::Execution
-        Delfos::Neo4j::Batch::Execution.flush!
+        begin
+          Delfos::Neo4j::Batch::Execution.flush!
+        rescue
+          Delfos::Neo4j::QueryExecution::ExpiredTransaction
+        end
+
         Delfos::Neo4j::Batch::Execution.reset!
       end
 

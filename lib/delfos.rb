@@ -28,6 +28,7 @@ module Delfos
     end
 
     def setup_neo4j!
+      require "delfos/neo4j"
       @neo4j ||= Delfos::Neo4j.config
     end
 
