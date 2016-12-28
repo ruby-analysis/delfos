@@ -120,22 +120,8 @@ Where:
 
 #### `call_site_logger#save_call_sites`
 `#save_call_sites` receives the following objects : `(call_sites, execution_count)`
-  * `call_sites`  An ordered array of call sites
+  * `call_sites`  An ordered array of call sites. Which are the same as the `call_site` defined above
   * `execution_count`  The number of this execution count during this run of `Delfos` # TODO: make this universally unique.
-
-Where:
-  * `arguments` has the following methods defined:
-   * `args` An array of classes referencing the type of the argument (if the argument is an instance - it refers to the class of that instance)
-   * `keyword_args` as above but for the keyword arguments in the method call
-  * `call_site` & `called_code` have the following methods defined:
-    * `file`
-    * `line_number`
-    * `object` - refers to the self defined at that line during runtime
-    * `class_method` - boolean
-      * for call sites - true if the call site is defined in a class method
-      * for called_code if the called method is a class method
-
-
 
 
 # Recorded data
