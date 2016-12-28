@@ -124,7 +124,7 @@ Where:
   * `execution_count`  The number of this execution count during this run of `Delfos` # TODO: make this universally unique.
 
 
-# Recorded data
+# File system distance
 As well as recording the call stacks, call sites, file and line number,
 Delfos also records the distance across the file system.  The distance is
 defined as basically the visual distance in an ordinary filesystem tree view
