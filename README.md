@@ -26,7 +26,7 @@ For the code in files [fixtures/a.rb](fixtures/a.rb) and [fixtures/b.rb](fixture
 ## Neo4j example recorded data model
 
 ```cypher
-(CallStack) - [:STEP{number: 1}]
+(:CallStack) - [:STEP{number: 1}]
             -> (cs:CallSite{file: "file.rb", line_number: 1})
 
 (cs) <- [:CONTAINS] - (m:Method{type:"InstanceMethod"})
