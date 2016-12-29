@@ -1,83 +1,86 @@
 # frozen_string_literal: true
 require_relative "informer"
 
-describe Delfos::Neo4j::Informer do
-  class A; end
-  class B; end
-  class C; end
-  class D; end
-  class E; end
+class A; end
+class B; end
+class C; end
+class D; end
+class E; end
 
-  let(:args) { double "args", argument_classes: [B, C, D] }
 
-  before do
-    wipe_db!
-  end
+module Delfos
+  module Neo4j
+    describe Informer do
+      let(:args) { double "args", argument_classes: [B, C, D] }
 
-  let(:call_site) do
-    double "CallSite",
-      klass: A,
-      file: "a.rb",
-      line_number: 4,
-      method_name: "method_a",
-      method_type: "ClassMethod",
-      method_definition_file: "a.rb",
-      method_definition_line: 2
-  end
+      before do
+        wipe_db!
+      end
 
-  let(:called_code) do
-    double "CalledCode",
-      klass: E,
-      file: "e.rb",
-      line_number: 2,
-      method_name: "method_e",
-      method_definition_file: "some/filename",
-      method_definition_line: 2,
-      method_type: "InstanceMethod"
-  end
+      let(:call_site) do
+        double "CallSite",
+          klass: A,
+          file: "a.rb",
+          line_number: 4,
+          method_name: "method_a",
+          method_type: "ClassMethod",
+          method_definition_file: "a.rb",
+          method_definition_line: 2
+      end
 
-  describe "#args_query" do
-    before do
-      subject.assign_query_variables(args, call_site, called_code)
-    end
+      let(:called_code) do
+        double "CalledCode",
+          klass: E,
+          file: "e.rb",
+          line_number: 2,
+          method_name: "method_e",
+          method_definition_file: "some/filename",
+          method_definition_line: 2,
+          method_type: "InstanceMethod"
+      end
 
-    it do
-      result = subject.args_query(args)
+      describe QueryBuilder do
+        subject { described_class.new(args, call_site, called_code) }
 
-      expect(result).to eq <<-QUERY.gsub(/^\s+/, "").chomp
+        describe "#args_query" do
+          it do
+            result = subject.args_query
+
+            expect(result).to eq <<-QUERY.gsub(/^\s+/, "").chomp
         MERGE (cs) - [:ARG] -> (k3)
         MERGE (cs) - [:ARG] -> (k4)
         MERGE (cs) - [:ARG] -> (k5)
-      QUERY
-    end
-  end
+            QUERY
+          end
+        end
 
-  it "#params_for" do
-    params = subject.params_for(args, call_site, called_code)
 
-    expect(params).to eq("k1" => "A",
-                         "k2" => "E",
-                         "k3" => "B",
-                         "k4" => "C",
-                         "k5" => "D",
-                         "m1_type" => "ClassMethod",
-                         "m1_name" => "method_a",
-                         "m1_file" => "a.rb",
-                         "m1_line_number" => 2,
+        it "#params" do
+          params = subject.params
 
-                         "cs_file" => "a.rb",
-                         "cs_line_number" => 4,
+          expect(params).to eq("k1" => "A",
+                               "k2" => "E",
+                               "k3" => "B",
+                               "k4" => "C",
+                               "k5" => "D",
+                               "m1_type" => "ClassMethod",
+                               "m1_name" => "method_a",
+                               "m1_file" => "a.rb",
+                               "m1_line_number" => 2,
 
-                         "m2_type" => "InstanceMethod",
-                         "m2_name" => "method_e",
-                         "m2_file" => "some/filename",
-                         "m2_line_number" => 2)
-  end
+                               "cs_file" => "a.rb",
+                               "cs_line_number" => 4,
 
-  it "#query_for" do
-    query = subject.query_for(args, call_site, called_code)
+                               "m2_type" => "InstanceMethod",
+                               "m2_name" => "method_e",
+                               "m2_file" => "some/filename",
+                               "m2_line_number" => 2)
+        end
 
-    expected = <<-QUERY
+        it "#query_for" do
+          query = subject.query
+
+          expected = <<-QUERY
       MERGE (k1:Class {name: {k1}})
       MERGE (k2:Class {name: {k2}})
       MERGE (k3:Class {name: {k3}})
@@ -117,8 +120,11 @@ describe Delfos::Neo4j::Informer do
       MERGE (cs) - [:ARG]   -> (k3)
       MERGE (cs) - [:ARG]   -> (k4)
       MERGE (cs) - [:ARG]   -> (k5)
-    QUERY
+          QUERY
 
-    expect(strip_whitespace(query)).to eq strip_whitespace(expected)
+          expect(strip_whitespace(query)).to eq strip_whitespace(expected)
+        end
+      end
+    end
   end
 end

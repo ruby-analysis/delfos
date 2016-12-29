@@ -83,10 +83,14 @@ module Delfos
             end
 
             with_stack.call(call_site) do
+              begin
               if !kw_args.empty?
                 super(*args, **kw_args, &block)
               else
                 super(*args, &block)
+              end
+              rescue Exception => e
+                byebug
               end
             end
           end
