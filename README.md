@@ -40,6 +40,11 @@ For the code in files [fixtures/a.rb](fixtures/a.rb) and [fixtures/b.rb](fixture
     <-[:OWNS]-(:Class{name:"B"})
 ```
 
+## Example usage with customer logger
+See https://github.com/markburns/delfos-custom-call-site-logger-example
+
+![custom-call-site-logger](examples/custom-call-site-logger.gif)
+
 ## Dependencies
 Only one explicit gem dependency on `binding_of_caller` (and one implicit dependency on its `debug_inspector`).
 
