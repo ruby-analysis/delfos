@@ -24,7 +24,7 @@ module Delfos
         Delfos::Patching::MethodCache.append(klass: B, method: B.instance_method("cyclic_dependency"))
       end
 
-      subject { described_class.new([a, b, c, d], c: c, d: d) }
+      subject { described_class.new(a, b, c, d, c: c, d: d) }
 
       describe "#args" do
         it do

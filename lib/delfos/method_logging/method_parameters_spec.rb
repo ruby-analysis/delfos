@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "delfos/method_logging"
 require_relative "method_parameters"
 require "./fixtures/b"
 require "./fixtures/a"
@@ -41,7 +42,7 @@ module Delfos
         Delfos.application_directories = [path]
       end
 
-      subject { described_class.new([a, b, c, d], c: c, d: d) }
+      subject { described_class.new(a, b, c, d, c: c, d: d) }
 
       describe "#args" do
         it do

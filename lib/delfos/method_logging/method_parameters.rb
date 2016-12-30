@@ -6,7 +6,7 @@ module Delfos
     class MethodParameters
       attr_reader :block
 
-      def initialize(args=[], keyword_args=nil, block=nil)
+      def initialize(*args, **keyword_args, &block)
         @raw_args         = args
         @raw_keyword_args = keyword_args
         @block            = block

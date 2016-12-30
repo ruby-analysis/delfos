@@ -5,6 +5,7 @@ require "delfos/call_stack"
 
 require_relative "module_defining_methods"
 require_relative "unstubber"
+require_relative "parameter_extraction"
 
 module Delfos
   module Patching
@@ -66,34 +67,36 @@ module Delfos
       # Redefine the method at runtime to enabling logging to Neo4j
       def setup
         cm = class_method
-        with_stack = method(:with_stack)
         method_name = name
         om = original_method
 
         mod = module_definition(klass, name, class_method) do
-          define_method(method_name) do |*args, **kw_args, &block|
-            stack = caller.dup
-            caller_binding = binding.dup
-            parameters = Delfos::MethodLogging::MethodParameters.new(args, kw_args, block)
+          parameters = ParameterExtraction.new(om).parameters
 
-            call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
+          module_eval <<-METHOD
+            def #{method_name}(#{parameters})
+              stack = caller.dup
+              caller_binding = binding.dup
+              parameters = Delfos::MethodLogging::MethodParameters.new(#{parameters})
 
-            if call_site
-              Delfos::MethodLogging.log(call_site, self, om, cm, parameters)
-            end
+              call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
 
-            with_stack.call(call_site) do
-              begin
-              if !kw_args.empty?
-                super(*args, **kw_args, &block)
-              else
-                super(*args, &block)
+              if call_site
+                class_method = self.is_a?(Class)
+                klass = self.is_a?(Class) ? self : self.class
+                om = MethodCache.find(klass: klass, class_method: class_method, method_name: __method__)
+                Delfos::MethodLogging.log(call_site, self, om, class_method, parameters)
               end
-              rescue Exception => e
-                byebug
+
+              MethodOverride.with_stack(call_site) do
+                begin
+                  super(#{parameters})
+                rescue Exception => e
+                  byebug
+                end
               end
             end
-          end
+          METHOD
         end
         return unless mod
 
@@ -104,7 +107,7 @@ module Delfos
         end
       end
 
-      def with_stack(call_site)
+      def self.with_stack(call_site)
         return yield unless call_site
 
         begin
