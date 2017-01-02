@@ -54,7 +54,15 @@ module Delfos
         let(:method_name) { :with_rest_args }
 
         it do
-          expect(extraction.rest_args).to eq "*args"
+          expect(extraction.rest_args).to eq :args
+        end
+      end
+
+      describe "#rest_args_string" do
+        let(:method_name) { :with_rest_args }
+
+        it do
+          expect(extraction.rest_args_string).to eq "*args"
         end
       end
 
@@ -62,7 +70,16 @@ module Delfos
         let(:method_name) { :with_rest_keyword_args }
 
         it do
-          expect(extraction.rest_keyword_args).to eq "**kw_args"
+          expect(extraction.rest_keyword_args).to eq :kw_args
+        end
+      end
+
+
+      describe "#rest_keyword_args_string" do
+        let(:method_name) { :with_rest_keyword_args }
+
+        it do
+          expect(extraction.rest_keyword_args_string).to eq "**kw_args"
         end
       end
 
