@@ -10,7 +10,11 @@ module Delfos
         end
 
         def from_called(object, called_method, class_method)
+          begin
           file, line_number = called_method.source_location
+          rescue Exception => e
+            byebug
+          end
           return unless file && line_number
 
           new(object: object, method_name: called_method.name.to_s,

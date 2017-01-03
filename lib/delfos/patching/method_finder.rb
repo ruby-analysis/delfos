@@ -2,9 +2,14 @@ unless defined?(Parser::CurrentRuby)
   require "parser/current"
 end
 
+require_relative "determine_constant"
+require_relative "argument_rewriter"
+
 module Delfos
   module Patching
     class MethodFinder
+      include DetermineConstant
+
       def initialize(filename)
         @filename = filename
       end
@@ -21,10 +26,11 @@ module Delfos
           select{|a| a.type == type}.
           map(&:children)
 
-        args.each_with_object({}) do |(name, val), result| 
-          result[name]= snippet_from(val.loc.expression)
+        args.each_with_object({}) do |(name, val), result|
+          result[name]= rewrite_constants(val, method)
         end
       end
+
 
       def find(m, sexp=file_sexp)
         return unless sexp.is_a?(Parser::AST::Node)
@@ -55,6 +61,10 @@ module Delfos
         end
       end
 
+      def rewrite_constants(val, method)
+        ArgumentRewriter.new(snippet_from(val.loc.expression), method.receiver.class).perform
+      end
+
       def snippet_from(o)
         start, finish= o.begin_pos, o.end_pos
 
@@ -62,7 +72,7 @@ module Delfos
       end
 
       def snippet(start, finish)
-        file_contents[start..finish-1]
+        file_contents[start.. finish - 1]
       end
 
       def file_contents

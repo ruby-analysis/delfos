@@ -9,7 +9,7 @@ module Delfos
 
         class << self
           def execute!(query, params: {}, size: nil)
-            batch = @batch || new_batch(size || 1_000)
+            batch = @batch || new_batch(size || 1)
 
             batch.execute!(query, params: params)
           end
