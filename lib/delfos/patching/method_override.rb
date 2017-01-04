@@ -70,8 +70,6 @@ module Delfos
         method_name = name
         om = original_method
         parameters = ParameterExtraction.new(om).parameters
-        byebug if parameters["DependencyGraph.new"]
-        parameters = ParameterExtraction.new(om).parameters
 
         mod = module_definition(klass, name, class_method) do
           module_eval <<-METHOD, __FILE__, __LINE__ + 1
@@ -79,11 +77,7 @@ module Delfos
               stack = caller.dup
               caller_binding = binding.dup
 
-              begin
-                parameters = Delfos::MethodLogging::MethodParameters.new(#{parameters})
-              rescue NameError => e
-                byebug
-              end
+              parameters = Delfos::MethodLogging::MethodParameters.new(#{parameters})
 
               call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
 
