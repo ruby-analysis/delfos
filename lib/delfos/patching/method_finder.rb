@@ -62,7 +62,7 @@ module Delfos
       end
 
       def rewrite_constants(val, method)
-        ArgumentRewriter.new(snippet_from(val.loc.expression), method.receiver.class).perform
+        ArgumentRewriter.new(snippet_from(val.loc.expression), method.owner).perform
       end
 
       def snippet_from(o)
