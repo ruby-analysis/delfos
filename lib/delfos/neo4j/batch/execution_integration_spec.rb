@@ -35,6 +35,8 @@ module Delfos
               let(:errors) { [{code: "some code", message: "some error message"}] }
 
               before do
+                require "logger"
+                Delfos.logger.level = Logger::FATAL
                 call_count = 0
 
                 allow_any_instance_of(QueryExecution::Transactional).to receive(:perform).and_wrap_original do |m|
@@ -46,6 +48,7 @@ module Delfos
 
                   m.call
                 end
+                Delfos.logger.level = Logger::DEBUG
               end
 
               it "retries the batch" do
