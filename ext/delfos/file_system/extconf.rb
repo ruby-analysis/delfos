@@ -2,7 +2,7 @@
 require 'mkmf'
 
 # Give it a name
-extension_name = 'delfos__file_system__pathname'
+extension_name = 'delfos_pathname'
 
 # The destination
 dir_config(extension_name)

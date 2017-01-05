@@ -1,3 +1,4 @@
+
 #include "ruby.h"
 #include "ruby/encoding.h"
 
@@ -1209,6 +1210,11 @@ path_f_pathname(VALUE self, VALUE str)
     return rb_class_new_instance(1, &str, rb_cPathname);
 }
 
+// Defining a space for information and references about the module to be stored internally
+VALUE Delfos = Qnil;
+extern VALUE Delfos;
+
+VALUE FileSystem = Qnil;
 /*
  *
  * Pathname represents the name of a file or directory on the filesystem,
@@ -1390,12 +1396,15 @@ path_f_pathname(VALUE self, VALUE str)
  * information.  In some cases, a brief description will follow.
  */
 void
-Init_pathname(void)
+Init_delfos_pathname(void)
 {
+    Delfos = rb_define_module("Delfos");
+    FileSystem = rb_define_module_under(Delfos, "FileSystem");
+
     id_at_path = rb_intern("@path");
     id_to_path = rb_intern("to_path");
 
-    rb_cPathname = rb_define_class("Pathname", rb_cObject);
+    rb_cPathname = rb_define_class_under(FileSystem, "Pathname", rb_cObject);
     rb_define_method(rb_cPathname, "initialize", path_initialize, 1);
     rb_define_method(rb_cPathname, "freeze", path_freeze, 0);
     rb_define_method(rb_cPathname, "taint", path_taint, 0);
@@ -1480,6 +1489,5 @@ Init_pathname(void)
     rb_define_method(rb_cPathname, "unlink", path_unlink, 0);
     rb_define_method(rb_cPathname, "delete", path_unlink, 0);
     rb_undef_method(rb_cPathname, "=~");
-    rb_define_global_function("Pathname", path_f_pathname, 1);
 }
 
