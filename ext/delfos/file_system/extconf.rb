@@ -2,10 +2,12 @@
 require 'mkmf'
 
 # Give it a name
-extension_name = 'delfos/file_system/shim'
+extension_name = 'delfos__file_system__pathname'
 
 # The destination
 dir_config(extension_name)
 
 # Do the work
 create_makefile(extension_name)
+
+
