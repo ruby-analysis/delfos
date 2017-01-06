@@ -25,8 +25,8 @@ describe Delfos::FileSystem::CommonPath do
     end
 
     it "works with a directory without trailing slash" do
-      path = Pathname.new File.expand_path "./fixtures/a.rb"
-      fixtures_path = Pathname.new File.expand_path "./fixtures"
+      path = Pathname.new(".").expand_path "./fixtures/a.rb"
+      fixtures_path = Pathname.new(".").expand_path "./fixtures"
       result = described_class.included_in?(path, [fixtures_path])
       expect(result).to be_truthy
     end

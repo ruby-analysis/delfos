@@ -76,7 +76,7 @@ module Delfos
       end
 
       def file_contents
-        @file_contents ||= File.read(filename)
+        @file_contents ||= Pathname.new(filename).read
       end
 
       def file_sexp

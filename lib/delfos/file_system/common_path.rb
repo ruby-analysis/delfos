@@ -1,6 +1,4 @@
 # frozen_string_literal: true
-require "pathname"
-
 module Delfos
   module FileSystem
     module CommonPath
@@ -16,8 +14,8 @@ module Delfos
 
         def common_parent(path_a, path_b)
           dirs = [
-            File.expand_path(path_a.to_s),
-            File.expand_path(path_b.to_s),
+            Pathname.new(path_a.to_s).expand_path,
+            Pahtname.new(path_b.to_s).expand_path,
           ]
 
           dir1, dir2 = dirs.minmax.map { |dir| dir.split(SEPARATOR) }

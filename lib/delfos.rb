@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 require "delfos/setup"
+require "delfos/file_system/pathname"
 
 module Delfos
+  Pathname = FileSystem::Pathname
+
   class << self
     attr_accessor :application_directories
     attr_writer :logger, :neo4j
