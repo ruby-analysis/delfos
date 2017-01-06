@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "binding_of_caller", "~> 0.7.2", ">= 0.7.0"
   spec.add_dependency "parser"
 
-  spec.add_development_dependency "webmock"
+  spec.add_development_dependency "webmock", ">= 2.3.2"
   spec.add_development_dependency "rake-compiler"
   spec.add_development_dependency "pry-byebug", "~> 3.4", ">= 3.4.0"
   spec.add_development_dependency "rake", "~> 11.3.0", ">= 11.3.0"
