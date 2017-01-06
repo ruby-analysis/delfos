@@ -1214,7 +1214,6 @@ path_f_pathname(VALUE self, VALUE str)
 VALUE Delfos = Qnil;
 extern VALUE Delfos;
 
-VALUE FileSystem = Qnil;
 /*
  *
  * Pathname represents the name of a file or directory on the filesystem,
@@ -1399,12 +1398,11 @@ void
 Init_delfos_pathname(void)
 {
     Delfos = rb_define_module("Delfos");
-    FileSystem = rb_define_module_under(Delfos, "FileSystem");
 
     id_at_path = rb_intern("@path");
     id_to_path = rb_intern("to_path");
 
-    rb_cPathname = rb_define_class_under(FileSystem, "Pathname", rb_cObject);
+    rb_cPathname = rb_define_class_under(Delfos, "Pathname", rb_cObject);
     rb_define_method(rb_cPathname, "initialize", path_initialize, 1);
     rb_define_method(rb_cPathname, "freeze", path_freeze, 0);
     rb_define_method(rb_cPathname, "taint", path_taint, 0);
