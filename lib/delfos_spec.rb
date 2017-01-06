@@ -11,7 +11,7 @@ describe Delfos do
 
       Delfos.setup!(application_directories: dir)
 
-      expect(Delfos.application_directories).to eq [Pathname.new(File.expand_path(dir.first))]
+      expect(Delfos.application_directories).to eq [Delfos::FileSystem::Pathname.new(File.expand_path(dir.first))]
     end
   end
 end

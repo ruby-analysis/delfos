@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 require "delfos/setup"
-require "delfos/file_system/pathname"
+require "delfos/file_system/pathname_extensions"
 
 module Delfos
   Pathname = FileSystem::Pathname
