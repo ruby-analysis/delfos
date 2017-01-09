@@ -2,7 +2,7 @@
 require 'mkmf'
 
 # Give it a name
-extension_name = 'Pathname'
+extension_name = 'pathname'
 
 # The destination
 dir_config(extension_name)
