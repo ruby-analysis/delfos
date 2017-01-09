@@ -139,7 +139,9 @@ module Delfos
             let(:now)  { expires + 20 }
 
             it "resets the batch" do
+              Delfos.logger.level = Logger::FATAL
               expect(-> { 2.times { batch.execute!(anything, params: anything) } }).to raise_error QueryExecution::ExpiredTransaction
+              Delfos.logger.level = Logger::ERROR
 
               new_batch = described_class.new_batch(size)
 

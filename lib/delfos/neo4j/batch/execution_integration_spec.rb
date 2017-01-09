@@ -48,7 +48,10 @@ module Delfos
 
                   m.call
                 end
-                Delfos.logger.level = Logger::DEBUG
+              end
+
+              after do
+                Delfos.logger.level = Logger::ERROR
               end
 
               it "retries the batch" do
