@@ -1,6 +1,5 @@
-unless defined?(Parser::CurrentRuby)
-  require "parser/current"
-end
+# frozen_string_literal: true
+require "parser/current" unless defined?(Parser::CurrentRuby)
 
 require_relative "determine_constant"
 
@@ -11,9 +10,9 @@ module Delfos
         @parser = Parser::CurrentRuby.new
 
         @code = if code.respond_to? :force_encoding
-          code.dup.force_encoding(@parser.default_encoding)
-        else
-          code
+                  code.dup.force_encoding(@parser.default_encoding)
+                else
+                  code
         end
 
         @klass = klass
@@ -34,7 +33,7 @@ module Delfos
       end
 
       def buffer
-        @buffer ||= Parser::Source::Buffer.new("(fragment:0)").tap{|b| b.source = @code }
+        @buffer ||= Parser::Source::Buffer.new("(fragment:0)").tap { |b| b.source = @code }
       end
     end
 
@@ -47,7 +46,8 @@ module Delfos
       end
 
       def on_const(node)
-        start, finish = node.loc.expression.begin_pos, node.loc.expression.end_pos
+        start = node.loc.expression.begin_pos
+        finish = node.loc.expression.end_pos
         constant = constant_from(node, @klass)
         replace(range(start, finish), constant)
       end
@@ -68,4 +68,3 @@ module Delfos
     end
   end
 end
-

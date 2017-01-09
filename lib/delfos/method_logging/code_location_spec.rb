@@ -4,11 +4,13 @@ module Delfos
   module MethodLogging
     describe CodeLocation do
       describe "#file" do
-        let(:code_location) { described_class.new(object: anything,
-                                                  method_name: anything,
-                                                  class_method: anything,
-                                                  file: filename,
-                                                  line_number: (1..1000).to_a.sample) }
+        let(:code_location) do
+          described_class.new(object: anything,
+                              method_name: anything,
+                              class_method: anything,
+                              file: filename,
+                              line_number: (1..1000).to_a.sample)
+        end
         let(:dir) { "/Users/mark/code/some_app" }
 
         before do

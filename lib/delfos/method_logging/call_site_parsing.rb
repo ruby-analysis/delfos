@@ -58,7 +58,7 @@ module Delfos
         return unless first_relevant_stack_trace_item
         file, line_number, rest, more = first_relevant_stack_trace_item.split(":")
 
-        rest = more.nil? ?  rest : "#{rest}:#{more}"
+        rest = more.nil? ? rest : "#{rest}:#{more}"
         method_name = rest.match(METHOD_NAME_REGEX)&.[](1)
 
         return unless method_name && file && line_number

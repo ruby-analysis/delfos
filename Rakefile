@@ -7,7 +7,6 @@ RSpec::Core::RakeTask.new(:spec) do |t|
   t.pattern = "lib/**/*_spec.rb"
 end
 
+load "ext/delfos/file_system/pathname/compile.rake"
 
-load 'ext/delfos/file_system/pathname/compile.rake'
-
-task :default => [:compile, :spec]
+task default: [:compile, :spec]

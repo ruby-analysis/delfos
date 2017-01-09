@@ -24,8 +24,8 @@ module Delfos
         @keyword_args ||= calculate_args(@raw_keyword_args.values)
       end
 
-      def as_json(*params)
-        {arguments: args, keyword_arguments: keyword_args}
+      def as_json(*_params)
+        { arguments: args, keyword_arguments: keyword_args }
       end
 
       private

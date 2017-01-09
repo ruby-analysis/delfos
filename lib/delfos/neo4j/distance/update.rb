@@ -25,7 +25,7 @@ module Delfos
             call_site_id:            call_site_id,
             called_id:               called_id,
             sum_traversals:          calc.sum_traversals,
-            sum_possible_traversals: calc.sum_possible_traversals
+            sum_possible_traversals: calc.sum_possible_traversals,
           )
         end
 

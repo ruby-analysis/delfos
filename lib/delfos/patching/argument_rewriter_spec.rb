@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "argument_rewriter"
 module Delfos
   module Patching
@@ -16,4 +17,3 @@ module Delfos
     end
   end
 end
-

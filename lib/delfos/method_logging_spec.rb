@@ -7,7 +7,7 @@ require_relative "../../fixtures/b"
 module Delfos
   describe MethodLogging do
     describe ".log" do
-      let(:block) { Proc.new{} }
+      let(:block) { proc {} }
       let(:class_method) { false }
 
       let(:args) { [A.new, B.new] }
@@ -24,7 +24,7 @@ module Delfos
       let(:method_b) { double "method b", source_location: [b_path, 2] }
 
       before do
-        # TODO replace this leaky abstraction. Stub out `.find'
+        # TODO: replace this leaky abstraction. Stub out `.find'
         # instead of `#added_methods'
         expect_any_instance_of(Patching::MethodCache).
           to receive(:added_methods).

@@ -19,7 +19,9 @@ module Delfos
       attr_reader :args, :call_site, :called_code
 
       def initialize(args, call_site, called_code)
-        @args, @call_site, @called_code = args, call_site, called_code
+        @args = args
+        @call_site = call_site
+        @called_code = called_code
 
         assign_query_variables
       end

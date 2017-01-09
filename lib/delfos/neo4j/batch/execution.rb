@@ -90,7 +90,7 @@ module Delfos
             end
           end
 
-          Delfos.logger.error {"Transaction expired - retrying batch. #{query_count} queries retry_count: #{@retry_count} #{caller.inspect}" }
+          Delfos.logger.error { "Transaction expired - retrying batch. #{query_count} queries retry_count: #{@retry_count} #{caller.inspect}" }
           reset_transaction!
           retry_batch!
         end

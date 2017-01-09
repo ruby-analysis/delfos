@@ -22,7 +22,6 @@ module Delfos
             let(:commit_url)      { transactional_query[1] }
             let(:response_expiry) { transactional_query[2] }
 
-
             it "returns a transaction url" do
               expect(transaction_url).to be_a URI
               expect(transaction_url.to_s).to match Delfos.neo4j.url
@@ -36,7 +35,7 @@ module Delfos
 
             it "returns an expiry time" do
               expect(response_expiry).to be_a Time
-              expect(response_expiry > Time.now ).to be_truthy
+              expect(response_expiry > Time.now).to be_truthy
             end
           end
 
@@ -57,7 +56,7 @@ module Delfos
             end
 
             it do
-              expect(->{transactional_query.perform}).to raise_error ExpiredTransaction
+              expect(-> { transactional_query.perform }).to raise_error ExpiredTransaction
             end
           end
         end

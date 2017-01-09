@@ -7,7 +7,6 @@ class C; end
 class D; end
 class E; end
 
-
 module Delfos
   module Neo4j
     describe CallSiteLogger do
@@ -53,7 +52,6 @@ module Delfos
             QUERY
           end
         end
-
 
         it "#params" do
           params = subject.params

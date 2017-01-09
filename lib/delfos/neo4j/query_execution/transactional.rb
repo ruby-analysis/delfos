@@ -25,9 +25,7 @@ module Delfos
         def self.check_for_error(uri, response)
           return if response.code[VALID_RESPONSE_MATCHER]
 
-          if response.code == "404"
-            raise ExpiredTransaction.new(uri, response)
-          end
+          raise ExpiredTransaction.new(uri, response) if response.code == "404"
 
           raise InvalidCommit.new(uri, response)
         end

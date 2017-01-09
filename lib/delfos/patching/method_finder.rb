@@ -1,6 +1,5 @@
-unless defined?(Parser::CurrentRuby)
-  require "parser/current"
-end
+# frozen_string_literal: true
+require "parser/current" unless defined?(Parser::CurrentRuby)
 
 require_relative "determine_constant"
 require_relative "argument_rewriter"
@@ -23,21 +22,18 @@ module Delfos
         args = sexp.children[1]
 
         args = args.children.
-          select{|a| a.type == type}.
-          map(&:children)
+               select { |a| a.type == type }.
+               map(&:children)
 
         args.each_with_object({}) do |(name, val), result|
-          result[name]= rewrite_constants(val, method)
+          result[name] = rewrite_constants(val, method)
         end
       end
 
-
-      def find(m, sexp=file_sexp)
+      def find(m, sexp = file_sexp)
         return unless sexp.is_a?(Parser::AST::Node)
 
-        if (sexp.type == :def) && (node_name(sexp) == m.to_s)
-          return sexp
-        end
+        return sexp if (sexp.type == :def) && (node_name(sexp) == m.to_s)
 
         sexp.children.each do |s|
           next unless s
@@ -54,10 +50,10 @@ module Delfos
 
       private
 
-      def methods(sexp, found=[])
+      def methods(sexp, found = [])
         if sexp.type == :def
           found << sexp
-          return found
+          found
         end
       end
 
@@ -66,13 +62,14 @@ module Delfos
       end
 
       def snippet_from(o)
-        start, finish= o.begin_pos, o.end_pos
+        start = o.begin_pos
+        finish = o.end_pos
 
         snippet(start, finish)
       end
 
       def snippet(start, finish)
-        file_contents[start.. finish - 1]
+        file_contents[start..finish - 1]
       end
 
       def file_contents

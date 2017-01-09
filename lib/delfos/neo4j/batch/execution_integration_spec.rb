@@ -32,7 +32,7 @@ module Delfos
             end
 
             context "with an expired transaction" do
-              let(:errors) { [{code: "some code", message: "some error message"}] }
+              let(:errors) { [{ code: "some code", message: "some error message" }] }
 
               before do
                 require "logger"

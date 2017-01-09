@@ -46,9 +46,9 @@ module Delfos
           files = distance_calculation.traversals.first.traversed_files
 
           match_file_array files, %w(
-        tree/some_file
-        tree/even_more
-        tree/another_top_level_file
+            tree/some_file
+            tree/even_more
+            tree/another_top_level_file
           )
         end
 
@@ -56,8 +56,8 @@ module Delfos
           files = distance_calculation.traversals.last.traversed_files
 
           match_file_array files, %w(
-        tree/sub_directory/even_more
-        tree/sub_directory/file_in_sub_directory
+            tree/sub_directory/even_more
+            tree/sub_directory/file_in_sub_directory
           )
 
           expect(distance_calculation.traversals.map(&:distance)).to match_array [

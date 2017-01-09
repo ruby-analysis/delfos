@@ -6,8 +6,7 @@ module Delfos
     describe MethodCache do
       class SuperKlass
         $instance_method_line = __LINE__ + 1
-        def some_method
-        end
+        def some_method; end
 
         $class_method_line = __LINE__ + 1
         def self.some_class_method
@@ -20,8 +19,7 @@ module Delfos
         end
 
         $sub_klass_method_not_in_super_klass_line = __LINE__ + 1
-        def method_not_in_super_klass
-        end
+        def method_not_in_super_klass; end
       end
 
       let(:instance_method)           { SuperKlass.instance_method(:some_method) }
@@ -49,7 +47,6 @@ module Delfos
         end
       end
 
-
       describe "#find" do
         before do
           subject.append(klass: SuperKlass, method: class_method)
@@ -76,7 +73,7 @@ module Delfos
 
       describe "#files_for" do
         it do
-          subject.append(klass: SubKlass,   method: sub_klass_instance_method)
+          subject.append(klass: SubKlass, method: sub_klass_instance_method)
           expect(subject.files_for(SubKlass)).to include(__FILE__)
         end
       end

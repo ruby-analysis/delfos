@@ -12,7 +12,6 @@ module Delfos
           new(object: object, method_name: called_method.name.to_s,
               class_method: class_method, file: file, line_number: line_number)
         end
-
       end
 
       attr_reader :object, :method_name, :class_method, :line_number

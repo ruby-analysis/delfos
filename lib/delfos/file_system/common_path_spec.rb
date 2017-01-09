@@ -101,4 +101,3 @@ module Delfos
     end
   end
 end
-

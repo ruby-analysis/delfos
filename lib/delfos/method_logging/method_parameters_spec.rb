@@ -30,7 +30,7 @@ module Delfos
           when "B"
             [b_path]
           else
-            ["/some-unincluded-path/example.rb", ]
+            ["/some-unincluded-path/example.rb"]
           end
         end
 

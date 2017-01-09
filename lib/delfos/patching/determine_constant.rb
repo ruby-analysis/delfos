@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Delfos
   module Patching
     module DetermineConstant
@@ -18,5 +19,3 @@ module Delfos
     end
   end
 end
-
-
