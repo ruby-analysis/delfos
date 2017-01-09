@@ -14,7 +14,7 @@ module Delfos
         describe "#perform" do
           context "success" do
             after do
-              described_class.flush!(commit_url)
+              described_class.commit!(commit_url)
             end
 
             let(:transactional_query) { described_class.new(write_query, params).perform }
