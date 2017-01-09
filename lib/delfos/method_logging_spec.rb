@@ -48,7 +48,7 @@ module Delfos
         # MethodOverride#setup
         def called_method(args, keyword_args, &block)
           $called_line = __LINE__ - 1
-          call_site = MethodLogging::CallSiteParsing.new(caller.dup, binding.dup, stack_offset: MAGIC_OFFSET).perform
+          call_site = MethodLogging::CallSiteParsing.new(caller.dup, stack_offset: MAGIC_OFFSET).perform
           args = MethodLogging::MethodParameters.new(*args, **keyword_args, &block)
 
           Delfos::MethodLogging.log(
@@ -90,50 +90,6 @@ module Delfos
           expect(called_code.method_name).to eq "called_method"
           expect(called_code.object).to eq dummy
         end
-      end
-    end
-
-    class SomeObject
-      def some_method(&block)
-        another_method(block, binding)
-      end
-
-      def another_method(block, call_site_binding)
-        a_third_method(block, call_site_binding)
-      end
-
-      def a_third_method(block, call_site_binding)
-        $line_number = __LINE__ + 1
-        block.call self, call_site_binding
-      end
-    end
-
-    describe ".log" do
-      before do
-        path = Pathname.new(__FILE__) + ".."
-
-        expect(Delfos).to receive(:application_directories).at_least(:once).and_return [
-          path,
-        ]
-      end
-
-      it do
-        call_site_result = nil
-        object = nil
-
-        SomeObject.new.some_method do |o, call_site_binding|
-          object = o
-          call_site_result = MethodLogging::CodeLocation.from_call_site(caller, call_site_binding)
-        end
-
-        # sanity check
-        expect(call_site_result.object).to be_a SomeObject
-        expect(call_site_result.object).to eq object
-
-        expect(call_site_result.method_name).to eq "a_third_method"
-
-        expect(call_site_result.file).to eq "delfos/method_logging_spec.rb"
-        expect(call_site_result.line_number).to eq $line_number
       end
     end
   end

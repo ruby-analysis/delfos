@@ -5,16 +5,8 @@ module Delfos
   module MethodLogging
     class CodeLocation
       class << self
-        def from_call_site(stack, call_site_binding)
-          CallSiteParsing.new(stack, call_site_binding).perform
-        end
-
         def from_called(object, called_method, class_method)
-          begin
-          file, line_number = called_method.source_location
-          rescue Exception => e
-            byebug
-          end
+          file, line_number = called_method&.source_location
           return unless file && line_number
 
           new(object: object, method_name: called_method.name.to_s,

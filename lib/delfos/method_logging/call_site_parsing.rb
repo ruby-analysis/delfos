@@ -5,21 +5,20 @@ module Delfos
   module MethodLogging
     class CallSiteParsing
       # This magic number is based on the implementation within this file.
-      # If the line with `call_site_binding.of_caller(stack_index + STACK_OFFSET).receiver`
+      # If the line with `binding.of_caller(stack_index + STACK_OFFSET).receiver`
       # is moved up or down the call stack a test fails and we have to change `STACK_OFFSET`
-      STACK_OFFSET = 5
+      STACK_OFFSET = 3
 
-      attr_reader :stack, :call_site_binding
+      attr_reader :stack
 
-      def initialize(stack, call_site_binding, stack_offset: nil)
+      def initialize(stack, stack_offset: nil)
         @stack             = stack
-        @call_site_binding = call_site_binding
         @stack_offset      = stack_offset
       end
 
       def perform
         file, line_number, method_name = method_details
-        return unless current && file && line_number && method_name
+        return unless first_relevant_stack_trace_item && file && line_number && method_name
 
         CodeLocation.new(object: object,
                          method_name: method_name.to_s,
@@ -34,7 +33,7 @@ module Delfos
         object.is_a? Module
       end
 
-      def current
+      def first_relevant_stack_trace_item
         stack.detect do |s|
           file = s.split(":")[0]
           Delfos::MethodLogging.include_file?(file)
@@ -42,7 +41,7 @@ module Delfos
       end
 
       def object
-        @object ||= call_site_binding.of_caller(stack_index + stack_offset).receiver
+        @object ||= binding.of_caller(stack_index + stack_offset).receiver
       end
 
       def stack_offset
@@ -50,23 +49,19 @@ module Delfos
       end
 
       def stack_index
-        stack.index { |c| c == current }
+        stack.index { |c| c == first_relevant_stack_trace_item }
       end
 
       METHOD_NAME_REGEX = /`(.*)'$/
 
       def method_details
-        return unless current
-        file, line_number, rest, more = current.split(":")
+        return unless first_relevant_stack_trace_item
+        file, line_number, rest, more = first_relevant_stack_trace_item.split(":")
 
         rest = more.nil? ?  rest : "#{rest}:#{more}"
         method_name = rest.match(METHOD_NAME_REGEX)&.[](1)
 
         return unless method_name && file && line_number
-
-        method_name = method_name.
-          delete("'").
-          delete("'")
 
         [file, line_number.to_i, method_name]
       end
