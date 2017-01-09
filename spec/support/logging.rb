@@ -1,22 +1,10 @@
-unless ENV["CI"]
-  # only log errors in dev
-  $delfos_test_logger = Object.new.tap do |o|
-    def o.debug(_s)
-      nil
-    end
+require "logger"
 
-    def o.info(_s)
-      nil
-    end
+$delfos_test_logger = Logger.new(STDOUT)
 
-    def o.log(_s)
-      nil
-    end
-
-    def o.error(s)
-      puts s
-    end
-  end
+def $delfos_test_logger.level=(l)
+  @level = l
 end
 
-
+$delfos_test_logger.progname = "Delfos test"
+$delfos_test_logger.level = Logger::ERROR

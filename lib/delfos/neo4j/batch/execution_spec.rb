@@ -81,7 +81,7 @@ module Delfos
           context "with some queries executed" do
             before do
               allow(QueryExecution::Transactional).
-                to receive(:flush!)
+                to receive(:commit!)
 
               Array.new(executions) { batch.execute!(anything, params: {}) }
             end
@@ -92,7 +92,7 @@ module Delfos
 
               it do
                 expect(QueryExecution::Transactional).
-                  not_to have_received(:flush!)
+                  not_to have_received(:commit!)
               end
 
               it "keeps track of the query count" do
@@ -100,7 +100,7 @@ module Delfos
               end
             end
 
-            context "just before flushing" do
+            context "just before commiting" do
               let(:size) { 6 }
               let(:executions) { 5 }
 
@@ -110,7 +110,7 @@ module Delfos
 
               it do
                 expect(QueryExecution::Transactional).
-                  not_to have_received(:flush!)
+                  not_to have_received(:commit!)
               end
             end
 
@@ -124,7 +124,7 @@ module Delfos
 
               it do
                 expect(QueryExecution::Transactional).
-                  to have_received(:flush!).
+                  to have_received(:commit!).
                   with(commit_url)
               end
 
@@ -139,7 +139,9 @@ module Delfos
             let(:now)  { expires + 20 }
 
             it "resets the batch" do
+              Delfos.logger.level = Logger::FATAL
               expect(-> { 2.times { batch.execute!(anything, params: anything) } }).to raise_error QueryExecution::ExpiredTransaction
+              Delfos.logger.level = Logger::ERROR
 
               new_batch = described_class.new_batch(size)
 
@@ -151,15 +153,16 @@ module Delfos
             end
           end
 
-          context "expires soon time" do
+          context "with a transaction that expires soon" do
             let(:now) { expires - 1.5 }
+
             before do
-              allow(QueryExecution::Transactional).to receive(:flush!)
+              allow(QueryExecution::Transactional).to receive(:commit!)
             end
 
-            it "flushes next transaction" do
+            it "commits next transaction" do
               batch.execute!(anything, params: {})
-              expect(QueryExecution::Transactional).to have_received(:flush!).with commit_url
+              expect(QueryExecution::Transactional).to have_received(:commit!).with commit_url
             end
           end
         end

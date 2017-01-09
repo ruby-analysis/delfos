@@ -39,7 +39,7 @@ module Delfos
       end
 
       def sibling_directories(path)
-        siblings(path).select { |f| File.directory?(f) }
+        siblings(path).select { |f| Pathname.new(f).directory?(f) }
       end
 
       def traversal_path

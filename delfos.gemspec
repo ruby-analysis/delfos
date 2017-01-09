@@ -4,6 +4,7 @@ lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
+  
   spec.name          = "delfos"
   spec.version       = "0.0.1"
   spec.authors       = ["Mark Burns"]
@@ -13,6 +14,8 @@ Gem::Specification.new do |spec|
   spec.description   = "Record every method call, call-site, arguments and their types in your application code"
   spec.homepage      = "https://github.com/markburns/delfos"
   spec.license       = "MIT"
+
+  spec.required_ruby_version = '>= 2.3.0'
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
   # delete this section to allow pushing this gem to any host.
@@ -30,7 +33,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "binding_of_caller", "~> 0.7.2", ">= 0.7.0"
   spec.add_dependency "parser"
 
-  spec.add_development_dependency "webmock"
+  spec.add_development_dependency "webmock", ">= 2.3.2"
+  spec.add_development_dependency "rake-compiler"
   spec.add_development_dependency "pry-byebug", "~> 3.4", ">= 3.4.0"
   spec.add_development_dependency "rake", "~> 11.3.0", ">= 11.3.0"
   spec.add_development_dependency "rspec", "~>3.5.0", ">= 3.5.0"

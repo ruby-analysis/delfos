@@ -69,41 +69,44 @@ module Delfos
         cm = class_method
         method_name = name
         om = original_method
+        parameters = ParameterExtraction.new(om).parameters
 
         mod = module_definition(klass, name, class_method) do
-          parameters = ParameterExtraction.new(om).parameters
-
-          module_eval <<-METHOD
+          method_string, file, line = [<<-METHOD, __FILE__, __LINE__ + 1]
             def #{method_name}(#{parameters})
-              stack = caller.dup
-              caller_binding = binding.dup
               parameters = Delfos::MethodLogging::MethodParameters.new(#{parameters})
 
-              call_site = Delfos::MethodLogging::CodeLocation.from_call_site(stack, caller_binding)
+              call_site = Delfos::MethodLogging::CallSiteParsing.new(caller.dup).perform
 
               if call_site
-                class_method = self.is_a?(Class)
-                klass = self.is_a?(Class) ? self : self.class
-                om = MethodCache.find(klass: klass, class_method: class_method, method_name: __method__)
-                Delfos::MethodLogging.log(call_site, self, om, class_method, parameters)
+                klass = self.is_a?(Module) ? self : self.class
+                om = MethodCache.find(klass: klass, class_method: #{cm}, method_name: #{method_name.inspect})
+
+                if om
+                  Delfos::MethodLogging.log(call_site, self, om, #{cm}, parameters)
+                else
+                  Delfos.logger.error("Method not found for \#{klass}, class_method: #{cm}, method_name: #{method_name}")
+                end
               end
 
               MethodOverride.with_stack(call_site) do
-                begin
-                  super(#{parameters})
-                rescue Exception => e
-                  byebug
-                end
+                super(#{parameters})
               end
             end
           METHOD
+
+          begin
+            module_eval method_string, file, line
+          rescue SyntaxError
+            byebug
+          end
         end
         return unless mod
 
         if class_method
-          klass.prepend mod
+          klass.singleton_class.prepend mod
         else
-          klass.instance_eval { prepend mod }
+          klass.prepend mod
         end
       end
 

@@ -1,6 +1,4 @@
 # frozen_string_literal: true
-require "pathname"
-
 module Delfos
   module FileSystem
     module CommonPath
@@ -16,13 +14,12 @@ module Delfos
 
         def common_parent(path_a, path_b)
           dirs = [
-            File.expand_path(path_a.to_s),
-            File.expand_path(path_b.to_s),
+            Pathname.new(path_a.to_s).expand_path,
+            Pathname.new(path_b.to_s).expand_path,
           ]
 
-          dir1, dir2 = dirs.minmax.map { |dir| dir.split(SEPARATOR) }
-
-          path_from(dir1, dir2, path_a, path_b)
+          dir1, dir2 = dirs.sort.map { |dir| dir.to_s.split(SEPARATOR) }
+          append_trailing_slash!(path_from(dir1, dir2, path_a, path_b).to_s)
         end
 
         private
@@ -47,13 +44,19 @@ module Delfos
             join(SEPARATOR)
         end
 
+        def append_trailing_slash!(path)
+          path = path.to_s
+
+          if Pathname.new(path).directory?
+            path += SEPARATOR if path && path.to_s[-1] != SEPARATOR
+          end
+
+          path
+        end
+
         def append_trailing_slashes!(*paths)
           paths.map do |path|
-            if Pathname.new(path).directory?
-              path += SEPARATOR if path && path.to_s[-1] != SEPARATOR
-            end
-
-            path
+            append_trailing_slash!(path)
           end
         end
       end

@@ -14,14 +14,17 @@ module Delfos
 
       def parameters
         output = []
-        output << required_args_string if required_args.length.positive?
-        output << optional_args_string if optional_args.length.positive?
-        output << rest_args if rest_args.length.positive?
-        output << keyword_args_string  if keyword_args.length.positive?
-        output << required_keyword_args_string  if required_keyword_args.length.positive?
-        output << rest_keyword_args if rest_keyword_args.length.positive?
-        output << block_string if block
+
+        [:required_args, :optional_args, :rest_args,
+         :keyword_args, :required_keyword_args, :rest_keyword_args,
+         :block].each do |a|
+           append_if_present(output, a)
+         end
         output.join(", ")
+      end
+
+      def append_if_present(output, arg)
+        output << send("#{arg}_string") if send(arg) && send(arg).length.positive?
       end
 
       def required_args
@@ -65,21 +68,19 @@ module Delfos
       end
 
       def rest_args
-        args = select_parameters(:rest).first
-        if args
-          "*#{args}"
-        else
-          ""
-        end
+        select_parameters(:rest).first
+      end
+
+      def rest_args_string
+        rest_args ?  "*#{rest_args}" : ""
       end
 
       def rest_keyword_args
-        args = select_parameters(:keyrest).first
-        if args
-          "**#{args}"
-        else
-          ""
-        end
+        select_parameters(:keyrest).first
+      end
+
+      def rest_keyword_args_string
+        rest_keyword_args ?  "**#{rest_keyword_args}" : ""
       end
       private
 

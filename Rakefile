@@ -5,7 +5,9 @@ require "rspec/core/rake_task"
 
 RSpec::Core::RakeTask.new(:spec) do |t|
   t.pattern = "lib/**/*_spec.rb"
-  t.rspec_opts = ["--profile 3"]
 end
 
-task default: :spec
+
+load 'ext/delfos/file_system/pathname/compile.rake'
+
+task :default => [:compile, :spec]

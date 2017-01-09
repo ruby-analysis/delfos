@@ -10,3 +10,5 @@
 .byebug_history
 .idea
 .rspec-failed-examples
+/*.bundle
+.agignore

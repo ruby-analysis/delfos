@@ -60,9 +60,9 @@ module Delfos
 
           (cs#{i}:CallSite {file: {file#{i}}, line_number: {line_number#{i}}})
 
-          MERGE (e#{i}:CallStack{number: {execution_count#{i}}})
+          #{i == 0 ? "CREATE (e:CallStack)" : "" }  
 
-          MERGE (e#{i})
+          MERGE (e)
             -
             [:STEP {number: {step_number#{i}}}]
             ->

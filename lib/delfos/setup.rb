@@ -13,8 +13,7 @@ module Delfos
 
     def application_directories=(dirs)
       dirs ||= %w(app lib)
-      require "pathname"
-      Delfos.application_directories = Array(dirs).map { |f| Pathname.new(File.expand_path(f.to_s)) }
+      Delfos.application_directories = Array(dirs).map { |f| Pathname.new(f.to_s).expand_path }
     end
 
     def call_site_logger
@@ -28,8 +27,8 @@ module Delfos
     def default_call_site_logger
       Delfos.setup_neo4j!
 
-      require "delfos/neo4j/informer"
-      Delfos:: Neo4j::Informer.new
+      require "delfos/neo4j/call_site_logger"
+      Delfos:: Neo4j::CallSiteLogger.new
     end
 
     def reset!

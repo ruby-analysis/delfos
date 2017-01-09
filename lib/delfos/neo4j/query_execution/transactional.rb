@@ -12,10 +12,10 @@ module Delfos
       class Transactional
         include HttpQuery
 
-        def self.flush!(commit_url)
-          response = Http.new(commit_url).post({ statements: [] }.to_json)
+        def self.commit!(url)
+          response = Http.new(url).post({ statements: [] }.to_json)
 
-          check_for_error(commit_url, response)
+          check_for_error(url, response)
 
           response.code == "200"
         end

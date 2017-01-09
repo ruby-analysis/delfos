@@ -46,7 +46,7 @@ See https://github.com/markburns/delfos-custom-call-site-logger-example
 ![custom-call-site-logger](examples/custom-call-site-logger.gif)
 
 ## Dependencies
-Only one explicit gem dependency on `binding_of_caller` (and one implicit dependency on its `debug_inspector`).
+Only two gem dependencies on `binding_of_caller` and `parser`
 
 Delfos by default depends upon an _optional_ connection to a Neo4j instance for recording data.
 

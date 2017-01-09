@@ -9,7 +9,7 @@ module Delfos
 
         class << self
           def execute!(query, params: {}, size: nil)
-            batch = @batch || new_batch(size || 1_000)
+            batch = batch() || new_batch(size || 1_000)
 
             batch.execute!(query, params: params)
           end
@@ -19,16 +19,16 @@ module Delfos
           end
 
           def flush!
-            @batch&.flush!
+            batch&.flush!
           rescue
             reset!
           end
 
           def reset!
-            @batch = nil
+            self.batch = nil
           end
 
-          attr_writer :batch
+          attr_accessor :batch
         end
 
         def initialize(size:, clock: Time)
@@ -58,7 +58,7 @@ module Delfos
         def flush!
           return unless query_count.positive?
           return unless @commit_url
-          QueryExecution::Transactional.flush!(@commit_url)
+          QueryExecution::Transactional.commit!(@commit_url)
 
           reset!
         end
@@ -85,11 +85,12 @@ module Delfos
 
             if @retry_count > 5
               @retry_count = 0
+              Delfos.logger.error "Transaction expired - 5 retries failed aborting"
               raise
             end
           end
 
-          Delfos.logger.error "Transaction expired - retrying batch. #{query_count} queries retry_count: #{@retry_count}"
+          Delfos.logger.error {"Transaction expired - retrying batch. #{query_count} queries retry_count: #{@retry_count} #{caller.inspect}" }
           reset_transaction!
           retry_batch!
         end
@@ -114,7 +115,6 @@ module Delfos
           return unless @expires
 
           if @clock.now > @expires
-            self.class.batch = nil
             raise QueryExecution::ExpiredTransaction.new(@comit_url, "")
           end
         end
@@ -130,7 +130,7 @@ module Delfos
         end
 
         def expires_soon?
-          @expires && (@clock.now + 2 > @expires)
+          @expires && (@clock.now + 10 > @expires)
         end
 
         def reset!

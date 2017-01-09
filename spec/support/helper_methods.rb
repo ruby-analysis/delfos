@@ -5,15 +5,19 @@ module DelfosSpecHelpers
   def expand_fixture_path(path = "")
     s = File.join File.expand_path(fixture_path), path
 
-    Pathname.new(s).realpath
+    pathname_klass.new(s).realpath
   end
 
   def fixture_path
-    Pathname.new("./fixtures").realpath
+    pathname_klass.new("./fixtures").realpath
   end
 
   def t(path)
-    Pathname.new(File.join(fixture_path, path)).realpath
+    pathname_klass.new(File.join(fixture_path, path)).realpath
+  end
+
+  def pathname_klass
+    Delfos::FileSystem::Pathname
   end
 
   def match_file_array(a, b)

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require "delfos/file_system/common_path"
+require "delfos/file_system/pathname"
 
 require_relative "method_logging/code_location"
 require_relative "method_logging/method_parameters"
@@ -22,7 +23,7 @@ module Delfos
       file, = method.source_location
       return true unless file
 
-      exclude_file?(File.expand_path(file))
+      exclude_file?(expand_path(file))
     end
 
     def include_file?(file)
@@ -31,7 +32,7 @@ module Delfos
 
     def exclude_file?(file)
       with_cache(file) do
-        !FileSystem::CommonPath.included_in?(File.expand_path(file), Delfos.application_directories)
+        !FileSystem::CommonPath.included_in?(expand_path(file), Delfos.application_directories)
       end
     end
 
@@ -40,6 +41,10 @@ module Delfos
     end
 
     private
+
+    def expand_path(f)
+      Pathname.new(f).expand_path
+    end
 
     def with_cache(key)
       cache.include?(key) ? cache[key] : cache[key] = yield

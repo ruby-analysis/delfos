@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require_relative "informer"
+require_relative "call_site_logger"
 
 class A; end
 class B; end
@@ -10,7 +10,7 @@ class E; end
 
 module Delfos
   module Neo4j
-    describe Informer do
+    describe CallSiteLogger do
       let(:args) { double "args", argument_classes: [B, C, D] }
 
       before do
