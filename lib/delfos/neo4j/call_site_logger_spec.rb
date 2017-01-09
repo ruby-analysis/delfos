@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require_relative "informer"
+require_relative "call_stack_logger"
 
 class A; end
 class B; end
