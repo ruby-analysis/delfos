@@ -1,6 +1,7 @@
 # Delfos
 
 [![Build Status](http://img.shields.io/travis/markburns/delfos.svg?style=flat-square)](https://travis-ci.org/markburns/delfos)
+[![CircleCI](https://circleci.com/gh/markburns/delfos.svg?style=svg)](https://circleci.com/gh/markburns/delfos)
 [![Dependency Status](http://img.shields.io/gemnasium/markburns/delfos.svg?style=flat-square)](https://gemnasium.com/markburns/delfos)
 [![Code Climate](http://img.shields.io/codeclimate/github/markburns/delfos3.svg?style=flat-square)](https://codeclimate.com/github/markburns/delfos)
 [![Gem Version](http://img.shields.io/gem/v/delfos.svg?style=flat-square)](https://rubygems.org/gems/delfos)
