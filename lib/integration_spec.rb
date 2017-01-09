@@ -5,7 +5,7 @@ require "delfos/neo4j"
 describe "integration" do
   context "with a customer call_stack_logger" do
     let(:loading_code) do
-      ->{ 
+      ->{
         load "fixtures/b.rb"
         load "fixtures/a.rb"
         A.new.some_method
@@ -23,6 +23,7 @@ describe "integration" do
       )
 
     end
+
     after do
       WebMock.disable_net_connect! allow_localhost: true
     end
@@ -60,123 +61,237 @@ describe "integration" do
     before(:each) do
       wipe_db!
 
-      Delfos.setup!(
-        application_directories: ["fixtures"],
-      )
-
-      load "fixtures/a.rb"
-      load "fixtures/b.rb"
-
-      a = A.new
-      b = B.new
-      a.some_method(1, "", a, something: b)
-      Delfos::Neo4j.flush!
+      Delfos.setup!(application_directories: ["fixtures"])
     end
 
     after do
       Delfos.reset!
     end
 
-    context "recording call stacks" do
-      let(:query) do
-        <<-QUERY
-       MATCH (e:CallStack) - [:STEP{number: 1}] -> (:CallSite) -[:CALLS]->(:Method)<-[:OWNS]-(:Class{name:"B"})
-       MATCH (e)           - [:STEP{number: 2}] -> (:CallSite) -[:CALLS]->(:Method)<-[:OWNS]-(:Class{name:"A"})
-       MATCH (e2:CallStack)- [:STEP{number: 1}] -> (:CallSite) -[:CALLS]->(:Method)<-[:OWNS]-(:Class{name:"C"})
-       RETURN count(e), count(e2)
-        QUERY
+    context "with a and b fixture files" do
+      before(:each) do
+        load "fixtures/a.rb"
+        load "fixtures/b.rb"
+
+        a = A.new
+        b = B.new
+        a.some_method(1, "", a, something: b)
+        Delfos::Neo4j.flush!
       end
 
-      it do
-        e_count, e2_count = result
+      context "recording call stacks" do
+        let(:query) do
+          <<-QUERY
+           MATCH (e:CallStack) - [:STEP{number: 1}] -> (:CallSite) -[:CALLS]->(:Method)<-[:OWNS]-(:Class{name:"B"})
+           MATCH (e)           - [:STEP{number: 2}] -> (:CallSite) -[:CALLS]->(:Method)<-[:OWNS]-(:Class{name:"A"})
+           MATCH (e2:CallStack)- [:STEP{number: 1}] -> (:CallSite) -[:CALLS]->(:Method)<-[:OWNS]-(:Class{name:"C"})
+           RETURN count(e), count(e2)
+          QUERY
+        end
 
-        expect(e_count).to eq 1
-        expect(e2_count).to eq 1
+        it do
+          e_count, e2_count = result
+
+          expect(e_count).to eq 1
+          expect(e2_count).to eq 1
+        end
+      end
+
+      context "records arguments" do
+        let(:query) do
+          <<-QUERY
+          MATCH (:CallSite)-[arg:ARG]->(a:Class{name: "A"})
+
+          RETURN count(arg)
+          QUERY
+        end
+
+        it do
+          arg_count = result.first
+
+          expect(arg_count).to eq 1
+        end
+      end
+
+      context "records call sites" do
+        let(:query) do
+          <<-QUERY
+        MATCH (b:Class{name: "B"})  -  [:OWNS]
+          ->  (mb:Method{type: "InstanceMethod", name: "another_method"})
+          -[:CONTAINS]->(csB2C:CallSite)-[:CALLS]->(mc)
+
+        MATCH (a:Class{name: "A"})  -  [:OWNS]
+          -> (ma:Method{name: "some_method"}) -[:CONTAINS]
+          ->(csA2B:CallSite)-[:CALLS]
+          ->(mb)
+
+        MATCH (ma)-[:CONTAINS]
+          ->(csA2C:CallSite)
+          -[:CALLS]
+          -> (mc:Method{type: "InstanceMethod", name: "method_with_no_more_method_calls"})
+          <- [:OWNS] - (c:Class{name: "C"})
+
+        RETURN
+          count(csA2B),
+          count(csB2C),
+          count(csA2C)
+          QUERY
+        end
+
+        it do
+          call_site_1_count, call_site_2_count, call_site_3_count =
+            result
+
+          expect(call_site_1_count).to eq 1
+          expect(call_site_2_count).to eq 1
+          expect(call_site_3_count).to eq 1
+        end
+      end
+
+      context "recording instance methods" do
+        let(:query) do
+          <<-QUERY
+        MATCH (a:Class{name: "A"})  -  [:OWNS]
+          -> (ma:Method{type: "InstanceMethod", name: "some_method"})
+        MATCH (b:Class{name: "B"})  -  [:OWNS]
+          ->  (mb:Method{type: "InstanceMethod", name: "another_method"})
+        MATCH (c:Class{name: "C"})  -  [:OWNS]
+          ->  (mc:Method{type: "InstanceMethod", name: "method_with_no_more_method_calls"})
+
+        RETURN
+          count(ma), ma,
+          count(mb), mb,
+          count(mc), mc
+          QUERY
+        end
+
+        it do
+          a_method_count, method_a, b_method_count, method_b, c_method_count, method_c = result
+
+          expect(a_method_count).to eq 1
+
+          expect(method_a).to eq({
+            "file" => "fixtures/a.rb",
+            "line_number" => 3,
+            "name" => "some_method",
+            "type" => "InstanceMethod"
+          })
+
+          expect(b_method_count).to eq 1
+          expect(c_method_count).to eq 1
+        end
       end
     end
 
-    context "records arguments" do
+    context "class method calls an instance method" do
+      before(:each) do
+        load "fixtures/class_method_calls_instance_method.rb"
+
+        ClassMethodCallsAnInstanceMethod.a_class_method
+
+        Delfos::Neo4j.flush!
+      end
+
       let(:query) do
         <<-QUERY
-        MATCH (:CallSite)-[arg:ARG]->(a:Class{name: "A"})
+          MATCH (a:Class{name: "ClassMethodCallsAnInstanceMethod"})  -  [:OWNS]
+            -> (ma:Method{type: "ClassMethod", name: "a_class_method"})
 
-        RETURN count(arg)
-        QUERY
-      end
+          MATCH (b:Class{name: "HasInstanceMethod"})  -  [:OWNS]
+            ->  (mb:Method{type: "InstanceMethod", name: "an_instance_method"})
 
-      it do
-        arg_count = result.first
-
-        expect(arg_count).to eq 1
-      end
-    end
-
-    context "records call sites" do
-      let(:query) do
-        <<-QUERY
-      MATCH (b:Class{name: "B"})  -  [:OWNS]
-        ->  (mb:Method{type: "InstanceMethod", name: "another_method"})
-        -[:CONTAINS]->(csB2C:CallSite)-[:CALLS]->(mc)
-
-      MATCH (a:Class{name: "A"})  -  [:OWNS]
-        -> (ma:Method{name: "some_method"}) -[:CONTAINS]
-        ->(csA2B:CallSite)-[:CALLS]
-        ->(mb)
-
-      MATCH (ma)-[:CONTAINS]
-        ->(csA2C:CallSite)
-        -[:CALLS]
-        -> (mc:Method{type: "InstanceMethod", name: "method_with_no_more_method_calls"})
-        <- [:OWNS] - (c:Class{name: "C"})
-
-      RETURN
-        count(csA2B),
-        count(csB2C),
-        count(csA2C)
-        QUERY
-      end
-
-      it do
-        call_site_1_count, call_site_2_count, call_site_3_count =
-          result
-
-        expect(call_site_1_count).to eq 1
-        expect(call_site_2_count).to eq 1
-        expect(call_site_3_count).to eq 1
-      end
-    end
-
-    context "recording instance methods" do
-      let(:query) do
-        <<-QUERY
-      MATCH (a:Class{name: "A"})  -  [:OWNS]
-        -> (ma:Method{type: "InstanceMethod", name: "some_method"})
-      MATCH (b:Class{name: "B"})  -  [:OWNS]
-        ->  (mb:Method{type: "InstanceMethod", name: "another_method"})
-      MATCH (c:Class{name: "C"})  -  [:OWNS]
-        ->  (mc:Method{type: "InstanceMethod", name: "method_with_no_more_method_calls"})
+          MATCH (ma)-[:CONTAINS]->(cs:CallSite)-[:CALLS]->(mb)
 
       RETURN
         count(ma), ma,
         count(mb), mb,
-        count(mc), mc
+        count(cs), cs
         QUERY
       end
 
       it do
-        a_method_count, method_a, b_method_count, method_b, c_method_count, method_c = result
+        a_method_count, method_a, b_method_count, method_b, call_site_count, call_site = result
 
         expect(a_method_count).to eq 1
 
         expect(method_a).to eq({
-          "file" => "fixtures/a.rb",
+          "file" => "fixtures/class_method_calls_instance_method.rb",
+          "line_number" => 2,
+          "name" => "a_class_method",
+          "type" => "ClassMethod"
+        })
+
+        expect(b_method_count).to eq 1
+
+        expect(method_b).to eq({
+          "file" => "fixtures/class_method_calls_instance_method.rb",
+          "line_number" => 8,
+          "name" => "an_instance_method",
+          "type" => "InstanceMethod"
+        })
+
+        expect(call_site_count).to eq 1
+
+        expect(call_site).to eq({
+          "file" => "fixtures/class_method_calls_instance_method.rb",
           "line_number" => 3,
-          "name" => "some_method",
+        })
+      end
+    end
+
+    context "instance method calls a class method" do
+      before(:each) do
+        load "fixtures/instance_method_calls_class_method.rb"
+
+        InstanceMethodCallsAClassMethod.new.an_instance_method
+
+        Delfos::Neo4j.flush!
+      end
+
+      let(:query) do
+        <<-QUERY
+          MATCH (a:Class{name: "InstanceMethodCallsAClassMethod"})  -  [:OWNS]
+            -> (ma:Method{type: "InstanceMethod", name: "an_instance_method"})
+
+          MATCH (b:Class{name: "HasClassMethod"})  -  [:OWNS]
+            ->  (mb:Method{type: "ClassMethod", name: "a_class_method"})
+
+          MATCH (ma)-[:CONTAINS]->(cs:CallSite)-[:CALLS]->(mb)
+
+      RETURN
+        count(ma), ma,
+        count(mb), mb,
+        count(cs), cs
+        QUERY
+      end
+
+      it do
+        a_method_count, method_a, b_method_count, method_b, call_site_count, call_site = result
+
+        expect(a_method_count).to eq 1
+
+        expect(method_a).to eq({
+          "file" => "fixtures/instance_method_calls_class_method.rb",
+          "line_number" => 2,
+          "name" => "an_instance_method",
           "type" => "InstanceMethod"
         })
 
         expect(b_method_count).to eq 1
-        expect(c_method_count).to eq 1
+
+        expect(method_b).to eq({
+          "file" => "fixtures/instance_method_calls_class_method.rb",
+          "line_number" => 8,
+          "name" => "a_class_method",
+          "type" => "ClassMethod"
+        })
+
+        expect(call_site_count).to eq 1
+
+        expect(call_site).to eq({
+          "file" => "fixtures/instance_method_calls_class_method.rb",
+          "line_number" => 3,
+        })
       end
     end
 

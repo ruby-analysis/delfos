@@ -45,7 +45,7 @@ module Delfos
       end
 
       def append(klass:, method:)
-        class_method = method.respond_to?(:receiver) && method.receiver.is_a?(Class)
+        class_method = method.respond_to?(:receiver) && method.receiver.is_a?(Module)
         key = key_for(class_method, method.name)
         m = fetch(klass)[key]
 
