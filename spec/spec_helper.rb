@@ -8,7 +8,7 @@ require "ostruct"
 
 require_relative "support/timeout" if ENV["TIMEOUT"]
 
-require_relative "support/logging"
+require_relative "support/logging" unless ENV["CI"]
 require_relative "support/neo4j"
 require_relative "support/web_mock"
 require_relative "support/helper_methods"
