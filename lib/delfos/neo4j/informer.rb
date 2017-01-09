@@ -9,15 +9,22 @@ module Delfos
       end
 
       def log(args, call_site, called_code)
-        query = query_for(args, call_site, called_code)
-        params = params_for(args, call_site, called_code)
+        builder = QueryBuilder.new(args, call_site, called_code)
 
-        Neo4j.execute(query, params)
+        Neo4j.execute(builder.query, builder.params)
+      end
+    end
+
+    class QueryBuilder
+      attr_reader :args, :call_site, :called_code
+
+      def initialize(args, call_site, called_code)
+        @args, @call_site, @called_code = args, call_site, called_code
+
+        assign_query_variables
       end
 
-      def params_for(args, call_site, called_code)
-        assign_query_variables(args, call_site, called_code)
-
+      def params
         params = query_variables.each_with_object({}) do |(klass, name), object|
           object[name] = klass.to_s
         end
@@ -38,9 +45,7 @@ module Delfos
         params
       end
 
-      def query_for(args, call_site, called_code)
-        assign_query_variables(args, call_site, called_code)
-
+      def query
         klasses_query = query_variables.map do |_klass, name|
           "MERGE (#{name}:Class {name: {#{name}}})"
         end.join("\n")
@@ -64,11 +69,11 @@ module Delfos
 
           MERGE (cs) - [:CALLS] -> (m2)
 
-          #{args_query args}
+          #{args_query}
         QUERY
       end
 
-      def assign_query_variables(args, call_site, called_code)
+      def assign_query_variables
         klasses = [call_site.klass, called_code.klass] + args.argument_classes
 
         klasses.uniq.each do |k|
@@ -89,7 +94,7 @@ module Delfos
         NODE
       end
 
-      def args_query(args)
+      def args_query
         query_text = args.argument_classes.map do |k|
           name = query_variable(k)
           "MERGE (cs) - [:ARG] -> (#{name})"

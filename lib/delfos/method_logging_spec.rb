@@ -7,7 +7,7 @@ require_relative "../../fixtures/b"
 module Delfos
   describe MethodLogging do
     describe ".log" do
-      let(:block) { double "block" }
+      let(:block) { Proc.new{} }
       let(:class_method) { false }
 
       let(:args) { [A.new, B.new] }
@@ -46,10 +46,10 @@ module Delfos
 
         # This method represents a simulated version of a method patched by
         # MethodOverride#setup
-        def called_method(args, keyword_args, block)
+        def called_method(args, keyword_args, &block)
           $called_line = __LINE__ - 1
           call_site = MethodLogging::CallSiteParsing.new(caller.dup, binding.dup, stack_offset: MAGIC_OFFSET).perform
-          args = MethodLogging::MethodParameters.new(args, keyword_args, block)
+          args = MethodLogging::MethodParameters.new(*args, **keyword_args, &block)
 
           Delfos::MethodLogging.log(
             call_site,
@@ -64,9 +64,9 @@ module Delfos
       end
 
       class TestCallSiteObject
-        def call_site_method(called_object, args, keyword_args, block)
+        def call_site_method(called_object, args, keyword_args, &block)
           $call_site_line = __LINE__ + 1
-          called_object.called_method(args, keyword_args, block)
+          called_object.called_method(args, keyword_args, &block)
         end
       end
 
@@ -74,7 +74,7 @@ module Delfos
         dummy = DummyPatchedObject.new
 
         call_site_object = TestCallSiteObject.new
-        call_site_object.call_site_method(dummy, args, keyword_args, block)
+        call_site_object.call_site_method(dummy, args, keyword_args, &block)
 
         expect(call_site_logger).to have_received(:log) do |args, call_site, called_code|
           expect(args.args).to eq [A, B]

@@ -64,8 +64,9 @@ module Delfos
 
         return unless method_name && file && line_number
 
-        method_name = method_name.delete("`")
-        method_name = method_name.delete("'")
+        method_name = method_name.
+          delete("'").
+          delete("'")
 
         [file, line_number.to_i, method_name]
       end
