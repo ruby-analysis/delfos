@@ -11,3 +11,4 @@
 .idea
 .rspec-failed-examples
 /*.bundle
+.agignore
