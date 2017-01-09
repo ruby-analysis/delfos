@@ -28,10 +28,10 @@ module Delfos
       Delfos.setup_neo4j!
 
       require "delfos/neo4j/informer"
-      Delfos:: Neo4j::Informer.new
+      Delfos:: Neo4j::CallSiteLogger.new
     end
 
-    def reset!
+    delib/delfos/neo4j/informer_spec.rbf reset!
       if defined? Delfos::CallStack
         Delfos::CallStack.pop_until_top!
         Delfos::CallStack.reset!

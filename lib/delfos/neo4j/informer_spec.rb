@@ -10,7 +10,7 @@ class E; end
 
 module Delfos
   module Neo4j
-    describe Informer do
+    describe CallSiteLogger do
       let(:args) { double "args", argument_classes: [B, C, D] }
 
       before do
