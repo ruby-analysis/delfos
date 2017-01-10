@@ -16,14 +16,14 @@ module Delfos
       include ModuleDefiningMethods
 
       class << self
-        def setup(klass, name, private_methods, class_method:)
+        def setup(klass, name, class_method:)
           return if skip_meta_programming_defined_method?
 
           MUTEX.synchronize do
             return if Thread.current[:__delfos_disable_patching]
           end
 
-          instance = new(klass, name, private_methods, class_method)
+          instance = new(klass, name, class_method)
 
           instance.ensure_method_recorded_once!
         end
@@ -51,12 +51,11 @@ module Delfos
         end
       end
 
-      attr_reader :klass, :name, :private_methods, :class_method
+      attr_reader :klass, :name, :class_method
 
-      def initialize(klass, name, private_methods, class_method)
+      def initialize(klass, name, class_method)
         @klass           = klass
         @name            = name
-        @private_methods = private_methods
         @class_method    = class_method
         original_method # ensure memoized method is the original not the overridden one
       end
