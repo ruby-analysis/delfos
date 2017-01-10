@@ -82,7 +82,10 @@ module Delfos
 
           check_retry_limit! if retrying
 
-          Delfos.logger.error { "Transaction expired - retrying batch. #{query_count} queries retry_count: #{@retry_count} #{caller.inspect}" }
+          Delfos.logger.error do
+            "Transaction expired - retrying batch. #{query_count} queries retry_count: #{@retry_count}"
+          end
+
           reset_transaction!
           retry_batch!
         end
