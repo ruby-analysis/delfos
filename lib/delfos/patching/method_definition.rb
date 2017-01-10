@@ -1,6 +1,7 @@
+# frozen_string_literal: true
 module Delfos
   module Patching
-    MethodDefinition  = Struct.new(:method_name, :class_method, :parameters) do
+    MethodDefinition = Struct.new(:method_name, :class_method, :parameters) do
       def setup
         [<<-METHOD, __FILE__, __LINE__ + 1]
           def #{method_name}(#{parameters})
@@ -28,5 +29,3 @@ module Delfos
     end
   end
 end
-
-

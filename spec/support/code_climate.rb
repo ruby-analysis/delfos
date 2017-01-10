@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "simplecov"
 
 SimpleCov.start do
@@ -8,4 +9,3 @@ SimpleCov.start do
   add_filter "/spec/"
   add_filter "/lib/delfos/file_system/pathname_extensions.rb" # Copied from standard library
 end
-

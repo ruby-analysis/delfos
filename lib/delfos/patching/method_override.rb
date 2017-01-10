@@ -35,7 +35,7 @@ module Delfos
         def skip_meta_programming_defined_method?
           return unless meta_programmed_method_stack_frame(caller.dup)
 
-          Delfos.logger.debug {"Skipping setting up delfos logging of method defined by #{result} #{stack[i+1]}"}
+          Delfos.logger.debug { "Skipping setting up delfos logging of method defined by #{result} #{stack[i + 1]}" }
           true
         end
 
@@ -66,7 +66,7 @@ module Delfos
 
       # Redefine the method at runtime to enabling logging to Neo4j
       def setup
-        method_string, file, line_number = method_definition()
+        method_string, file, line_number = method_definition
 
         mod = module_definition(klass, name, class_method) do
           module_eval method_string, file, line_number

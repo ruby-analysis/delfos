@@ -40,7 +40,7 @@ module Delfos
       end
 
       def optional_args_string
-        optional_args.map{|name, value| "#{name}=#{value}" }.join(", ")
+        optional_args.map { |name, value| "#{name}=#{value}" }.join(", ")
       end
 
       def keyword_args
@@ -48,7 +48,7 @@ module Delfos
       end
 
       def keyword_args_string
-        keyword_args.map{|k,v| "#{k}: #{v}"}.join(", ")
+        keyword_args.map { |k, v| "#{k}: #{v}" }.join(", ")
       end
 
       def block
@@ -64,7 +64,7 @@ module Delfos
       end
 
       def required_keyword_args_string
-        required_keyword_args.map{|k| "#{k}:"}.join(", ")
+        required_keyword_args.map { |k| "#{k}:" }.join(", ")
       end
 
       def rest_args
@@ -72,7 +72,7 @@ module Delfos
       end
 
       def rest_args_string
-        rest_args ?  "*#{rest_args}" : ""
+        rest_args ? "*#{rest_args}" : ""
       end
 
       def rest_keyword_args
@@ -80,8 +80,9 @@ module Delfos
       end
 
       def rest_keyword_args_string
-        rest_keyword_args ?  "**#{rest_keyword_args}" : ""
+        rest_keyword_args ? "**#{rest_keyword_args}" : ""
       end
+
       private
 
       def method_parameters
@@ -89,7 +90,7 @@ module Delfos
       end
 
       def select_parameters(type)
-        method_parameters.select{|t, name| type == t } .map(&:last)
+        method_parameters.select { |t, _name| type == t } .map(&:last)
       end
     end
   end

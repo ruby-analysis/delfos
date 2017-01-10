@@ -40,7 +40,7 @@ module Delfos
             to eq(["fixtures/method_override/some_random_class.rb", $instance_method_line_number])
 
           expect(result["SomeRandomClass"]["ClassMethod_some_class_method"].source_location).
-            to eq([ "fixtures/method_override/some_random_class.rb", $class_method_line_number])
+            to eq(["fixtures/method_override/some_random_class.rb", $class_method_line_number])
         end
       end
 

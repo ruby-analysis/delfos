@@ -24,7 +24,9 @@ module Delfos
       attr_reader :klass, :method_name, :class_method
 
       def initialize(klass, method_name, class_method)
-        @klass, @method_name, @class_method = klass, method_name, class_method
+        @klass = klass
+        @method_name = method_name
+        @class_method = class_method
       end
 
       def perform(&block)
@@ -81,7 +83,7 @@ module Delfos
         m
       end
 
-      CAPITALIZE_REGEX =/^[a-z\d]*/
+      CAPITALIZE_REGEX = /^[a-z\d]*/
       CAMELIZE_REGEX = /(?:_|(\/))([a-z\d]*)/
       ANONYMOUS_CLASS_REGEX = /\#\<Class\:0x(.*)\>/
 
@@ -89,8 +91,8 @@ module Delfos
         string = string.sub(CAPITALIZE_REGEX) { $&.capitalize }
 
         string = string.
-          gsub(CAMELIZE_REGEX) { "#{Regexp.last_match(1)}#{Regexp.last_match(2).capitalize}" }.
-          gsub(ANONYMOUS_CLASS_REGEX) { "AnonymousClass_#{Regexp.last_match(1)}" }
+                 gsub(CAMELIZE_REGEX) { "#{Regexp.last_match(1)}#{Regexp.last_match(2).capitalize}" }.
+                 gsub(ANONYMOUS_CLASS_REGEX) { "AnonymousClass_#{Regexp.last_match(1)}" }
 
         MAPPINGS.each do |regex, replacement|
           string = string.gsub(regex, replacement)
@@ -112,8 +114,8 @@ module Delfos
         [/\?/, "QuestionMark"],
         [/\!$/, "Bang"],
         [/\+/, "Plus"],
-        [/\[\]/, "SquareBrackets"]
-      ]
+        [/\[\]/, "SquareBrackets"],
+      ].freeze
     end
   end
 end

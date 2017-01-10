@@ -21,7 +21,7 @@ module Delfos
       end
 
       def self.unstub!(klass, method_name, class_method)
-        module_definition(klass, method_name, class_method) do |m|
+        module_definition(klass, method_name, class_method) do |_m|
           begin
             remove_method :"#{method_name}"
           rescue NameError => e

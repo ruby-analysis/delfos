@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "./fixtures/parameter_extraction"
 require_relative "parameter_extraction"
 
@@ -15,14 +16,13 @@ module Delfos
         it do
           expect(extraction.required_args).to eq [:a, :b]
         end
-
       end
 
       describe "#optional_args" do
         let(:method_name) { :with_optional_args }
 
         it do
-          expect(extraction.optional_args).to eq(a:  "nil", b: "2", c: '"some_string"')
+          expect(extraction.optional_args).to eq(a: "nil", b: "2", c: '"some_string"')
         end
 
         context "with constants defined as defaults" do
@@ -32,10 +32,10 @@ module Delfos
             expect(extraction.optional_args).to eq(
               a:  "DelfosSpecs::SomeOtherConstant",
               b: "File",
-              c: 'DelfosSpecs::ANOTHER_CONSTANT',
+              c: "DelfosSpecs::ANOTHER_CONSTANT",
               d: 'DelfosSpecs::SomeOtherConstant.new("asdf")',
-              e: 'DelfosSpecs::SomeOtherConstant.new(DelfosSpecs::ANOTHER_CONSTANT)',
-              f: 'DelfosSpecs::SomeOtherConstant.new(DelfosSpecs::SomeOtherConstant.new(DelfosSpecs::ANOTHER_CONSTANT))',
+              e: "DelfosSpecs::SomeOtherConstant.new(DelfosSpecs::ANOTHER_CONSTANT)",
+              f: "DelfosSpecs::SomeOtherConstant.new(DelfosSpecs::SomeOtherConstant.new(DelfosSpecs::ANOTHER_CONSTANT))",
             )
           end
         end
@@ -54,7 +54,7 @@ module Delfos
 
         it do
           expect(extraction.keyword_args).
-            to eq({asdf: "1", qwer: "{}", some_call: "a_method_call"})
+            to eq(asdf: "1", qwer: "{}", some_call: "a_method_call")
         end
       end
 
@@ -90,7 +90,6 @@ module Delfos
         end
       end
 
-
       describe "#rest_keyword_args_string" do
         let(:method_name) { :with_rest_keyword_args }
 
@@ -99,9 +98,7 @@ module Delfos
         end
       end
 
-
       describe "#parameters" do
-
         context "with required_args" do
           let(:method_name) { :with_required_args }
 
@@ -131,7 +128,7 @@ module Delfos
 
           it do
             expect(extraction.parameters).
-              to eq('asdf: 1, qwer: {}, some_call: a_method_call')
+              to eq("asdf: 1, qwer: {}, some_call: a_method_call")
           end
         end
 

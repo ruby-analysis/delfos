@@ -5,12 +5,12 @@ require "delfos/neo4j"
 describe "integration" do
   context "with a customer call_stack_logger" do
     let(:loading_code) do
-      ->{
+      lambda do
         load "fixtures/b.rb"
         load "fixtures/a.rb"
         A.new.some_method
         B.new.another_method anything
-      }
+      end
     end
     let(:logger) { double "call stack logger", log: nil, save_call_stack: nil }
 
@@ -19,9 +19,8 @@ describe "integration" do
 
       Delfos.setup!(
         application_directories: ["fixtures"],
-        call_site_logger: logger
+        call_site_logger: logger,
       )
-
     end
 
     after do
@@ -45,8 +44,8 @@ describe "integration" do
     it "saves the call stack" do
       expect(logger).to receive(:save_call_stack) do |call_sites, execution_count|
         expect(call_sites)  .to be_a Array
-        expect(call_sites.length)  .to eq 8
-        expect(execution_count)  .to eq 1
+        expect(call_sites.length) .to eq 8
+        expect(execution_count) .to eq 1
       end
       loading_code.call
     end
@@ -170,12 +169,10 @@ describe "integration" do
 
           expect(a_method_count).to eq 1
 
-          expect(method_a).to eq({
-            "file" => "fixtures/a.rb",
-            "line_number" => 3,
-            "name" => "some_method",
-            "type" => "InstanceMethod"
-          })
+          expect(method_a).to eq("file" => "fixtures/a.rb",
+                                 "line_number" => 3,
+                                 "name" => "some_method",
+                                 "type" => "InstanceMethod")
 
           expect(b_method_count).to eq 1
           expect(c_method_count).to eq 1
@@ -214,28 +211,22 @@ describe "integration" do
 
         expect(a_method_count).to eq 1
 
-        expect(method_a).to eq({
-          "file" => "fixtures/class_method_calls_instance_method.rb",
-          "line_number" => 2,
-          "name" => "a_class_method",
-          "type" => "ClassMethod"
-        })
+        expect(method_a).to eq("file" => "fixtures/class_method_calls_instance_method.rb",
+                               "line_number" => 2,
+                               "name" => "a_class_method",
+                               "type" => "ClassMethod")
 
         expect(b_method_count).to eq 1
 
-        expect(method_b).to eq({
-          "file" => "fixtures/class_method_calls_instance_method.rb",
-          "line_number" => 8,
-          "name" => "an_instance_method",
-          "type" => "InstanceMethod"
-        })
+        expect(method_b).to eq("file" => "fixtures/class_method_calls_instance_method.rb",
+                               "line_number" => 8,
+                               "name" => "an_instance_method",
+                               "type" => "InstanceMethod")
 
         expect(call_site_count).to eq 1
 
-        expect(call_site).to eq({
-          "file" => "fixtures/class_method_calls_instance_method.rb",
-          "line_number" => 3,
-        })
+        expect(call_site).to eq("file" => "fixtures/class_method_calls_instance_method.rb",
+                                "line_number" => 3)
       end
     end
 
@@ -270,28 +261,22 @@ describe "integration" do
 
         expect(a_method_count).to eq 1
 
-        expect(method_a).to eq({
-          "file" => "fixtures/instance_method_calls_class_method.rb",
-          "line_number" => 2,
-          "name" => "an_instance_method",
-          "type" => "InstanceMethod"
-        })
+        expect(method_a).to eq("file" => "fixtures/instance_method_calls_class_method.rb",
+                               "line_number" => 2,
+                               "name" => "an_instance_method",
+                               "type" => "InstanceMethod")
 
         expect(b_method_count).to eq 1
 
-        expect(method_b).to eq({
-          "file" => "fixtures/instance_method_calls_class_method.rb",
-          "line_number" => 8,
-          "name" => "a_class_method",
-          "type" => "ClassMethod"
-        })
+        expect(method_b).to eq("file" => "fixtures/instance_method_calls_class_method.rb",
+                               "line_number" => 8,
+                               "name" => "a_class_method",
+                               "type" => "ClassMethod")
 
         expect(call_site_count).to eq 1
 
-        expect(call_site).to eq({
-          "file" => "fixtures/instance_method_calls_class_method.rb",
-          "line_number" => 3,
-        })
+        expect(call_site).to eq("file" => "fixtures/instance_method_calls_class_method.rb",
+                                "line_number" => 3)
       end
     end
 

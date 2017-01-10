@@ -10,29 +10,26 @@
 # For documentation, see class Pathname.
 #
 
-require_relative 'pathname.so'
+require_relative "pathname.so"
 
 module Delfos
   module FileSystem
-
     class Pathname
-
       # to_path is implemented so Pathname objects are usable with File.open, etc.
       TO_PATH = :to_path
 
       SAME_PATHS = if File::FNM_SYSCASE.nonzero?
                      # Avoid #zero? here because #casecmp can return nil.
-                     proc {|a, b| a.casecmp(b) == 0}
+                     proc { |a, b| a.casecmp(b) == 0 }
                    else
-                     proc {|a, b| a == b}
+                     proc { |a, b| a == b }
                    end
-
 
       if File::ALT_SEPARATOR
         SEPARATOR_LIST = "#{Regexp.quote File::ALT_SEPARATOR}#{Regexp.quote File::SEPARATOR}"
         SEPARATOR_PAT = /[#{SEPARATOR_LIST}]/
       else
-        SEPARATOR_LIST = "#{Regexp.quote File::SEPARATOR}"
+        SEPARATOR_LIST = (Regexp.quote File::SEPARATOR).to_s
         SEPARATOR_PAT = /#{Regexp.quote File::SEPARATOR}/
       end
 
@@ -56,7 +53,7 @@ module Delfos
           path, basename = r
           names.unshift basename
         end
-        return path, names
+        [path, names]
       end
       private :split_names
 
@@ -65,7 +62,7 @@ module Delfos
           File.dirname(prefix)
         elsif /#{SEPARATOR_PAT}/o =~ prefix
           prefix = File.dirname(prefix)
-          prefix = File.join(prefix, "") if File.basename(prefix + 'a') != 'a'
+          prefix = File.join(prefix, "") if File.basename(prefix + "a") != "a"
           prefix + relpath
         else
           prefix + relpath
@@ -83,7 +80,7 @@ module Delfos
       #
       # See Pathname#realpath.
       #
-      def cleanpath(consider_symlink=false)
+      def cleanpath(consider_symlink = false)
         if consider_symlink
           cleanpath_conservative
         else
@@ -102,11 +99,11 @@ module Delfos
         while r = chop_basename(pre)
           pre, base = r
           case base
-          when '.'
-          when '..'
+          when "."
+          when ".."
             names.unshift base
           else
-            if names[0] == '..'
+            if names[0] == ".."
               names.shift
             else
               names.unshift base
@@ -115,7 +112,7 @@ module Delfos
         end
         pre.tr!(File::ALT_SEPARATOR, File::SEPARATOR) if File::ALT_SEPARATOR
         if /#{SEPARATOR_PAT}/o =~ File.basename(pre)
-          names.shift while names[0] == '..'
+          names.shift while names[0] == ".."
         end
         self.class.new(prepend_prefix(pre, File.join(*names)))
       end
@@ -134,7 +131,7 @@ module Delfos
 
       # add_trailing_separator(path) -> path
       def add_trailing_separator(path) # :nodoc:
-        if File.basename(path + 'a') == 'a'
+        if File.basename(path + "a") == "a"
           path
         else
           File.join(path, "") # xxx: Is File.join is appropriate to add separator?
@@ -160,18 +157,16 @@ module Delfos
         pre = path
         while r = chop_basename(pre)
           pre, base = r
-          names.unshift base if base != '.'
+          names.unshift base if base != "."
         end
         pre.tr!(File::ALT_SEPARATOR, File::SEPARATOR) if File::ALT_SEPARATOR
         if /#{SEPARATOR_PAT}/o =~ File.basename(pre)
-          names.shift while names[0] == '..'
+          names.shift while names[0] == ".."
         end
         if names.empty?
           self.class.new(File.dirname(pre))
         else
-          if names.last != '..' && File.basename(path) == '.'
-            names << '.'
-          end
+          names << "." if names.last != ".." && File.basename(path) == "."
           result = prepend_prefix(pre, File.join(*names))
           if /\A(?:\.|\.\.)\z/ !~ names.last && has_trailing_separator?(path)
             self.class.new(add_trailing_separator(result))
@@ -186,19 +181,17 @@ module Delfos
       #
       # This is same as <code>self + '..'</code>.
       def parent
-        self + '..'
+        self + ".."
       end
 
       # Returns +true+ if +self+ points to a mountpoint.
       def mountpoint?
-        begin
-          stat1 = self.lstat
-          stat2 = self.parent.lstat
-          stat1.dev == stat2.dev && stat1.ino == stat2.ino ||
-            stat1.dev != stat2.dev
-        rescue Errno::ENOENT
-          false
-        end
+        stat1 = lstat
+        stat2 = parent.lstat
+        stat1.dev == stat2.dev && stat1.ino == stat2.ino ||
+          stat1.dev != stat2.dev
+      rescue Errno::ENOENT
+        false
       end
 
       #
@@ -209,7 +202,7 @@ module Delfos
       # pathnames which points to roots such as <tt>/usr/..</tt>.
       #
       def root?
-        !!(chop_basename(@path) == nil && /#{SEPARATOR_PAT}/o =~ @path)
+        !!(chop_basename(@path).nil? && /#{SEPARATOR_PAT}/o =~ @path)
       end
 
       # Predicate method for testing whether a path is absolute.
@@ -243,7 +236,7 @@ module Delfos
         while r = chop_basename(path)
           path, = r
         end
-        path == ''
+        path == ""
       end
 
       #
@@ -262,7 +255,7 @@ module Delfos
       def each_filename # :yield: filename
         return to_enum(__method__) unless block_given?
         _, names = split_names(@path)
-        names.each {|filename| yield filename }
+        names.each { |filename| yield filename }
         nil
       end
 
@@ -294,8 +287,8 @@ module Delfos
       def descend
         return to_enum(__method__) unless block_given?
         vs = []
-        ascend {|v| vs << v }
-        vs.reverse_each {|v| yield v }
+        ascend { |v| vs << v }
+        vs.reverse_each { |v| yield v }
         nil
       end
 
@@ -363,18 +356,18 @@ module Delfos
           index_list2.unshift prefix2.length
           basename_list2.unshift basename2
         end
-        return path2 if prefix2 != ''
+        return path2 if prefix2 != ""
         prefix1 = path1
-        while true
-          while !basename_list2.empty? && basename_list2.first == '.'
+        loop do
+          while !basename_list2.empty? && basename_list2.first == "."
             index_list2.shift
             basename_list2.shift
           end
           break unless r1 = chop_basename(prefix1)
           prefix1, basename1 = r1
-          next if basename1 == '.'
-          if basename1 == '..' || basename_list2.empty? || basename_list2.first != '..'
-            prefix1 = prefix1 + basename1
+          next if basename1 == "."
+          if basename1 == ".." || basename_list2.empty? || basename_list2.first != ".."
+            prefix1 += basename1
             break
           end
           index_list2.shift
@@ -382,7 +375,7 @@ module Delfos
         end
         r1 = chop_basename(prefix1)
         if !r1 && /#{SEPARATOR_PAT}/o =~ File.basename(prefix1)
-          while !basename_list2.empty? && basename_list2.first == '..'
+          while !basename_list2.empty? && basename_list2.first == ".."
             index_list2.shift
             basename_list2.shift
           end
@@ -411,11 +404,11 @@ module Delfos
         result = args.pop
         result = Pathname.new(result) unless Pathname === result
         return result if result.absolute?
-        args.reverse_each {|arg|
+        args.reverse_each do |arg|
           arg = Pathname.new(arg) unless Pathname === arg
           result = arg + result
           return result if result.absolute?
-        }
+        end
         self + result
       end
 
@@ -439,17 +432,17 @@ module Delfos
       # Note that the results never contain the entries +.+ and +..+ in
       # the directory because they are not children.
       #
-      def children(with_directory=true)
-        with_directory = false if @path == '.'
+      def children(with_directory = true)
+        with_directory = false if @path == "."
         result = []
-        Dir.foreach(@path) {|e|
-          next if e == '.' || e == '..'
-          if with_directory
-            result << self.class.new(File.join(@path, e))
-          else
-            result << self.class.new(e)
-          end
-        }
+        Dir.foreach(@path) do |e|
+          next if e == "." || e == ".."
+          result << if with_directory
+                      self.class.new(File.join(@path, e))
+                    else
+                      self.class.new(e)
+                    end
+        end
         result
       end
 
@@ -489,7 +482,7 @@ module Delfos
       #
       # See Pathname#children
       #
-      def each_child(with_directory=true, &b)
+      def each_child(with_directory = true, &b)
         children(with_directory).each(&b)
       end
 
@@ -505,44 +498,43 @@ module Delfos
       # ArgumentError is raised when it cannot find a relative path.
       #
       def relative_path_from(base_directory)
-        dest_directory = self.cleanpath.to_s
+        dest_directory = cleanpath.to_s
         base_directory = base_directory.cleanpath.to_s
         dest_prefix = dest_directory
         dest_names = []
         while r = chop_basename(dest_prefix)
           dest_prefix, basename = r
-          dest_names.unshift basename if basename != '.'
+          dest_names.unshift basename if basename != "."
         end
         base_prefix = base_directory
         base_names = []
         while r = chop_basename(base_prefix)
           base_prefix, basename = r
-          base_names.unshift basename if basename != '.'
+          base_names.unshift basename if basename != "."
         end
         unless SAME_PATHS[dest_prefix, base_prefix]
           raise ArgumentError, "different prefix: #{dest_prefix.inspect} and #{base_directory.inspect}"
         end
         while !dest_names.empty? &&
-            !base_names.empty? &&
-            SAME_PATHS[dest_names.first, base_names.first]
+              !base_names.empty? &&
+              SAME_PATHS[dest_names.first, base_names.first]
           dest_names.shift
           base_names.shift
         end
-        if base_names.include? '..'
+        if base_names.include? ".."
           raise ArgumentError, "base_directory has ..: #{base_directory.inspect}"
         end
-        base_names.fill('..')
+        base_names.fill("..")
         relpath_names = base_names + dest_names
         if relpath_names.empty?
-          Pathname.new('.')
+          Pathname.new(".")
         else
           Pathname.new(File.join(*relpath_names))
         end
       end
     end
 
-
-    class Pathname    # * Find *
+    class Pathname # * Find *
       #
       # Iterates over the directory tree in a depth first manner, yielding a
       # Pathname for each file under "this" directory.
@@ -559,23 +551,22 @@ module Delfos
       #
       def find(ignore_error: true) # :yield: pathname
         return to_enum(__method__, ignore_error: ignore_error) unless block_given?
-        require 'find'
-        if @path == '.'
-          Find.find(@path, ignore_error: ignore_error) {|f| yield self.class.new(f.sub(%r{\A\./}, '')) }
+        require "find"
+        if @path == "."
+          Find.find(@path, ignore_error: ignore_error) { |f| yield self.class.new(f.sub(%r{\A\./}, "")) }
         else
-          Find.find(@path, ignore_error: ignore_error) {|f| yield self.class.new(f) }
+          Find.find(@path, ignore_error: ignore_error) { |f| yield self.class.new(f) }
         end
       end
     end
 
-
-    class Pathname    # * FileUtils *
+    class Pathname # * FileUtils *
       # Creates a full path, including any intermediate directories that don't yet
       # exist.
       #
       # See FileUtils.mkpath and FileUtils.mkdir_p
       def mkpath
-        require 'fileutils'
+        require "fileutils"
         FileUtils.mkpath(@path)
         nil
       end
@@ -586,12 +577,10 @@ module Delfos
       def rmtree
         # The name "rmtree" is borrowed from File::Path of Perl.
         # File::Path provides "mkpath" and "rmtree".
-        require 'fileutils'
+        require "fileutils"
         FileUtils.rm_r(@path)
         nil
       end
     end
-
-
   end
 end
