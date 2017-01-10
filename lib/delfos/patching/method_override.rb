@@ -107,26 +107,10 @@ module Delfos
       end
 
       def record_method!
-        return true if bail?
+        return true if ::Delfos::MethodLogging.exclude?(original_method)
         MethodCache.append(klass: klass, method: original_method)
 
         yield
-      end
-
-      def bail?
-        method_has_been_added? || private_method? || exclude?
-      end
-
-      def method_has_been_added?
-        MethodCache.find(klass: klass, class_method: class_method, method_name: name)
-      end
-
-      def private_method?
-        private_methods.include?(name.to_sym)
-      end
-
-      def exclude?
-        ::Delfos::MethodLogging.exclude?(original_method)
       end
     end
   end
