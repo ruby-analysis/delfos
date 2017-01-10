@@ -28,16 +28,12 @@ module Delfos
       end
 
       def perform(&block)
-        safe_method_name = safe_method_name()
-        safe_class_name = safe_class_name()
-        module_type = class_method ? "ClassMethodLogging" : "InstanceMethodLogging"
-        find_or_create = method(:find_or_create)
+        that = self
 
-        m = nil
         Patching.const_get(module_type).instance_eval do
-          namespace = find_or_create.call(self, safe_class_name)
+          namespace = that.find_or_create(self, that.safe_class_name)
 
-          m = find_or_create.call(namespace, safe_method_name)
+          m = that.find_or_create(namespace, that.safe_method_name)
 
           m.class_eval(&block) if block_given?
 
@@ -45,7 +41,9 @@ module Delfos
         end
       end
 
-      private
+      def module_type 
+        class_method ? "ClassMethodLogging" : "InstanceMethodLogging"
+      end
 
       def safe_class_name
         module_safe_name(klass.name || klass.to_s)
@@ -71,35 +69,49 @@ module Delfos
         create(container, module_name)
       end
 
+      private
+
       def create(container, module_name)
         m = Module.new
 
         container.const_set(module_name, m)
-        return m
-      rescue Exception => e
+
         m
       end
 
-      def module_safe_name(string, _uppercase_first_letter = true)
-        string = string.sub(/^[a-z\d]*/) { $&.capitalize }
+      CAPITALIZE_REGEX =/^[a-z\d]*/
+      CAMELIZE_REGEX = /(?:_|(\/))([a-z\d]*)/
+      ANONYMOUS_CLASS_REGEX = /\#\<Class\:0x(.*)\>/
 
-        string.
-          gsub(/(?:_|(\/))([a-z\d]*)/) { "#{Regexp.last_match(1)}#{Regexp.last_match(2).capitalize}" }.
-          gsub("/", "::").
-          gsub(/\=/, "Equals").
-          gsub(/\<\=\>/, "Spaceship").
-          gsub(/\<\=/, "LessThanOrEqualTo").
-          gsub(/\>\=/, "GreaterThanOrEqualTo").
-          gsub(/\#\<Class\:0x(.*)\>/) { "AnonymousClass_#{Regexp.last_match(1)}" }.
-          gsub(/\>/, "GreaterThan").
-          gsub(/\</, "LessThan").
-          gsub(/!\~/, "NotMatchOperator").
-          gsub(/\~/, "MatchOperator").
-          gsub(/\?/, "QuestionMark").
-          gsub(/\!$/, "Bang").
-          gsub(/\+/, "Plus").
-          gsub(/\[\]/, "SquareBrackets")
+      def module_safe_name(string, _uppercase_first_letter = true)
+        string = string.sub(CAPITALIZE_REGEX) { $&.capitalize }
+
+        string = string.
+          gsub(CAMELIZE_REGEX) { "#{Regexp.last_match(1)}#{Regexp.last_match(2).capitalize}" }.
+          gsub(ANONYMOUS_CLASS_REGEX) { "AnonymousClass_#{Regexp.last_match(1)}" }
+
+        MAPPINGS.each do |regex, replacement|
+          string = string.gsub(regex, replacement)
+        end
+
+        string
       end
+
+      MAPPINGS = [
+        ["/", "::"],
+        [/\=/, "Equals"],
+        [/\<\=\>/, "Spaceship"],
+        [/\<\=/, "LessThanOrEqualTo"],
+        [/\>\=/, "GreaterThanOrEqualTo"],
+        [/\>/, "GreaterThan"],
+        [/\</, "LessThan"],
+        [/!\~/, "NotMatchOperator"],
+        [/\~/, "MatchOperator"],
+        [/\?/, "QuestionMark"],
+        [/\!$/, "Bang"],
+        [/\+/, "Plus"],
+        [/\[\]/, "SquareBrackets"]
+      ]
     end
   end
 end
