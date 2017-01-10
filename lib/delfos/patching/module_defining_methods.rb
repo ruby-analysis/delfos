@@ -13,7 +13,7 @@ module Delfos
         definer = ModuleDefiner.new(klass, method_name, class_method)
 
         if block_given?
-          definer.perform(&block) 
+          definer.perform(&block)
         else
           definer.perform
         end
@@ -31,17 +31,19 @@ module Delfos
         that = self
 
         Patching.const_get(module_type).instance_eval do
-          namespace = that.find_or_create(self, that.safe_class_name)
-
-          m = that.find_or_create(namespace, that.safe_method_name)
-
-          m.class_eval(&block) if block_given?
-
-          m
+          that.create_module_with_namespace(self).tap do |m|
+            m.class_eval(&block)
+          end
         end
       end
 
-      def module_type 
+      def create_module_with_namespace(other)
+        namespace = find_or_create(other, safe_class_name)
+
+        find_or_create(namespace, safe_method_name)
+      end
+
+      def module_type
         class_method ? "ClassMethodLogging" : "InstanceMethodLogging"
       end
 
