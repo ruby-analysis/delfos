@@ -13,7 +13,7 @@ require_relative "support/neo4j"
 require_relative "support/web_mock"
 require_relative "support/helper_methods"
 require_relative "support/show_class_instance_variables"
-require_relative "support/codeclimate" if ENV["CI"]
+require_relative "support/code_climate" if ENV["CI"]
 
 RSpec.configure do |c|
   c.expect_with :rspec do |c|
