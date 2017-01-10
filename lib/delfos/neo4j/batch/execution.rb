@@ -80,19 +80,21 @@ module Delfos
         rescue QueryExecution::ExpiredTransaction
           @retry_count ||= 0
 
-          if retrying
-            @retry_count += 1
-
-            if @retry_count > 5
-              @retry_count = 0
-              Delfos.logger.error "Transaction expired - 5 retries failed aborting"
-              raise
-            end
-          end
+          check_retry_limit! if retrying
 
           Delfos.logger.error { "Transaction expired - retrying batch. #{query_count} queries retry_count: #{@retry_count} #{caller.inspect}" }
           reset_transaction!
           retry_batch!
+        end
+
+        def check_retry_limit!
+          @retry_count += 1
+
+          return if @retry_count <= 5
+
+          @retry_count = 0
+          Delfos.logger.error "Transaction expired - 5 retries failed aborting"
+          raise
         end
 
         def retry_batch!
@@ -113,10 +115,9 @@ module Delfos
 
         def check_for_expiry!
           return unless @expires
+          return if @clock.now <= @expires
 
-          if @clock.now > @expires
-            raise QueryExecution::ExpiredTransaction.new(@comit_url, "")
-          end
+          raise QueryExecution::ExpiredTransaction.new(@comit_url, "")
         end
 
         def flush_if_required!
