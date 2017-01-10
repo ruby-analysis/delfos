@@ -27,24 +27,29 @@ module Delfos
       end
 
       def params
-        params = query_variables.each_with_object({}) do |(klass, name), object|
-          object[name] = klass.to_s
-        end
+        params = initial_params
 
-        params["m1_type"]        = call_site.method_type
-        params["m1_name"]        = call_site.method_name
-        params["m1_file"]        = call_site.method_definition_file
-        params["m1_line_number"] = call_site.method_definition_line
+        add_method_info(params, "m1", call_site)
 
         params["cs_file"]        = call_site.file
         params["cs_line_number"] = call_site.line_number
 
-        params["m2_type"]        = called_code.method_type
-        params["m2_name"]        = called_code.method_name
-        params["m2_file"]        = called_code.method_definition_file
-        params["m2_line_number"] = called_code.method_definition_line
+        add_method_info(params, "m2", called_code)
 
         params
+      end
+
+      def initial_params
+        query_variables.each_with_object({}) do |(klass, name), object|
+          object[name] = klass.to_s
+        end
+      end
+
+      def add_method_info(params, key, code_location)
+        params["#{key}_type"]        = code_location.method_type
+        params["#{key}_name"]        = code_location.method_name
+        params["#{key}_file"]        = code_location.method_definition_file
+        params["#{key}_line_number"] = code_location.method_definition_line
       end
 
       def query
