@@ -67,10 +67,10 @@ module Delfos
 
       # Redefine the method at runtime to enabling logging to Neo4j
       def setup
-        method_string, line_number = method_definition()
+        method_string, file, line_number = method_definition()
 
         mod = module_definition(klass, name, class_method) do
-          module_eval method_string, __FILE__, line_number
+          module_eval method_string, file, line_number
         end
 
         receiver = class_method ? klass.singleton_class : klass

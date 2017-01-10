@@ -2,7 +2,7 @@ module Delfos
   module Patching
     MethodDefinition  = Struct.new(:method_name, :class_method, :parameters) do
       def setup
-        [<<-METHOD, __LINE__ + 1]
+        [<<-METHOD, __FILE__, __LINE__ + 1]
           def #{method_name}(#{parameters})
             parameters = Delfos::MethodLogging::MethodParameters.new(#{parameters})
 
