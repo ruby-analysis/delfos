@@ -6,6 +6,7 @@ require "delfos/call_stack"
 require_relative "module_defining_methods"
 require_relative "unstubber"
 require_relative "parameter_extraction"
+require_relative "method_definition"
 
 module Delfos
   module Patching
@@ -29,24 +30,25 @@ module Delfos
 
         META_PROGRAMMING_REGEX = /`define_method'\z|`attr_accessor'\z|`attr_reader'\z|`attr_writer'\z/
 
+        private
+
         def skip_meta_programming_defined_method?
-          stack = caller.dup
+          return unless meta_programmed_method_stack_frame(caller.dup)
 
-          i = stack.index do |l|
-            l["delfos/patching/basic_object.rb"]
-          end
-
-          return unless i
-
-          result = stack[i + 1][META_PROGRAMMING_REGEX]
-
-          return unless result
-
-          Delfos.logger.debug "Skipping setting up delfos logging of method defined by #{result} #{stack[i+1]}"
+          Delfos.logger.debug {"Skipping setting up delfos logging of method defined by #{result} #{stack[i+1]}"}
           true
         end
 
+        def patching_index(stack)
+          stack.index { |l| l["delfos/patching/basic_object.rb"] }
+        end
 
+        def meta_programmed_method_stack_frame(stack)
+          i = patching_index(stack)
+          return unless i
+
+          stack[i + 1][META_PROGRAMMING_REGEX]
+        end
       end
 
       attr_reader :klass, :name, :private_methods, :class_method
@@ -63,51 +65,24 @@ module Delfos
         record_method! { setup }
       end
 
-
       # Redefine the method at runtime to enabling logging to Neo4j
       def setup
-        cm = class_method
-        method_name = name
-        om = original_method
-        parameters = ParameterExtraction.new(om).parameters
+        method_string, line_number = method_definition()
 
         mod = module_definition(klass, name, class_method) do
-          method_string, file, line = [<<-METHOD, __FILE__, __LINE__ + 1]
-            def #{method_name}(#{parameters})
-              parameters = Delfos::MethodLogging::MethodParameters.new(#{parameters})
-
-              call_site = Delfos::MethodLogging::CallSiteParsing.new(caller.dup).perform
-
-              if call_site
-                klass = self.is_a?(Module) ? self : self.class
-                om = MethodCache.find(klass: klass, class_method: #{cm}, method_name: #{method_name.inspect})
-
-                if om
-                  Delfos::MethodLogging.log(call_site, self, om, #{cm}, parameters)
-                else
-                  Delfos.logger.error("Method not found for \#{klass}, class_method: #{cm}, method_name: #{method_name}")
-                end
-              end
-
-              MethodOverride.with_stack(call_site) do
-                super(#{parameters})
-              end
-            end
-          METHOD
-
-          begin
-            module_eval method_string, file, line
-          rescue SyntaxError
-            byebug
-          end
+          module_eval method_string, __FILE__, line_number
         end
-        return unless mod
 
-        if class_method
-          klass.singleton_class.prepend mod
-        else
-          klass.prepend mod
-        end
+        receiver = class_method ? klass.singleton_class : klass
+        receiver.prepend mod
+      end
+
+      def method_definition
+        MethodDefinition.new(name, class_method, parameters).setup
+      end
+
+      def parameters
+        ParameterExtraction.new(original_method).parameters
       end
 
       def self.with_stack(call_site)
@@ -122,14 +97,14 @@ module Delfos
       end
 
       def original_method
-        @original_method ||= if class_method
-                               klass.method(name)
-                             else
-                               klass.instance_method(name)
-                             end
+        @original_method ||= klass.send(method_finding_method, name)
       end
 
       private
+
+      def method_finding_method
+        class_method ? :method : :instance_method
+      end
 
       def record_method!
         return true if bail?
