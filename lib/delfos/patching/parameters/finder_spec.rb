@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "./fixtures/parameter_extraction"
-require_relative "method_finder"
+require_relative "finder"
 
 module Delfos
   module Patching

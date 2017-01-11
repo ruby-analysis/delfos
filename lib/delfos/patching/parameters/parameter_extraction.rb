@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "method_finder"
+require_relative "finder"
 
 module Delfos
   module Patching
