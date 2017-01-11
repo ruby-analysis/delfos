@@ -5,7 +5,7 @@ require_relative "finder"
 module Delfos
   module Patching
     module Parameters
-      class ParameterExtraction
+      class Extraction
         attr_reader :meth, :finder
 
         def initialize(meth)

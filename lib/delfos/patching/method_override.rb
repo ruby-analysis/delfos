@@ -5,7 +5,7 @@ require "delfos/call_stack"
 
 require_relative "module_defining_methods"
 require_relative "unstubber"
-require_relative "parameters/parameter_extraction"
+require_relative "parameters/extraction"
 require_relative "method_definition"
 
 module Delfos
@@ -81,7 +81,7 @@ module Delfos
       end
 
       def parameters
-        Parameters::ParameterExtraction.new(original_method).parameters
+        Parameters::Extraction.new(original_method).parameters
       end
 
       def self.with_stack(call_site)

@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 require "./fixtures/parameter_extraction"
-require_relative "parameter_extraction"
+require_relative "extraction"
 
 # frozen_string_literal: true
 module Delfos
   module Patching
     module Parameters
-      RSpec.describe ParameterExtraction do
+      RSpec.describe Extraction do
         let(:container) { DelfosSpecs::ParameterExtractionExample.new }
         let(:meth) { container.method(method_name) }
         let(:extraction) { described_class.new(meth) }
