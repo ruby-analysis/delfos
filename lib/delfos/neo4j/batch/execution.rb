@@ -9,23 +9,15 @@ module Delfos
 
         class << self
           def execute!(query, params: {}, size: nil)
-            batch = batch() || new_batch(size || 1_000)
-
-            batch.execute!(query, params: params)
+            ensure_batch(size).execute!(query, params: params)
           end
 
-          def new_batch(size)
-            @batch = new(size: size)
+          def ensure_batch(size=nil)
+            self.batch ||= new(size: size || 1_000)
           end
 
           def flush!
             batch&.flush!
-          rescue
-            reset!
-          end
-
-          def reset!
-            self.batch = nil
           end
 
           attr_accessor :batch
@@ -78,8 +70,6 @@ module Delfos
         def with_retry(retrying)
           yield
         rescue QueryExecution::ExpiredTransaction
-          @retry_count ||= 0
-
           check_retry_limit! if retrying
 
           Delfos.logger.error do
@@ -91,6 +81,7 @@ module Delfos
         end
 
         def check_retry_limit!
+          @retry_count ||= 0
           @retry_count += 1
 
           return if @retry_count <= 5
@@ -101,9 +92,7 @@ module Delfos
         end
 
         def retry_batch!
-          queries.each do |q, p|
-            execute!(q, params: p, retrying: true)
-          end
+          queries.each { |q, p| execute!(q, params: p, retrying: true) }
         end
 
         def url
@@ -117,8 +106,7 @@ module Delfos
         end
 
         def check_for_expiry!
-          return unless @expires
-          return if @clock.now <= @expires
+          return if @expires.nil? || (@clock.now <= @expires)
 
           raise QueryExecution::ExpiredTransaction.new(@comit_url, "")
         end

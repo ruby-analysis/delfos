@@ -143,7 +143,7 @@ module Delfos
               expect(-> { 2.times { batch.execute!(anything, params: anything) } }).to raise_error QueryExecution::ExpiredTransaction
               Delfos.logger.level = Logger::ERROR
 
-              new_batch = described_class.new_batch(size)
+              new_batch = described_class.ensure_batch(size)
 
               expect(new_batch).not_to eq batch
               expect(new_batch.query_count).to eq 0

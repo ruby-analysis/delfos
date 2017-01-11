@@ -44,7 +44,7 @@ module Delfos
           Delfos::Neo4j::QueryExecution::ExpiredTransaction
         end
 
-        Delfos::Neo4j::Batch::Execution.reset!
+        Delfos::Neo4j::Batch::Execution.batch = nil
       end
 
       # unstubbing depends upon MethodCache being still defined
