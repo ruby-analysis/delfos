@@ -12,3 +12,4 @@
 .rspec-failed-examples
 /*.bundle
 .agignore
+lib/delfos/file_system/pathname.bundle
