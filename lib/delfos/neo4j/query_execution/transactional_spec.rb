@@ -50,31 +50,6 @@ module Delfos
           expect(response_expiry).to eq Time.parse expiry
         end
       end
-
-      def write_query
-        strip_whitespace <<-QUERY
-            MERGE (n:SomeNode{name:{node_name}})
-              -   [r:SOME_RELATIONSHIP{rel_attribute:2}]
-              ->  (o:OtherNode{name:"other name"})
-        QUERY
-      end
-
-      def params
-        { node_name: "some name" }
-      end
-
-      def read_query
-        <<-QUERY
-          MATCH (n:SomeNode{name:{node_name}})
-            -   [r:SOME_RELATIONSHIP]
-            ->  (o:OtherNode)
-
-          RETURN
-            n.name,
-            r.rel_attribute,
-            o.name
-        QUERY
-      end
     end
   end
 end
