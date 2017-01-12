@@ -44,7 +44,7 @@ describe "integration" do
     it "saves the call stack" do
       expect(logger).to receive(:save_call_stack) do |call_sites, execution_count|
         expect(call_sites)  .to be_a Array
-        expect(call_sites.length) .to eq 8
+        expect(call_sites.length) .to eq 11
         expect(execution_count) .to eq 1
       end
       loading_code.call

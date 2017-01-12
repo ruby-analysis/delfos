@@ -57,10 +57,10 @@ module Delfos
         @klass           = klass
         @name            = name
         @class_method    = class_method
-        original_method # ensure memoized method is the original not the overridden one
       end
 
       def ensure_method_recorded_once!
+        original_method # ensure memoized method is the original not the overridden one
         record_method! { setup }
       end
 

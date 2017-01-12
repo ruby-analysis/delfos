@@ -49,10 +49,10 @@ module Delfos
 
         before do
           exclusion = lambda do |m|
-            ![:some_public_method, :some_externally_called_public_method].include?(m.name)
+            ![:some_public_method, :some_externally_called_public_method, :some_private_method].include?(m.name)
           end
 
-          allow(MethodLogging).to receive(:include_file?) { |f| f == __FILE__ }
+          allow(MethodLogging).to receive(:include_file?) { |f| f.match %r{fixtures/method_override/some_random_class.rb} }
           allow(MethodLogging).to receive(:exclude?, &exclusion)
 
           Delfos.call_site_logger = call_site_logger
@@ -62,10 +62,12 @@ module Delfos
           before do
             setup_method("some_externally_called_public_method")
             setup_method("some_public_method")
+            setup_method("some_private_method")
           end
 
-          pending "this test was broken - will fix soon - sends the correct args to the method call_site_logger" do
+          it "sends the correct args to the method call_site_logger" do
             calls = 0
+
             expect(Delfos::MethodLogging).to receive(:log) do |call_site, object, called_method, _class_method, _arguments|
               calls += 1
 
@@ -83,11 +85,12 @@ module Delfos
                 expect(called_method.name).to eq :some_public_method
               when 2
                 expect(object).to be_a SomeRandomClass
+                expect(call_site.method_name).to eq "some_public_method"
+                expect(called_method.name).to eq :some_private_method
               end
             end.twice
 
             instance.some_externally_called_public_method
-            expect(calls).to eq 2
           end
 
           def setup_method(m)

@@ -42,7 +42,7 @@ module Delfos
         # This represents the stack offset from the point at parsing the stack,
         # and the aimed at location to determine the caller object. It is
         # unfortunately implementation specific. Hence the magic number.
-        MAGIC_OFFSET = 3
+        MAGIC_OFFSET = 4
 
         # This method represents a simulated version of a method patched by
         # MethodOverride#setup
