@@ -49,15 +49,13 @@ module Delfos
         end
 
         def log_query
-          statement = strip_whitespace(query)
+          Delfos.logger.debug do
+            statement = strip_whitespace(query)
 
-          if statement
-            begin
-                params.each { |k, v| statement = statement.gsub("{#{k}}", v.inspect) }
-              rescue
-              end
-            Delfos.logger.debug "sending query: "
-            Delfos.logger.debug statement.gsub(/^/, "    ")
+            if statement
+              params.each { |k, v| statement = statement.gsub("{#{k}}", v.inspect) }
+              statement.gsub(/^/, "    ")
+            end
           end
         end
       end

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require_relative "neo4j"
+require_relative "call_stack/stack"
 
 module Delfos
   module CallStack

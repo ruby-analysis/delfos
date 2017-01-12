@@ -36,7 +36,7 @@ module Delfos
 
               before do
                 require "logger"
-                Delfos.logger.level = Logger::FATAL
+                @level, Delfos.logger.level = Delfos.logger.level, Logger::FATAL
                 call_count = 0
 
                 allow_any_instance_of(QueryExecution::Transactional).to receive(:perform).and_wrap_original do |m|
@@ -51,7 +51,7 @@ module Delfos
               end
 
               after do
-                Delfos.logger.level = Logger::ERROR
+                Delfos.logger.level = @level
               end
 
               it "retries the batch" do

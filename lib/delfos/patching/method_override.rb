@@ -33,9 +33,10 @@ module Delfos
         private
 
         def skip_meta_programming_defined_method?
-          return unless meta_programmed_method_stack_frame(caller.dup)
+          result = meta_programmed_method_stack_frame(caller.dup)
+          return unless result
 
-          Delfos.logger.debug { "Skipping setting up delfos logging of method defined by #{result} #{stack[i + 1]}" }
+          Delfos.logger.debug { "Skipping setting up delfos logging of method defined by #{result}" }
           true
         end
 

@@ -12,14 +12,14 @@ describe "integration" do
         B.new.another_method anything
       end
     end
-    let(:logger) { double "call stack logger", log: nil, save_call_stack: nil }
+    let(:call_site_logger) { double "call stack logger", log: nil, save_call_stack: nil }
 
     before do
       WebMock.disable_net_connect! allow_localhost: false
 
       Delfos.setup!(
         application_directories: ["fixtures"],
-        call_site_logger: logger,
+        call_site_logger: call_site_logger,
       )
     end
 
@@ -32,7 +32,7 @@ describe "integration" do
     end
 
     it "logs the call sites" do
-      expect(logger).to receive(:log) do |parameters, call_site, called_code|
+      expect(call_site_logger).to receive(:log) do |parameters, call_site, called_code|
         expect(parameters)  .to be_a Delfos::MethodLogging::MethodParameters
         expect(call_site)   .to be_a Delfos::MethodLogging::CodeLocation
         expect(called_code) .to be_a Delfos::MethodLogging::CodeLocation
@@ -42,7 +42,7 @@ describe "integration" do
     end
 
     it "saves the call stack" do
-      expect(logger).to receive(:save_call_stack) do |call_sites, execution_count|
+      expect(call_site_logger).to receive(:save_call_stack) do |call_sites, execution_count|
         expect(call_sites)  .to be_a Array
         expect(call_sites.length) .to eq 11
         expect(execution_count) .to eq 1
@@ -60,7 +60,7 @@ describe "integration" do
     before(:each) do
       wipe_db!
 
-      Delfos.setup!(application_directories: ["fixtures"])
+      Delfos.setup!(application_directories: ["fixtures"], logger: $delfos_test_logger)
     end
 
     after do
