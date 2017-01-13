@@ -11,9 +11,13 @@ module Delfos
           return if results.length.negative?
 
           results.each do |start_file, call_site_id, finish_file, called_id|
-            calc = FileSystem::DistanceCalculation.new(start_file, finish_file)
+            begin
+              calc = FileSystem::DistanceCalculation.new(start_file, finish_file)
 
-            update(call_site_id, called_id, calc)
+              update(call_site_id, called_id, calc)
+            rescue FileSystem::DistanceCalculation::PathNotFound => e
+              Delfos.logger.error("Whilst updating distance #{start_file}->#{finish_file} call_site_id: #{call_site_id} called_id: #{called_id} - #{e.message} #{e.backtrace}")
+            end
           end
 
           Neo4j.flush!

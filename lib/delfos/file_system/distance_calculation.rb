@@ -7,8 +7,14 @@ module Delfos
     class DistanceCalculation
       attr_reader :path_a, :path_b
 
+      PathNotFound = Class.new(ArgumentError)
+
       def initialize(path_a, path_b)
         @path_a, @path_b = PathDetermination.for(path_a, path_b)
+
+        unless @path_a && @path_b
+          raise PathNotFound.new("path_a: #{path_a} -> #{@path_a.inspect}, path_b: #{path_b} -> #{@path_b.inspect}")
+        end
       end
 
       attr_reader :traversal_a, :traversal_b
