@@ -59,6 +59,13 @@ module Delfos
           queries.length
         end
 
+        def retry_count
+          @retry_count ||= 0
+        end
+
+        attr_writer :retry_count
+
+
         private
 
         def perform_query(query, params)
@@ -73,20 +80,23 @@ module Delfos
           check_retry_limit! if retrying
 
           Delfos.logger.error do
-            "Transaction expired - retrying batch. #{query_count} queries retry_count: #{@retry_count}"
+            "Transaction expired - retrying batch. #{query_count} queries retry_count: #{retry_count}"
           end
 
           reset_transaction!
           retry_batch!
+
+          Delfos.logger.error do
+            "Batch retry successful"
+          end
         end
 
         def check_retry_limit!
-          @retry_count ||= 0
-          @retry_count += 1
+          self.retry_count += 1
 
-          return if @retry_count <= 5
+          return if self.retry_count <= 5
 
-          @retry_count = 0
+          self.retry_count = 0
           Delfos.logger.error "Transaction expired - 5 retries failed aborting"
           raise
         end
