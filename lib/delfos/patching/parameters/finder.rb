@@ -22,7 +22,6 @@ module Delfos
             args_from_defs(method, type)
           else
             args_from_def(method, type)
-
           end
         end
 
@@ -30,20 +29,14 @@ module Delfos
           sexp = find_defs(method.name)
           return "" unless sexp
 
-          args = case sexp.type 
+          args = case sexp.type
                 when :def
                   sexp.children[1]
                 when :defs
                   sexp.children[2]
                 end
 
-          args = args.children.
-            select { |a| a.type == type }.
-            map(&:children)
-
-          args.each_with_object({}) do |(name, val), result|
-            result[name] = rewrite_constants(val, method)
-          end
+          format_args(args, type, method)
         end
 
         def find_defs(m, sexp = file_sexp)
@@ -58,13 +51,9 @@ module Delfos
             return result if result
           end
 
-          sexp.children.each do |s|
-            next unless s
-            result = find_defs(m, s)
-            return result if result
+          check_children(m, sexp) do |s|
+            find_defs(m, s)
           end
-
-          nil
         end
 
         def args_from_def(method, type)
@@ -73,6 +62,10 @@ module Delfos
 
           args = sexp.children[1]
 
+          format_args(args, type, method)
+        end
+
+        def format_args(args, type, method)
           args = args.children.
             select { |a| a.type == type }.
             map(&:children)
@@ -82,14 +75,20 @@ module Delfos
           end
         end
 
-        def find_def(m, sexp = file_sexp)
+        def find_def(method_name, sexp = file_sexp)
           return unless sexp.is_a?(Parser::AST::Node)
 
-          return sexp if (sexp.type == :def) && (node_name(sexp) == m.to_s)
+          return sexp if (sexp.type == :def) && (node_name(sexp) == method_name.to_s)
 
+          check_children(method_name, sexp) do |s|
+            find_def(method_name, s)
+          end
+        end
+
+        def check_children(method_name, sexp)
           sexp.children.each do |s|
             next unless s
-            result = find_def(m, s)
+            result = yield(s)
             return result if result
           end
 
