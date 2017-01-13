@@ -6,7 +6,7 @@ require_relative "finder"
 module Delfos
   module Patching
     module Parameters
-      RSpec.describe MethodFinder do
+      RSpec.describe Finder do
         let(:container) { DelfosSpecs::ParameterExtractionExample.new }
         let(:meth) { container.method(method_name) }
         let(:finder) { described_class.new("./fixtures/parameter_extraction.rb") }
@@ -14,6 +14,37 @@ module Delfos
 
         describe "#args_from" do
           let(:meth) { container.method(method_name) }
+
+          context "wth a class method" do
+            subject { finder.args_from(meth, arg_type) }
+            let(:arg_type) { :optarg }
+            let(:method_name) { :a_class_method }
+            let(:container) { DelfosSpecs::ParameterExtractionExample }
+
+            it do
+              expect(subject).to eq(source_requirements: "{}",
+                                    base: "[]", 
+                                    gem_version_promoter: 'DelfosSpecs::SomeOtherConstant.new',
+                                    additional_base_requirements: "[]"
+                                   )
+            end
+          end
+          context "wth a self << class style method" do
+            subject { finder.args_from(meth, arg_type) }
+            let(:arg_type) { :optarg }
+            let(:method_name) { :another_class_method }
+            let(:container) { DelfosSpecs::ParameterExtractionExample }
+
+            it do
+              finder.args_from(meth, arg_type)
+
+              expect(subject).to eq(source_requirements: "{}",
+                                    base: "[]", 
+                                    gem_version_promoter: 'DelfosSpecs::SomeOtherConstant.new',
+                                    additional_base_requirements: "[]"
+                                   )
+            end
+          end
 
           context "with optional arguments" do
             let(:arg_type) { :optarg }

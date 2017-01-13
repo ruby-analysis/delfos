@@ -10,7 +10,7 @@ module Delfos
 
         def initialize(meth)
           @meth = meth
-          @finder = MethodFinder.new(meth.source_location.first)
+          @finder = Finder.new(meth.source_location.first)
         end
 
         def parameters

@@ -23,6 +23,20 @@ module DelfosSpecs
     )
     end
 
+    def self.a_class_method(
+      requirements, index, source_requirements = {}, base = [],
+      gem_version_promoter = SomeOtherConstant.new,
+      additional_base_requirements = [])
+    end
+
+    class << self
+      def another_class_method(
+        requirements, index, source_requirements = {}, base = [],
+        gem_version_promoter = SomeOtherConstant.new,
+        additional_base_requirements = [])
+      end
+    end
+
     def with_block(&some_block)
     end
 

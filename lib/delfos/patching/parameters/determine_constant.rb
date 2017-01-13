@@ -4,6 +4,12 @@ module Delfos
     module DetermineConstant
       def constant_from(val, klass)
         constant_name = val.to_a.last
+        klass = if klass.singleton_class?
+                  Object.const_get klass.inspect.gsub(/#<Class:|>/, "")
+                else
+                  klass
+                end
+
         klass_namespaces = klass.name.split("::")
         namespace = klass_namespaces.shift(klass_namespaces.length - 1).join("::")
         namespace = Object.const_get namespace
