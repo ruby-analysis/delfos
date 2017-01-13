@@ -3,6 +3,7 @@ require "parser/current" unless defined?(Parser::CurrentRuby)
 
 require_relative "determine_constant"
 require_relative "argument_rewriter"
+require_relative "file_parser_cache"
 
 module Delfos
   module Patching
@@ -131,12 +132,14 @@ module Delfos
           o.source
         end
 
-        def file_contents
-          @file_contents ||= Pathname.new(filename).read
+        def file_sexp
+          @file_sexp ||= FileParserCache.for(filename) do
+            Parser::CurrentRuby.parse(file_contents)
+          end
         end
 
-        def file_sexp
-          Parser::CurrentRuby.parse(file_contents)
+        def file_contents
+          Pathname.new(filename).read
         end
       end
     end

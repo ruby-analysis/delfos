@@ -37,6 +37,10 @@ module Delfos
         Delfos::CallStack.reset!
       end
 
+       if defined? Delfos::Patching::Parameters::FileParserCache
+         Delfos::Patching::Parameters::FileParserCache.reset!
+       end
+
       if defined? Delfos::Neo4j::Batch::Execution
         begin
           Delfos::Neo4j::Batch::Execution.flush!
