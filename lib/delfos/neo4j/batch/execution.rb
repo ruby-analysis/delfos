@@ -5,46 +5,19 @@ module Delfos
   module Neo4j
     module Batch
       class Execution
-        BATCH_MUTEX = Mutex.new
-
-        class << self
-          def execute!(query, params: {}, size: nil)
-            ensure_batch(size).execute!(query, params: params)
-          end
-
-          def ensure_batch(size=nil)
-            self.batch ||= new(size: size || 1_000)
-          end
-
-          def flush!
-            batch&.flush!
-          end
-
-          attr_accessor :batch
-        end
+        attr_reader :size, :current_transaction_url, :commit_url, :expires, :query_count
 
         def initialize(size:, clock: Time)
           @size                    = size
           @clock                   = clock
-          @queries                 = []
-          @expires                 = nil
-          @commit_url              = nil
-          @current_transaction_url = nil
+          reset!
         end
 
-        attr_reader :size, :current_transaction_url, :commit_url, :expires, :queries
+        def execute!(query, params: {})
+          check_for_expiry!
 
-        def execute!(query, params: {}, retrying: false)
-          queries.push([query, params]) unless retrying
-
-          with_retry(retrying) do
-            BATCH_MUTEX.synchronize do
-              check_for_expiry!
-
-              perform_query(query, params)
-              flush_if_required!
-            end
-          end
+          perform_query(query, params)
+          flush_if_required!
         end
 
         def flush!
@@ -55,54 +28,13 @@ module Delfos
           reset!
         end
 
-        def query_count
-          queries.length
-        end
-
-        def retry_count
-          @retry_count ||= 0
-        end
-
-        attr_writer :retry_count
-
-
         private
 
         def perform_query(query, params)
           transactional_query = QueryExecution::Transactional.new(query, params, url)
           transaction_url, @commit_url, @expires = transactional_query.perform
           @current_transaction_url ||= transaction_url # the transaction_url is only returned with the first request
-        end
-
-        def with_retry(retrying)
-          yield
-        rescue QueryExecution::ExpiredTransaction
-          check_retry_limit! if retrying
-
-          Delfos.logger.error do
-            "Transaction expired - retrying batch. #{query_count} queries retry_count: #{retry_count}"
-          end
-
-          reset_transaction!
-          retry_batch!
-
-          Delfos.logger.error do
-            "Batch retry successful"
-          end
-        end
-
-        def check_retry_limit!
-          self.retry_count += 1
-
-          return if self.retry_count <= 5
-
-          self.retry_count = 0
-          Delfos.logger.error "Transaction expired - 5 retries failed aborting"
-          raise
-        end
-
-        def retry_batch!
-          queries.each { |q, p| execute!(q, params: p, retrying: true) }
+          @query_count += 1
         end
 
         def url
@@ -124,7 +56,12 @@ module Delfos
         def flush_if_required!
           check_for_expiry!
 
-          flush! if batch_full? || expires_soon?
+          if batch_full? || expires_soon?
+            flush!
+            return true
+          end
+
+          false
         end
 
         def batch_full?
@@ -136,11 +73,7 @@ module Delfos
         end
 
         def reset!
-          @queries = []
-          reset_transaction!
-        end
-
-        def reset_transaction!
+          @query_count = 0
           @current_transaction_url = nil
           @commit_url = nil
           @expires = nil

@@ -10,7 +10,7 @@ module Delfos
         if satisfies_constraints?(required)
           log "Neo4j schema constraints satisfied"
         else
-          error "Neo4j schema constraints not satisfied - adding"
+          warn "Neo4j schema constraints not satisfied - adding"
 
           required.each do |label, attribute|
             create_constraint(label, attribute)
@@ -32,8 +32,8 @@ module Delfos
 
       private
 
-      def error(s)
-        log(s, :error)
+      def warn(s)
+        log(s, :warn)
       end
 
       def log(s, type = :debug)
