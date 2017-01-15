@@ -3,12 +3,12 @@ require "spec_helper"
 
 require "delfos/neo4j"
 
-require_relative "execution"
+require_relative "retryable"
 
 module Delfos
   module Neo4j
     module Batch
-      RSpec.describe RetryableExecution do
+      RSpec.describe Retryable do
         let(:size)      { 10 }
         let(:execution)     { described_class.new(size: size) }
         let(:transaction_url) { Delfos.neo4j.uri_for("/db/data/transaction/1") }

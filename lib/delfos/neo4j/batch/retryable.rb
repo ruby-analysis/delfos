@@ -4,13 +4,13 @@ require_relative "execution"
 module Delfos
   module Neo4j
     module Batch
-      class RetryableExecution
+      class Retryable
         class << self
           def execute!(query, params: {}, size: nil)
-            new_instance(size).execute!(query, params: params)
+            ensure_instance(size).execute!(query, params: params)
           end
 
-          def new_instance(size=nil)
+          def ensure_instance(size)
             self.instance ||= new(size: size || 1_000)
           end
 
@@ -47,20 +47,12 @@ module Delfos
 
         private
 
-        def with_retry(retrying)
+        def with_retry(already_retrying)
           yield
         rescue QueryExecution::ExpiredTransaction
-          check_retry_limit! if retrying
-
-          Delfos.logger.error do
-            "Transaction expired - retrying batch. #{queries.count} queries retry_count: #{retry_count}"
-          end
+          check_retry_limit! if already_retrying
 
           retry_batch!
-
-          Delfos.logger.error do
-            "Batch retry successful"
-          end
         end
 
         def check_retry_limit!
@@ -74,17 +66,25 @@ module Delfos
         end
 
         def retry_batch!
+          Delfos.logger.error do
+            "Transaction expired - retrying batch. #{queries.count} queries retry_count: #{retry_count}"
+          end
+
+          new_execution
+
           queries.each { |q, p| execute!(q, params: p, retrying: true) }
+
+          Delfos.logger.error { "Batch retry successful" }
         end
 
         def reset!
           @queries = []
-          @execution = new_execution
+          new_execution
           @retry_count = 0
         end
 
         def new_execution
-          Execution.new(size: size)
+          @execution = Execution.new(size: size)
         end
       end
     end

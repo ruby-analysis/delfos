@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 require "spec_helper"
-require_relative "retryable_execution"
+require_relative "retryable"
 
 module Delfos
   module Neo4j
     module Batch
-      RSpec.describe RetryableExecution, "integration" do
+      RSpec.describe Retryable, "integration" do
         before do
           Delfos.setup_neo4j!
           WebMock.disable_net_connect! allow_localhost: true

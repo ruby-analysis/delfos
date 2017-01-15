@@ -27,10 +27,10 @@ RSpec.configure do |c|
   c.before(:suite) do
     require "delfos/neo4j/query_execution/errors"
     begin
-      Delfos.logger = $delfos_test_logger
       DelfosSpecNeo4jHelpers.wipe_db!
-    rescue *Delfos::Neo4j::QueryExecution::HTTP_ERRORS, Delfos::Neo4j::QueryExecution::ConnectionError => e
-      Delfos.logger.error <<-ERROR
+    rescue *Delfos::Neo4j::QueryExecution::HTTP_ERRORS,
+            Delfos::Neo4j::QueryExecution::ConnectionError => e
+      puts <<-ERROR
        ***************************************
        ***************************************
        ***************************************

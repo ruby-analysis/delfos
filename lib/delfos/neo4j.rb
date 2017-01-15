@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require_relative "neo4j/call_site_logger"
 require_relative "neo4j/query_execution/sync"
-require_relative "neo4j/batch/retryable_execution"
+require_relative "neo4j/batch/retryable"
 require_relative "neo4j/schema"
 require_relative "neo4j/distance/update"
 
@@ -14,11 +14,11 @@ module Delfos
     end
 
     def execute(query, params = {})
-      Batch::RetryableExecution.execute!(query, params: params)
+      Batch::Retryable.execute!(query, params: params)
     end
 
     def flush!
-      Batch::RetryableExecution.flush!
+      Batch::Retryable.flush!
     end
 
     def ensure_schema!
