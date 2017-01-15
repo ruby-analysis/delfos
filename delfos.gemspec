@@ -33,6 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "parser"
 
   spec.add_development_dependency "simplecov"
+  spec.add_development_dependency 'rspec_junit_formatter', '>= 0.2.3'
   spec.add_development_dependency "codeclimate-test-reporter"
   spec.add_development_dependency "webmock", ">= 2.3.2"
   spec.add_development_dependency "rake-compiler"
