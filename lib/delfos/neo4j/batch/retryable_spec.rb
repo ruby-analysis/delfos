@@ -28,12 +28,16 @@ module Delfos
             and_return(execution)
 
           allow(execution).
+            to receive(:flush!)
+
+          allow(execution).
             to receive(:execute!).
             and_return(true)
         end
 
         after do
           WebMock.disable_net_connect! allow_localhost: true
+          Delfos::Setup.reset_batch!
         end
 
         describe ".execute!" do

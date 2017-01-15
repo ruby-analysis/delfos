@@ -31,36 +31,57 @@ module Delfos
       Delfos:: Neo4j::CallSiteLogger.new
     end
 
+
     def reset!
-      if defined? Delfos::CallStack
-        Delfos::CallStack.pop_until_top!
-        Delfos::CallStack.reset!
+      reset_call_stack!
+      reset_parser_cache!
+      reset_batch!
+
+      reset_unstubbing_and_method_cache!
+
+      remove_patching!
+      reset_method_logging!
+
+      reset_top_level_variables!
+    end
+
+    def reset_call_stack!
+      ignoring_undefined("Delfos::CallStack") do |k|
+        k.pop_until_top!
+        k.reset!
       end
+    end
 
-       if defined? Delfos::Patching::Parameters::FileParserCache
-         Delfos::Patching::Parameters::FileParserCache.reset!
-       end
+    def reset_parser_cache!
+      ignoring_undefined("Delfos::Patching::Parameters::FileParserCache") do |k|
+        k.reset!
+      end
+    end
 
-      if defined? Delfos::Neo4j::Batch::Execution
+    def reset_batch!
+      ignoring_undefined "Delfos::Neo4j::Batch::Retryable" do |b|
         begin
-          Delfos::Neo4j::Batch::Execution.flush!
-        rescue
-          Delfos::Neo4j::QueryExecution::ExpiredTransaction
+          with_rescue { b.flush!  }
+        ensure
+          b.instance = nil
         end
-
-        Delfos::Neo4j::Batch::Retryable.flush!
-        Delfos::Neo4j::Batch::Retryable.instance = nil
       end
+    end
 
+    def reset_unstubbing_and_method_cache!
       # unstubbing depends upon MethodCache being still defined
       # so this order is important
       unstub_all!
       remove_cached_methods!
+    end
 
-      remove_patching!
+    def reset_method_logging!
+      ignoring_undefined("Delfos::MethodLogging") do |k|
+        k.reset!
+      end
+    end
 
-      Delfos::MethodLogging.reset! if defined?(Delfos::MethodLogging) && Delfos::MethodLogging.respond_to?(:reset!)
-
+    def reset_top_level_variables!
       Delfos.neo4j                   = nil
       Delfos.logger                  = nil
       Delfos.application_directories = nil
@@ -69,16 +90,28 @@ module Delfos
       Delfos.neo4j                   = nil
     end
 
-    def unstub_all!
-      return unless defined? Delfos::Patching::Unstubber
+    def ignoring_undefined(k)
+      o = Object.const_get(k)
+      yield(o)
+    rescue NameError => e
+      raise unless e.message[k]
+    end
 
-      Delfos::Patching::Unstubber.unstub_all!
+    def with_rescue
+      yield
+    rescue Delfos::Neo4j::QueryExecution::ExpiredTransaction
+    end
+
+    def unstub_all!
+      ignoring_undefined("Delfos::Patching::Unstubber") do |u|
+        u.unstub_all!
+      end
     end
 
     def remove_cached_methods!
-      return unless defined? Delfos::Patching::MethodCache
-
-      Delfos::Patching::MethodCache.reset!
+      ignoring_undefined("Delfos::Patching::MethodCache") do |u|
+        u.reset!
+      end
     end
 
     def remove_patching!

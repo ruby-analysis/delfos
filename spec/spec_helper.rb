@@ -30,6 +30,10 @@ RSpec.configure do |c|
     Delfos.reset! if Delfos.respond_to?(:reset!)
   end
 
+  c.after(:each) do
+    Delfos::Setup.reset_batch!
+  end
+
   c.before(:each) do
     Delfos.reset! if Delfos.respond_to?(:reset!)
     ShowClassInstanceVariables.variables_for(Delfos)
