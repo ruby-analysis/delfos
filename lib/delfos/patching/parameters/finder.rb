@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 require "parser/current" unless defined?(Parser::CurrentRuby)
 
-require_relative "determine_constant"
 require_relative "argument_rewriter"
 require_relative "file_parser_cache"
 
@@ -9,8 +8,6 @@ module Delfos
   module Patching
     module Parameters
       class Finder
-        include DetermineConstant
-
         def initialize(filename)
           @filename = filename
         end
