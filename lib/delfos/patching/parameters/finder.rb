@@ -17,52 +17,47 @@ module Delfos
 
         attr_reader :filename
 
-        def args_from(method, type)
-          if method.respond_to?(:receiver) && method.receiver.is_a?(Module)
-            args_from_defs(method, type)
-          else
-            args_from_def(method, type)
-          end
-        end
-
-        def args_from_defs(method, type)
-          sexp = find_defs(method.name)
+        def args_from(method, arg_type)
+          sexp = send(def_type_for(method), method.name)
           return "" unless sexp
 
-          args = case sexp.type
-                when :def
-                  sexp.children[1]
-                when :defs
-                  sexp.children[2]
-                end
+          index = sexp.type == :def ? 1 : 2
+          args = sexp.children[index]
 
-          format_args(args, type, method)
+          format_args(args, arg_type, method)
+        end
+
+        def def_type_for(method)
+          if method.respond_to?(:receiver) && method.receiver.is_a?(Module)
+            :find_defs
+          else
+            :find_def
+          end
         end
 
         def find_defs(m, sexp = file_sexp)
+          check_for_def_type(m, sexp, :defs) ||
+            check_class_extend_self_definitions(m, sexp) ||
+            check_children(m, sexp, :find_defs)
+        end
+
+        def find_def(method_name, sexp = file_sexp)
+          check_for_def_type(method_name, sexp, :def) ||
+            check_children(method_name, sexp, :find_def)
+        end
+
+        def check_for_def_type(method_name, sexp, def_type)
           return unless sexp.is_a?(Parser::AST::Node)
 
-          if (sexp.type == :defs) && (node_name(sexp) == m.to_s)
+          if (sexp.type == def_type) && (sexp.loc.name.source == method_name.to_s)
             return sexp
-          end
-
-          if sexp.type == :sclass
-            result = find_def(m, sexp)
-            return result if result
-          end
-
-          check_children(m, sexp) do |s|
-            find_defs(m, s)
           end
         end
 
-        def args_from_def(method, type)
-          sexp = find_def(method.name)
-          return "" unless sexp
+        def check_class_extend_self_definitions(m, sexp)
+          return unless sexp.respond_to?(:type) && sexp.type == :sclass
 
-          args = sexp.children[1]
-
-          format_args(args, type, method)
+          find_def(m, sexp)
         end
 
         def format_args(args, type, method)
@@ -75,47 +70,27 @@ module Delfos
           end
         end
 
-        def find_def(method_name, sexp = file_sexp)
-          return unless sexp.is_a?(Parser::AST::Node)
 
-          return sexp if (sexp.type == :def) && (node_name(sexp) == method_name.to_s)
+        def check_children(method_name, sexp, type)
+          return unless sexp.respond_to?(:children)
 
-          check_children(method_name, sexp) do |s|
-            find_def(method_name, s)
-          end
-        end
-
-        def check_children(method_name, sexp)
           sexp.children.each do |s|
             next unless s
-            result = yield(s)
+            result = send(type, method_name, s)
             return result if result
           end
 
           nil
         end
 
-        def node_name(sexp)
-          snippet_from(sexp.loc.name)
-        end
-
         private
-
-        def methods(sexp, found = [])
-          if sexp.type == :def
-            found << sexp
-            found
-          end
-        end
 
         def rewrite_constants(val, method)
           source = val.loc.expression.source
 
-          if contains_constant?(val)
-            ArgumentRewriter.new(source, method.owner).perform
-          else
-            source
-          end
+          return source unless contains_constant?(val)
+
+          ArgumentRewriter.new(source, method.owner).perform
         end
 
         def contains_constant?(expression)
@@ -127,18 +102,11 @@ module Delfos
           end
         end
 
-        def snippet_from(o)
-          o.source
-        end
-
         def file_sexp
           @file_sexp ||= FileParserCache.for(filename) do
+            file_contents = Pathname.new(filename).read
             Parser::CurrentRuby.parse(file_contents)
           end
-        end
-
-        def file_contents
-          Pathname.new(filename).read
         end
       end
     end
