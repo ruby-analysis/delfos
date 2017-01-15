@@ -1,37 +1,46 @@
 # frozen_string_literal: true
 module ShowClassInstanceVariables
   def self.variables_for(n)
-    return unless n.is_a?(Class) || n.is_a?(Module)
+    return unless n.is_a?(Module)
 
-    display(n)
+    display_variables(n)
 
     n.constants.each do |c|
-      next if n == c
+      klass = relevant_constant_for(c, n)
+      next unless klass
 
-      klass = n.const_get(c)
+      display_variables(klass)
 
-      next unless klass.is_a?(Class) || klass.is_a?(Module)
-      next unless klass.name[n.name]
-
-      display(klass)
-
-      klass.constants.each do |s|
-        s = klass.const_get(s)
-        next if s == klass || s == n
-
-        variables_for(s)
-      end
+      handle_nesting(klass, n)
     end
   end
 
-  def self.display(klass)
-    if klass.instance_variables.length.positive?
-      klass.instance_variables.each do |iv|
-        val = klass.instance_eval(iv.to_s)
+  def self.handle_nesting(klass, n)
+    klass.constants.each do |k|
+      k = klass.const_get(k)
+      next if k == klass || k == n
 
-        unless val.nil?
-          puts "non-nil class variable found:\n  #{klass} #{iv}: #{val.inspect}"
-        end
+      variables_for(k)
+    end
+  end
+
+  def self.relevant_constant_for(c, namespace)
+    return if namespace == c
+    klass = namespace.const_get(c)
+
+    return unless klass.is_a?(Module)
+    return unless klass.name[namespace.name]
+    klass
+  end
+
+  def self.display_variables(klass)
+    return unless klass.instance_variables.length.positive?
+
+    klass.instance_variables.each do |iv|
+      val = klass.instance_eval(iv.to_s)
+
+      unless val.nil?
+        puts "non-nil class variable found:\n  #{klass} #{iv}: #{val.inspect}"
       end
     end
   end
