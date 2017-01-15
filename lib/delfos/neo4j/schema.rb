@@ -10,7 +10,7 @@ module Delfos
         if satisfies_constraints?(required)
           log "Neo4j schema constraints satisfied"
         else
-          error "Neo4j schema constraints not satisfied - adding"
+          log "Neo4j schema constraints not satisfied - adding", :warn
 
           required.each do |label, attribute|
             create_constraint(label, attribute)
@@ -20,24 +20,10 @@ module Delfos
         end
       end
 
-      def decorate(msg)
-        line = "-" * 80
-
-        <<-MSG
-          #{line}
-          #{msg}
-          #{line}
-        MSG
-      end
-
       private
 
-      def error(s)
-        log(s, :error)
-      end
-
       def log(s, type = :debug)
-        Delfos.logger.send(type, decorate(s))
+        Delfos.logger.send(type, s)
       end
 
       def create_constraint(label, attribute)

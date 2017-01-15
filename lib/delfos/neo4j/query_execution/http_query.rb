@@ -19,15 +19,12 @@ module Delfos
 
         def request_body
           {
-            "statements": [{ "statement": strip_whitespace(query), "parameters": params }],
+            "statements": [{ "statement": formatted_query, "parameters": params }],
           }.to_json
         end
 
-        def strip_whitespace(s)
-          s.
-            gsub(/^\s+/, "").
-            gsub(/ +/, " ").
-            gsub("\n\n", "\n")
+        def formatted_query
+          strip_whitespace(query)
         end
 
         def json
@@ -50,13 +47,18 @@ module Delfos
 
         def log_query
           Delfos.logger.debug do
-            statement = strip_whitespace(query)
+            statement = formatted_query
 
-            if statement
-              params.each { |k, v| statement = statement.gsub("{#{k}}", v.inspect) }
-              statement.gsub(/^/, "    ")
-            end
+            params.each { |k, v| statement = statement.gsub("{#{k}}", v.inspect) }
+            statement.gsub(/^/, "    ")
           end
+        end
+
+        def strip_whitespace(s)
+          s.
+            gsub(/^\s+/, "").
+            gsub(/ +/, " ").
+            gsub("\n\n", "\n")
         end
       end
     end

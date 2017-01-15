@@ -55,28 +55,6 @@ module Delfos
           WebMock.disable_net_connect! allow_localhost: true
         end
 
-        describe ".execute!" do
-          before do
-            allow(described_class).
-              to receive(:new).
-              with(size: size).
-              and_return(batch)
-          end
-
-          it "calls execute on the batch returning the url and expiry" do
-            expect(batch).
-              to receive(:execute!).
-              with(anything, params: {}).
-              and_return([transaction_url, commit_url, expires])
-
-            returned_url, commit_url, returned_expiry = described_class.execute!(anything, params: {}, size: size)
-
-            expect(returned_url)    .to eq transaction_url
-            expect(commit_url)      .to eq commit_url
-            expect(returned_expiry) .to eq expires
-          end
-        end
-
         describe "#execute!" do
           context "with some queries executed" do
             before do
@@ -143,7 +121,7 @@ module Delfos
               expect(-> { 2.times { batch.execute!(anything, params: anything) } }).to raise_error QueryExecution::ExpiredTransaction
               Delfos.logger.level = Logger::ERROR
 
-              new_batch = described_class.ensure_batch(size)
+              new_batch = described_class.new(size: size)
 
               expect(new_batch).not_to eq batch
               expect(new_batch.query_count).to eq 0
