@@ -31,7 +31,6 @@ module Delfos
       Delfos:: Neo4j::CallSiteLogger.new
     end
 
-
     def reset!
       reset_call_stack!
       reset_parser_cache!
@@ -53,15 +52,13 @@ module Delfos
     end
 
     def reset_parser_cache!
-      ignoring_undefined("Delfos::Patching::Parameters::FileParserCache") do |k|
-        k.reset!
-      end
+      ignoring_undefined("Delfos::Patching::Parameters::FileParserCache", &:reset!)
     end
 
     def reset_batch!
       ignoring_undefined "Delfos::Neo4j::Batch::Retryable" do |b|
         begin
-          with_rescue { b.flush!  }
+          with_rescue { b.flush! }
         ensure
           b.instance = nil
         end
@@ -76,9 +73,7 @@ module Delfos
     end
 
     def reset_method_logging!
-      ignoring_undefined("Delfos::MethodLogging") do |k|
-        k.reset!
-      end
+      ignoring_undefined("Delfos::MethodLogging", &:reset!)
     end
 
     def reset_top_level_variables!
@@ -103,15 +98,11 @@ module Delfos
     end
 
     def unstub_all!
-      ignoring_undefined("Delfos::Patching::Unstubber") do |u|
-        u.unstub_all!
-      end
+      ignoring_undefined("Delfos::Patching::Unstubber", &:unstub_all!)
     end
 
     def remove_cached_methods!
-      ignoring_undefined("Delfos::Patching::MethodCache") do |u|
-        u.reset!
-      end
+      ignoring_undefined("Delfos::Patching::MethodCache", &:reset!)
     end
 
     def remove_patching!

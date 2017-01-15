@@ -11,8 +11,6 @@ RSpec::Core::RakeTask.new(:spec) do |t|
                     "--format RspecJunitFormatter",
                     "-o $CIRCLE_TEST_REPORTS/rspec/junit.xml"]
   end
-
-
 end
 
 load "ext/delfos/file_system/pathname/compile.rake"

@@ -9,8 +9,8 @@ module Delfos
   module Neo4j
     module Batch
       RSpec.describe Retryable do
-        let(:size)      { 10 }
-        let(:execution)     { described_class.new(size: size) }
+        let(:size) { 10 }
+        let(:execution) { described_class.new(size: size) }
         let(:transaction_url) { Delfos.neo4j.uri_for("/db/data/transaction/1") }
         let(:commit_url) { Delfos.neo4j.uri_for("/db/data/transaction/1/commit") }
 

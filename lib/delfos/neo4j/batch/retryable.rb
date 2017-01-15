@@ -24,7 +24,6 @@ module Delfos
         attr_reader :size, :queries, :execution
         attr_accessor :retry_count
 
-
         def initialize(size:)
           @size = size
           reset!

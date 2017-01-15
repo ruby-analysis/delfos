@@ -23,7 +23,7 @@ module Delfos
           @cached_sexpressions = {}
         end
 
-        def for(filename, &block)
+        def for(filename)
           get(filename) || set(filename, yield)
         end
 

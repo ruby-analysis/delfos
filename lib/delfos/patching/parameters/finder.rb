@@ -59,14 +59,13 @@ module Delfos
 
         def format_args(args, type, method)
           args = args.children.
-            select { |a| a.type == type }.
-            map(&:children)
+                 select { |a| a.type == type }.
+                 map(&:children)
 
           args.each_with_object({}) do |(name, val), result|
             result[name] = rewrite_constants(val, method)
           end
         end
-
 
         def check_children(method_name, sexp, type)
           return unless sexp.respond_to?(:children)

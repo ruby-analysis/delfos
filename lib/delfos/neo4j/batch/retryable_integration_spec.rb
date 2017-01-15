@@ -36,7 +36,8 @@ module Delfos
 
               before do
                 require "logger"
-                @level, Delfos.logger.level = Delfos.logger.level, Logger::FATAL
+                @level = Delfos.logger.level
+                Delfos.logger.level = Logger::FATAL
                 call_count = 0
 
                 allow_any_instance_of(QueryExecution::Transactional).to receive(:perform).and_wrap_original do |m|

@@ -21,7 +21,7 @@ module Delfos
            :block].each do |a|
              append_if_present(output, a)
            end
-           output.join(", ")
+          output.join(", ")
         end
 
         def append_if_present(output, arg)

@@ -61,11 +61,12 @@ module Delfos
         @original_method ||= Delfos::Patching::MethodCache.find(
           klass: klass,
           method_name: method_name,
-          class_method: class_method)
+          class_method: class_method,
+        )
       end
 
       def klass
-        caller_object.is_a?(Module) ?  caller_object : caller_object.class
+        caller_object.is_a?(Module) ? caller_object : caller_object.class
       end
     end
   end

@@ -13,7 +13,7 @@ module Delfos
         @path_a, @path_b = PathDetermination.for(path_a, path_b)
 
         unless @path_a && @path_b
-          raise PathNotFound.new("path_a: #{path_a} -> #{@path_a.inspect}, path_b: #{path_b} -> #{@path_b.inspect}")
+          raise PathNotFound, "path_a: #{path_a} -> #{@path_a.inspect}, path_b: #{path_b} -> #{@path_b.inspect}"
         end
       end
 

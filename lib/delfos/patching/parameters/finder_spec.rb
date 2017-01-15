@@ -23,10 +23,9 @@ module Delfos
 
             it do
               expect(subject).to eq(source_requirements: "{}",
-                                    base: "[]", 
-                                    gem_version_promoter: 'DelfosSpecs::SomeOtherConstant.new',
-                                    additional_base_requirements: "[]"
-                                   )
+                                    base: "[]",
+                                    gem_version_promoter: "DelfosSpecs::SomeOtherConstant.new",
+                                    additional_base_requirements: "[]")
             end
           end
           context "wth a self << class style method" do
@@ -39,10 +38,9 @@ module Delfos
               finder.args_from(meth, arg_type)
 
               expect(subject).to eq(source_requirements: "{}",
-                                    base: "[]", 
-                                    gem_version_promoter: 'DelfosSpecs::SomeOtherConstant.new',
-                                    additional_base_requirements: "[]"
-                                   )
+                                    base: "[]",
+                                    gem_version_promoter: "DelfosSpecs::SomeOtherConstant.new",
+                                    additional_base_requirements: "[]")
             end
           end
 

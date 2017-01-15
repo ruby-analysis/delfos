@@ -3,6 +3,7 @@ AllCops:
   DisplayStyleGuide: true
   Exclude:
     - 'vendor/**/*'
+    - 'fixtures/**/*'
     - 'db/**/*'
 Rails:
   Enabled: false

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "call_site_query"
 
 class A; end
@@ -5,7 +6,6 @@ class B; end
 class C; end
 class D; end
 class E; end
-
 
 module Delfos
   module Neo4j
@@ -39,8 +39,6 @@ module Delfos
       before do
         wipe_db!
       end
-
-
 
       describe "#args_query" do
         it do

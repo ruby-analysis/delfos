@@ -29,7 +29,7 @@ RSpec.configure do |c|
     begin
       DelfosSpecNeo4jHelpers.wipe_db!
     rescue *Delfos::Neo4j::QueryExecution::HTTP_ERRORS,
-            Delfos::Neo4j::QueryExecution::ConnectionError => e
+           Delfos::Neo4j::QueryExecution::ConnectionError => e
       puts <<-ERROR
        ***************************************
        ***************************************
