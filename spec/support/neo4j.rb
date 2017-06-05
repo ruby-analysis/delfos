@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 ENV["NEO4J_HOST"]     ||= "http://localhost"
-ENV["NEO4J_PORT"]     ||= "7476"
+ENV["NEO4J_PORT"]     ||= "7474"
 ENV["NEO4J_USERNAME"] ||= "neo4j"
 ENV["NEO4J_PASSWORD"] ||= "password"
 
