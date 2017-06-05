@@ -61,7 +61,6 @@ module Delfos
             #{method_node("m2")}
 
           MERGE (cs) - [:CALLS] -> (m2)
-          
         QUERY
       end
 

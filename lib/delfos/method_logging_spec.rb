@@ -49,7 +49,7 @@ module Delfos
         def called_method(args, keyword_args, &block)
           $called_line = __LINE__ - 1
           call_site = MethodLogging::CallSiteParsing.new(caller.dup, stack_offset: MAGIC_OFFSET).perform
-          
+
           Delfos::MethodLogging.log(
             call_site,
             self,

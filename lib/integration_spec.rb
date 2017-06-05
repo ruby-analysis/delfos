@@ -95,22 +95,6 @@ describe "integration" do
         end
       end
 
-      context "records arguments" do
-        let(:query) do
-          <<-QUERY
-          MATCH (:CallSite)-[arg:ARG]->(a:Class{name: "A"})
-
-          RETURN count(arg)
-          QUERY
-        end
-
-        it do
-          arg_count = result.first
-
-          expect(arg_count).to eq 1
-        end
-      end
-
       context "records call sites" do
         let(:query) do
           <<-QUERY
