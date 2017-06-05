@@ -9,8 +9,8 @@ module Delfos
         perform Neo4j::CallStackQuery, call_sites, execution_number
       end
 
-      def log(args, call_site, called_code)
-        perform CallSiteQuery, args, call_site, called_code
+      def log(call_site, called_code)
+        perform CallSiteQuery, call_site, called_code
       end
 
       private

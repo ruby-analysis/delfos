@@ -10,8 +10,6 @@ class E; end
 module Delfos
   module Neo4j
     describe CallSiteQuery do
-      let(:args) { double "args", argument_classes: [B, C, D] }
-
       let(:called_code) do
         double "CalledCode",
           klass: E,
@@ -34,22 +32,10 @@ module Delfos
           method_definition_line: 2
       end
 
-      subject { described_class.new(args, call_site, called_code) }
+      subject { described_class.new(call_site, called_code) }
 
       before do
         wipe_db!
-      end
-
-      describe "#args_query" do
-        it do
-          result = subject.args_query
-
-          expect(result).to eq <<-QUERY.gsub(/^\s+/, "").chomp
-        MERGE (cs) - [:ARG] -> (k3)
-        MERGE (cs) - [:ARG] -> (k4)
-        MERGE (cs) - [:ARG] -> (k5)
-          QUERY
-        end
       end
 
       it "#params" do
@@ -113,10 +99,6 @@ module Delfos
        )
 
       MERGE (cs) - [:CALLS] -> (m2)
-
-      MERGE (cs) - [:ARG]   -> (k3)
-      MERGE (cs) - [:ARG]   -> (k4)
-      MERGE (cs) - [:ARG]   -> (k5)
         QUERY
 
         expect(strip_whitespace(query)).to eq strip_whitespace(expected)

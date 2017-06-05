@@ -49,14 +49,12 @@ module Delfos
         def called_method(args, keyword_args, &block)
           $called_line = __LINE__ - 1
           call_site = MethodLogging::CallSiteParsing.new(caller.dup, stack_offset: MAGIC_OFFSET).perform
-          args = MethodLogging::MethodParameters.new(*args, **keyword_args, &block)
-
+          
           Delfos::MethodLogging.log(
             call_site,
             self,
             method(__method__),
             class_method = false,
-            args,
           )
 
           # real method would do stuff here
@@ -77,9 +75,6 @@ module Delfos
         call_site_object.call_site_method(dummy, args, keyword_args, &block)
 
         expect(call_site_logger).to have_received(:log) do |args, call_site, called_code|
-          expect(args.args).to eq [A, B]
-          expect(args.keyword_args).to eq [A, B]
-
           expect(call_site.file).to eq "delfos/method_logging_spec.rb"
           expect(call_site.line_number).to eq $call_site_line
           expect(call_site.method_name).to eq "call_site_method"

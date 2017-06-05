@@ -32,8 +32,7 @@ describe "integration" do
     end
 
     it "logs the call sites" do
-      expect(call_site_logger).to receive(:log) do |parameters, call_site, called_code|
-        expect(parameters)  .to be_a Delfos::MethodLogging::MethodParameters
+      expect(call_site_logger).to receive(:log) do |call_site, called_code|
         expect(call_site)   .to be_a Delfos::MethodLogging::CodeLocation
         expect(called_code) .to be_a Delfos::MethodLogging::CodeLocation
       end

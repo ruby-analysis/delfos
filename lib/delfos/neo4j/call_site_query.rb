@@ -5,8 +5,7 @@ module Delfos
     class CallSiteQuery
       attr_reader :args, :call_site, :called_code
 
-      def initialize(args, call_site, called_code)
-        @args = args
+      def initialize(call_site, called_code)
         @call_site = call_site
         @called_code = called_code
 
@@ -62,13 +61,12 @@ module Delfos
             #{method_node("m2")}
 
           MERGE (cs) - [:CALLS] -> (m2)
-
-          #{args_query}
+          
         QUERY
       end
 
       def assign_query_variables
-        klasses = [call_site.klass, called_code.klass] + args.argument_classes
+        klasses = [call_site.klass, called_code.klass]
 
         klasses.uniq.each do |k|
           query_variables.assign(k, "k")
@@ -86,15 +84,6 @@ module Delfos
             }
           )
         NODE
-      end
-
-      def args_query
-        query_text = args.argument_classes.map do |k|
-          name = query_variable(k)
-          "MERGE (cs) - [:ARG] -> (#{name})"
-        end
-
-        query_text.join("\n")
       end
 
       def query_variable(k)
