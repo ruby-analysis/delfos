@@ -5,7 +5,6 @@ module Delfos
       def setup
         [<<-METHOD, __FILE__, __LINE__ + 1]
           def #{method_name}(#{parameters})
-            parameters = Delfos::MethodLogging::MethodParameters.new(#{parameters})
 
             call_site = Delfos::MethodLogging::CallSiteParsing.new(caller.dup).perform
 
@@ -14,7 +13,7 @@ module Delfos
               original_method = MethodCache.find(klass: klass, class_method: #{class_method}, method_name: #{method_name.inspect})
 
               if original_method
-                Delfos::MethodLogging.log(call_site, self, original_method, #{class_method}, parameters)
+                Delfos::MethodLogging.log(call_site, self, original_method, #{class_method})
               else
                 Delfos.logger.error("Method not found for \#{klass}, class_method: #{class_method}, method_name: #{method_name}")
               end

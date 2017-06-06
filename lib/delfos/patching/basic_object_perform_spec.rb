@@ -34,11 +34,9 @@ module Delfos
 
         allow(call_site_logger).to receive(:log)
 
-        expect(call_site_logger).to receive(:log) do |args, call_site, called_code|
+        expect(call_site_logger).to receive(:log) do |call_site, called_code|
           expect(call_site.object).   to eq(a)
           expect(called_code.object). to eq(b)
-          expect(args.args).          to eq [A, B]
-          expect(args.keyword_args).  to eq([B])
         end
 
         a.some_method(b, 2, c: b, b: "some string")
