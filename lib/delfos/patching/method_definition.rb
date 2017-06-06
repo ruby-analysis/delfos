@@ -5,7 +5,7 @@ module Delfos
       def setup
         [<<-METHOD, __FILE__, __LINE__ + 1]
           def #{method_name}(#{parameters})
-          
+
             call_site = Delfos::MethodLogging::CallSiteParsing.new(caller.dup).perform
 
             if call_site

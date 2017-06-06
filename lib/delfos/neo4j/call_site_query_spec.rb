@@ -43,9 +43,6 @@ module Delfos
 
         expect(params).to eq("k1" => "A",
                              "k2" => "E",
-                             "k3" => "B",
-                             "k4" => "C",
-                             "k5" => "D",
                              "m1_type" => "ClassMethod",
                              "m1_name" => "method_a",
                              "m1_file" => "a.rb",
@@ -66,9 +63,6 @@ module Delfos
         expected = <<-QUERY
       MERGE (k1:Class {name: {k1}})
       MERGE (k2:Class {name: {k2}})
-      MERGE (k3:Class {name: {k3}})
-      MERGE (k4:Class {name: {k4}})
-      MERGE (k5:Class {name: {k5}})
 
       MERGE (k1) - [:OWNS] ->
         (m1:Method

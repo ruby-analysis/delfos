@@ -26,8 +26,14 @@ RSpec.configure do |c|
     c.syntax = :expect
   end
 
+  def reset_all
+      Delfos.reset! if Delfos.respond_to?(:reset!)
+  rescue NameError => e
+    raise unless e.message["Delfos::Patching"]
+  end
+
   c.before(:suite) do
-    Delfos.reset! if Delfos.respond_to?(:reset!)
+    reset_all
   end
 
   c.after(:each) do
@@ -35,7 +41,8 @@ RSpec.configure do |c|
   end
 
   c.before(:each) do
-    Delfos.reset! if Delfos.respond_to?(:reset!)
+    reset_all
+
     ShowClassInstanceVariables.variables_for(Delfos)
     Delfos.logger = $delfos_test_logger if defined? $delfos_test_logger
   end
