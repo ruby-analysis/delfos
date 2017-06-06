@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require_relative "method_logging"
 require_relative "./patching/method_override"
+require_relative "./patching/method_cache"
 require_relative "../../fixtures/a"
 require_relative "../../fixtures/b"
 
@@ -24,14 +25,6 @@ module Delfos
       let(:method_b) { double "method b", source_location: [b_path, 2] }
 
       before do
-        # TODO: replace this leaky abstraction. Stub out `.find'
-        # instead of `#added_methods'
-        expect_any_instance_of(Patching::MethodCache).
-          to receive(:added_methods).
-          at_least(:once).
-          and_return("A" => { instance_method_some_method: method_a },
-                     "B" => { instance_method_another_method: method_b })
-
         Delfos.call_site_logger = call_site_logger
         path_fixtures = Pathname.new(File.expand_path(__FILE__)) + "../../../fixtures"
         path_spec     = Pathname.new(File.expand_path(__FILE__)) + ".."
@@ -74,7 +67,7 @@ module Delfos
         call_site_object = TestCallSiteObject.new
         call_site_object.call_site_method(dummy, args, keyword_args, &block)
 
-        expect(call_site_logger).to have_received(:log) do |args, call_site, called_code|
+        expect(call_site_logger).to have_received(:log) do |call_site, called_code|
           expect(call_site.file).to eq "delfos/method_logging_spec.rb"
           expect(call_site.line_number).to eq $call_site_line
           expect(call_site.method_name).to eq "call_site_method"
