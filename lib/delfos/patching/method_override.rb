@@ -7,6 +7,7 @@ require_relative "module_defining_methods"
 require_relative "unstubber"
 require_relative "parameters/extraction"
 require_relative "method_definition"
+require_relative "method_cache"
 
 module Delfos
   module Patching
