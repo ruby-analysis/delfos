@@ -9,4 +9,4 @@ At the time of writing there was no way to inject the logging code but allow thi
 
 # How can we get rid of this?
 
-If we can find a way to make `Delfos` work completely unintrusively.
+If we find a way to make `Delfos` work unintrusively.
