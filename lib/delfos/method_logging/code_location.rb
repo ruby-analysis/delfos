@@ -1,47 +1,30 @@
 # frozen_string_literal: true
-require_relative "call_site_parsing"
-
 module Delfos
   module MethodLogging
     class CodeLocation
-      class << self
-        def from_called(object, called_method, class_method)
-          file, line_number = called_method&.source_location
-          return unless file && line_number
+      attr_reader :object, :file, :line_number
 
-          new(object: object, method_name: called_method.name.to_s,
-              class_method: class_method, file: file, line_number: line_number)
-        end
-      end
-
-      attr_reader :object, :method_name, :class_method, :line_number
-
-      def initialize(object:, method_name:, class_method:, file:, line_number:)
+      def initialize(object:, method_name:, file:, line_number:)
         @object       = object
         @method_name  = method_name
-        @class_method = class_method
-        @line_number  = line_number.to_i
         @file         = file
-      end
-
-      def file
-        relative_filename @file
+        @line_number  = line_number.to_i
       end
 
       def klass
         object.is_a?(Class) ? object : object.class
       end
 
-      def method_definition_file
-        relative_filename(method_definition&.first || fallback_method_definition_file)
+      def file
+        relative_filename(@file)
       end
 
-      def method_definition_line
-        method_definition&.last&.to_i || fallback_method_definition_line_number
+      def method_name
+        @method_name.to_s
       end
 
       def method_type
-        class_method ? "ClassMethod" : "InstanceMethod"
+        klass.instance_methods(false).include?(@method_name) ? "InstanceMethod" : "ClassMethod"
       end
 
       private
@@ -66,18 +49,6 @@ module Delfos
         end
 
         file
-      end
-
-      def fallback_method_definition_file
-        @file
-      end
-
-      def fallback_method_definition_line_number
-        0
-      end
-
-      def method_definition
-        @method_definition ||= Patching::MethodCache.find(klass: klass, method_name: method_name, class_method: class_method)&.source_location
       end
     end
   end

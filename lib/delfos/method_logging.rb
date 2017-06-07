@@ -12,9 +12,7 @@ module Delfos
       Delfos.call_site_logger.save_call_stack(call_sites, execution_number)
     end
 
-    def log(call_site, called_object, called_method, class_method)
-      called_code = CodeLocation.from_called(called_object, called_method, class_method)
-
+    def log(call_site, called_code)
       Delfos.call_site_logger.log(call_site, called_code)
     end
 

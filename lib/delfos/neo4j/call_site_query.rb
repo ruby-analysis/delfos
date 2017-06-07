@@ -34,8 +34,8 @@ module Delfos
       def add_method_info(params, key, code_location)
         params["#{key}_type"]        = code_location.method_type
         params["#{key}_name"]        = code_location.method_name
-        params["#{key}_file"]        = code_location.method_definition_file
-        params["#{key}_line_number"] = code_location.method_definition_line
+        params["#{key}_file"]        = code_location.file
+        params["#{key}_line_number"] = code_location.line_number
       end
 
       def query

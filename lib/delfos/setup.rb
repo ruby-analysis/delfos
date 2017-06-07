@@ -8,7 +8,8 @@ module Delfos
       self.application_directories = application_directories
       self.call_site_logger = call_site_logger
 
-      perform_patching!
+      require "delfos/method_trace"
+      ::Delfos::MethodTrace.trace(Delfos.application_directories)
     end
 
     def application_directories=(dirs)

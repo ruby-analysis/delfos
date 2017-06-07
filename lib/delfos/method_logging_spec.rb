@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 require_relative "method_logging"
-require_relative "./patching/method_override"
-require_relative "./patching/method_cache"
 require_relative "../../fixtures/a"
 require_relative "../../fixtures/b"
 
@@ -41,8 +39,6 @@ module Delfos
         # MethodOverride#setup
         def called_method(args, keyword_args, &block)
           $called_line = __LINE__ - 1
-          call_site = MethodLogging::CallSiteParsing.new(caller.dup, stack_offset: MAGIC_OFFSET).perform
-
           Delfos::MethodLogging.log(
             call_site,
             self,
