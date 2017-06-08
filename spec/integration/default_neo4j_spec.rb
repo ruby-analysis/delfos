@@ -118,7 +118,6 @@ describe "integration with default neo4j logging" do
 
   context "class method calls an instance method" do
     before(:each) do
-
       ClassMethodCallsAnInstanceMethod.a_class_method
 
       Delfos::Neo4j.flush!

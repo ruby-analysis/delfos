@@ -11,7 +11,7 @@ module Delfos
         @object       = object
         @method_name  = method_name
         @file         = file
-        @line_number  = line_number.to_i
+        @line_number  = line_number
         @class_method = class_method
       end
 
@@ -24,7 +24,7 @@ module Delfos
       end
 
       def method_type
-        class_method ? "InstanceMethod" : "ClassMethod"
+        class_method ? "ClassMethod" : "InstanceMethod"
       end
 
       def to_s

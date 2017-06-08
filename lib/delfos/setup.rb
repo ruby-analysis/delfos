@@ -33,11 +33,10 @@ module Delfos
     end
 
     def reset!
-      reset_call_stack!
-      reset_batch!
-
       disable_tracepoint!
 
+      reset_call_stack!
+      reset_batch!
 
       reset_top_level_variables!
       reset_app_directories!

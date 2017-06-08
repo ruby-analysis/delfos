@@ -16,11 +16,11 @@ module Delfos
       end
 
       def container_method_path
-        container_method.path
+        container_method.raw_path
       end
 
       def called_method_path
-        called_method.path
+        called_method.raw_path
       end
 
       def to_s

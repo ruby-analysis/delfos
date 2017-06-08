@@ -1,8 +1,8 @@
 # Delfos
 
-[![CircleCI](https://circleci.com/gh/markburns/delfos.svg?style=svg)](https://circleci.com/gh/markburns/delfos)
-[![Dependency Status](http://img.shields.io/gemnasium/markburns/delfos.svg?style=flat-square)](https://gemnasium.com/markburns/delfos)
-[![Code Climate](http://img.shields.io/codeclimate/github/markburns/delfos.svg?style=flat-square)](https://codeclimate.com/github/markburns/delfos)
+[![CircleCI](https://circleci.com/gh/ruby-analysis/delfos.svg?style=svg)](https://circleci.com/gh/ruby-analysis/delfos)
+[![Dependency Status](http://img.shields.io/gemnasium/ruby-analysis/delfos.svg?style=flat-square)](https://gemnasium.com/ruby-analysis/delfos)
+[![Code Climate](http://img.shields.io/codeclimate/github/ruby-analysis/delfos.svg?style=flat-square)](https://codeclimate.com/github/ruby-analysis/delfos)
 [![Gem Version](http://img.shields.io/gem/v/delfos.svg?style=flat-square)](https://rubygems.org/gems/delfos)
 
 # Background
@@ -40,7 +40,7 @@ For the code in files [fixtures/a.rb](fixtures/a.rb) and [fixtures/b.rb](fixture
 ```
 
 ## Example usage with customer logger
-See https://github.com/markburns/delfos-custom-call-site-logger-example
+See https://github.com/ruby-analysis/delfos-custom-call-site-logger-example
 
 ![custom-call-site-logger](examples/custom-call-site-logger.gif)
 
@@ -55,7 +55,7 @@ Delfos by default depends upon an _optional_ connection to a Neo4j instance for 
 #Gemfile
 # Until this gem is a little more stable, then github master will be the best
 # place to install from.
-gem 'delfos', :git => 'https://github.com/markburns/delfos.git'
+gem 'delfos', :git => 'https://github.com/ruby-analysis/delfos.git'
 
 
 #e.g.  in config/initializers/delfos.rb or equivalent

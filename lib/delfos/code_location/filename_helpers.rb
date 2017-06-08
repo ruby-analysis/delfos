@@ -10,6 +10,10 @@ module Delfos
         relative_filename(@file)
       end
 
+      def raw_path
+        @file
+      end
+
       private
 
       def relative_filename(f)

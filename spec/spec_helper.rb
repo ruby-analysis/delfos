@@ -31,7 +31,9 @@ RSpec.configure do |c|
   c.before(:suite) do
     Delfos.reset!
   end
-
+  c.after(:suite) do
+    puts Delfos::MethodTrace::ALL_ERRORS
+  end
   c.before(:each) do |e|
     Delfos.reset!
     ShowClassInstanceVariables.variables_for(Delfos)

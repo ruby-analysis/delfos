@@ -19,6 +19,7 @@ module Delfos
 
         map_call_sites do |c, i|
           params.merge!(call_site_params(c, i))
+          params.merge!(container_method_params(c.container_method, i))
         end
 
         params
@@ -70,12 +71,17 @@ module Delfos
         QUERY
       end
 
+      def container_method_params(m, i)
+        {
+          "klass#{i}"                  => m.klass.to_s,
+          "method_name#{i}"            => m.method_name,
+          "method_type#{i}"            => m.method_type,
+          "method_definition_line#{i}" => m.line_number,
+        }
+      end
+
       def call_site_params(cs, i)
         {
-          "klass#{i}"                  => cs.container_method.klass.to_s,
-          "method_name#{i}"            => cs.container_method.method_name,
-          "method_type#{i}"            => cs.container_method.method_type,
-          "method_definition_line#{i}" => cs.container_method.line_number,
           "file#{i}"                   => cs.file,
           "line_number#{i}"            => cs.line_number,
           "execution_count#{i}"        => execution_count,

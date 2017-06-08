@@ -6,13 +6,15 @@ require_relative "app_directories"
 
 module Delfos
   class MethodTrace
+    ALL_ERRORS = {}
+
     class << self
-      STACK_OFFSET = 6
+      STACK_OFFSET = 5
 
       def trace
-        on_raise.enable
         on_call.enable
         on_return.enable
+        on_raise.enable
       end
 
       def disable!
@@ -24,70 +26,52 @@ module Delfos
 
         @on_raise&.disable
         @on_raise = nil
-
-        @disable_trace_point = nil
       end
 
       def on_call
         @on_call ||= TracePoint.new(:call) do |tp|
+          next unless AppDirectories.include_files?(tp.path)
           handle_call(tp)
         end
       end
 
-      def temporarily_disable_trace_point
-        return if @disable_trace_point
-        @disable_trace_point = true
-
-        yield
-
-        @disable_trace_point = false
-      end
-
       def handle_call(tp)
-        temporarily_disable_trace_point do
-          call_site = call_site_from(tp)
-          return unless relevant?(call_site)
+        call_site = call_site_from(tp)
+        return unless relevant?(call_site)
 
-          CallStack.push(call_site)
+        CallStack.push(call_site)
 
-          Delfos.call_site_logger.log(call_site)
-        end
+        Delfos.call_site_logger.log(call_site)
       end
 
       def on_return
         @on_return ||= TracePoint.new(:return) do |tp|
-          handle_return tp
-        end
-      end
-
-      def handle_return(tp)
-        temporarily_disable_trace_point do
-          call_site = call_site_from(tp)
-          return unless relevant?(call_site)
-
-          CallStack.pop rescue nil
+          next unless AppDirectories.include_files?(tp.path)
+          handle_return(tp)
         end
       end
 
       def on_raise
         @on_raise ||= TracePoint.new(:raise) do |tp|
-          temporarily_disable_trace_point do
-            #next unless relevant?(tp)
-            # TODO - how to determine if this is an unhandled exception ? so should pop_until_top
-            # CallStack.pop_until_top
-          end
+          next unless AppDirectories.include_files?(tp.path)
+          #next unless relevant?(tp)
+          # TODO - how to determine if this is an unhandled exception ? so should pop_until_top
+          # CallStack.pop_until_top
         end
+      end
+
+      def handle_return(tp)
+        call_site = call_site_from(tp)
+        return unless relevant?(call_site)
+
+        CallStack.pop rescue nil
       end
 
       private
 
       def relevant?(call_site)
-        puts call_site.path
-        puts call_site.container_method_path
-        puts call_site.called_method_path
-
-        AppDirectories.include_files?(
-          call_site.path,
+        call_site && AppDirectories.include_files?(
+          call_site.raw_path,
           call_site.container_method_path,
           call_site.called_method_path
         )
@@ -98,25 +82,39 @@ module Delfos
           file:        eval_in_caller("__FILE__"),
           line_number: eval_in_caller("__LINE__"),
           container_method: container_method,
-          called_method: called_method(tp),
+          called_method:    called_method(tp),
         )
       end
+
+      RUBY_IS_MAIN                = "self.class == Object && self&.to_s == 'main'"
+      RUBY_INSTANCE_METHOD_SOURCE = "self.class.instance_method(__method__).source_location"
+      RUBY_CLASS_METHOD_SOURCE    = "method(__method__).source_location"
 
       def container_method
+        object       = eval_in_caller('self', 1)
+        class_method = eval_in_caller('is_a?(Module)', 1)
+        method_finder = class_method ? RUBY_CLASS_METHOD_SOURCE : RUBY_INSTANCE_METHOD_SOURCE
+        file         = eval_in_caller("#{RUBY_IS_MAIN} ? __FILE__ : #{method_finder}.first", 1)
+        line         = eval_in_caller("#{RUBY_IS_MAIN} ? 0        : #{method_finder}.last",  1)
+        meth         = eval_in_caller("__method__", 1)
+
         CodeLocation::Method.new(
-          object:       eval_in_caller('is_a?(Module) ? self : self.class', 1),
-          method_name:  eval_in_caller("__method__", 1),
-          file:         eval_in_caller("method(__method__).source_location.first", 1),
-          line_number:  eval_in_caller("method(__method__).source_location.last", 1),
-          class_method: eval_in_caller('is_a?(Module)', 1),
+          object:       object,
+          method_name:  meth,
+          file:         file,
+          line_number:  line,
+          class_method: class_method,
         )
       end
 
-      def eval_in_caller(s, extra_offset=0)
-        return if s.nil?
-
+      def eval_in_caller(s, extra_offset=0, &block)
         other = binding.of_caller(STACK_OFFSET + extra_offset)
-        other.eval(s)
+
+        begin
+          other.eval(s)
+        rescue Exception => e
+          ALL_ERRORS[e.message] = other.receiver
+        end
       end
 
       def called_method(tp)
