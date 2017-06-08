@@ -9,7 +9,7 @@ module Delfos
       self.call_site_logger = call_site_logger
 
       require "delfos/method_trace"
-      ::Delfos::MethodTrace.trace(Delfos.application_directories)
+      ::Delfos::MethodTrace.trace
     end
 
     def application_directories=(dirs)
@@ -34,15 +34,18 @@ module Delfos
 
     def reset!
       reset_call_stack!
-      reset_parser_cache!
       reset_batch!
 
-      reset_unstubbing_and_method_cache!
+      disable_tracepoint!
 
-      remove_patching!
-      reset_method_logging!
 
       reset_top_level_variables!
+      reset_app_directories!
+    end
+
+    def disable_tracepoint!
+      require "delfos/method_trace"
+      ::Delfos::MethodTrace.disable!
     end
 
     def reset_call_stack!
@@ -50,10 +53,6 @@ module Delfos
         k.pop_until_top!
         k.reset!
       end
-    end
-
-    def reset_parser_cache!
-      ignoring_undefined("Delfos::Patching::Parameters::FileParserCache", &:reset!)
     end
 
     def reset_batch!
@@ -66,15 +65,8 @@ module Delfos
       end
     end
 
-    def reset_unstubbing_and_method_cache!
-      # unstubbing depends upon MethodCache being still defined
-      # so this order is important
-      unstub_all!
-      remove_cached_methods!
-    end
-
-    def reset_method_logging!
-      ignoring_undefined("Delfos::MethodLogging", &:reset!)
+    def reset_app_directories!
+      ignoring_undefined("Delfos::AppDirectories", &:reset!)
     end
 
     def reset_top_level_variables!
@@ -96,22 +88,6 @@ module Delfos
     def with_rescue
       yield
     rescue Delfos::Neo4j::QueryExecution::ExpiredTransaction
-    end
-
-    def unstub_all!
-      ignoring_undefined("Delfos::Patching::Unstubber", &:unstub_all!)
-    end
-
-    def remove_cached_methods!
-      ignoring_undefined("Delfos::Patching::MethodCache", &:reset!)
-    end
-
-    def remove_patching!
-      load "delfos/patching/basic_object_remove.rb"
-    end
-
-    def perform_patching!
-      load "delfos/patching/basic_object.rb"
     end
   end
 end

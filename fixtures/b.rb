@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 class B
-  def another_method(that, *_args, **_keyword_args)
+  def another_method(that)
     that.to_s
 
     C.new.method_with_no_more_method_calls # cs2 e-step

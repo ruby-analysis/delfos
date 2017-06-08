@@ -11,7 +11,6 @@ For more on the background behind this project see [SOLID](solid.md) or [This ta
 # Functionality
   * Record runtime type information and call site file locations in every method call of your application for most ruby programs
   * Ignores library code - i.e. only records method calls defined in your application
-  * [Not yet] Working with programs which redefine `BasicObject.inherited`, `.method_added`, `.singleton_method_added`
   * [Not yet] Analysis of type information in Neo4j to:
     * show cyclic dependencies
     * highlight dependency issues across large file system distances
@@ -46,7 +45,7 @@ See https://github.com/markburns/delfos-custom-call-site-logger-example
 ![custom-call-site-logger](examples/custom-call-site-logger.gif)
 
 ## Dependencies
-Only two gem dependencies on `binding_of_caller` and `parser`
+Only one gem dependency on `binding_of_caller`
 
 Delfos by default depends upon an _optional_ connection to a Neo4j instance for recording data.
 
@@ -61,7 +60,7 @@ gem 'delfos', :git => 'https://github.com/markburns/delfos.git'
 
 #e.g.  in config/initializers/delfos.rb or equivalent
 
-# Delfos monkey patches BasicObjeect, so we recommend only setting up when required
+# Delfos affects performance, so we recommend only setting up when required
 if defined?(Delfos) && ENV["DELFOS_ENABLED"]
   Delfos.setup!
 end
@@ -76,6 +75,9 @@ end
 
 Delfos.flush!
 Delfos.update_distance!
+
+# to disable Delfos
+Delfos.reset!
 
 
 ```
@@ -109,19 +111,16 @@ end
 You can supply an object for the `call_site_logger` that responds to `#log` and `#save_call_sites`
 
 #### `call_site_logger#log`
-`#log` receives the following objects : `(arguments, call_site, called_code)`
+`#log` receives the following objects : `(call_site)`
 
 Where:
-  * `arguments` has the following methods defined:
-   * `args` An array of classes referencing the type of the argument (if the argument is an instance - it refers to the class of that instance)
-   * `keyword_args` as above but for the keyword arguments in the method call
-  * `call_site` & `called_code` have the following methods defined:
+  * `call_site` has the following methods:
+    * `container_method`, `called_method`, `file`, `line_number`
+  * `container_method` & `called_method` have the following methods defined:
     * `file`
     * `line_number`
     * `object` - refers to the self defined at that line during runtime
     * `class_method` - boolean
-      * for call sites - true if the call site is defined in a class method
-      * for called_code if the called method is a class method
 
 #### `call_site_logger#save_call_sites`
 `#save_call_sites` receives the following objects : `(call_sites, execution_count)`
@@ -221,10 +220,6 @@ I would like to create a UI for visualizing call stacks with their respective fi
 ### Command line tool
 I want to detect common software design mistakes in a way which is useful/actionable like rubocop.
 
-### Cope with Metaprogramming
-It would be nice if Delfos were able to handle code which defines/re-defines
-the 3 metaprogramming methods it uses.
-
 
 # Development
 
@@ -244,7 +239,7 @@ lib/delfos/neo4j/
 The rake task is setup to handle this default and is equivalent to the following:
 
 ```
-NEO4J_HOST=http://localhost NEO4J_PORT=7474 NEO4J_USERNAME=username NEO4J_PASSWORD=password bundle exec rspec lib
+NEO4J_HOST=http://localhost NEO4J_PORT=7476 NEO4J_USERNAME=username NEO4J_PASSWORD=password bundle exec rspec lib
 ```
 
 

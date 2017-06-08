@@ -3,11 +3,12 @@
 module Delfos
   module Neo4j
     class CallSiteQuery
-      attr_reader :args, :call_site, :called_code
+      attr_reader :container_method, :call_site, :called_method
 
-      def initialize(call_site, called_code)
+      def initialize(call_site)
         @call_site = call_site
-        @called_code = called_code
+        @container_method = call_site.container_method
+        @called_method = call_site.called_method
 
         assign_query_variables
       end
@@ -15,12 +16,12 @@ module Delfos
       def params
         params = initial_params
 
-        add_method_info(params, "m1", call_site)
+        add_method_info(params, "m1", container_method)
 
         params["cs_file"]        = call_site.file
         params["cs_line_number"] = call_site.line_number
 
-        add_method_info(params, "m2", called_code)
+        add_method_info(params, "m2", called_method)
 
         params
       end
@@ -46,7 +47,7 @@ module Delfos
         <<-QUERY
           #{klasses_query}
 
-          MERGE (#{query_variable(call_site.klass)}) - [:OWNS] ->
+          MERGE (#{query_variable(container_method.klass)}) - [:OWNS] ->
             #{method_node("m1")}
 
           MERGE (m1) - [:CONTAINS] ->
@@ -57,7 +58,7 @@ module Delfos
               }
             )
 
-          MERGE (#{query_variable(called_code.klass)}) - [:OWNS] ->
+          MERGE (#{query_variable(called_method.klass)}) - [:OWNS] ->
             #{method_node("m2")}
 
           MERGE (cs) - [:CALLS] -> (m2)
@@ -65,7 +66,7 @@ module Delfos
       end
 
       def assign_query_variables
-        klasses = [call_site.klass, called_code.klass]
+        klasses = [container_method.klass, called_method.klass]
 
         klasses.uniq.each do |k|
           query_variables.assign(k, "k")
@@ -94,8 +95,8 @@ module Delfos
       end
 
       class QueryVariables < Hash
-        def initialize(*args)
-          super(*args)
+        def initialize
+          super
           @counters = Hash.new(1)
         end
 

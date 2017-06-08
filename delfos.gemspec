@@ -30,7 +30,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "binding_of_caller", "~> 0.7.2", ">= 0.7.0"
-  spec.add_dependency "parser"
 
   spec.add_development_dependency "simplecov"
   spec.add_development_dependency "rspec_junit_formatter", ">= 0.2.3"

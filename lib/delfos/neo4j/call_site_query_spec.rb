@@ -2,37 +2,39 @@
 require_relative "call_site_query"
 
 class A; end
-class B; end
-class C; end
-class D; end
 class E; end
 
 module Delfos
   module Neo4j
     describe CallSiteQuery do
-      let(:called_code) do
-        double "CalledCode",
-          klass: E,
-          file: "e.rb",
-          line_number: 2,
-          method_name: "method_e",
-          method_definition_file: "some/filename",
-          method_definition_line: 2,
-          method_type: "InstanceMethod"
+      let(:container_method) do
+        double "ContainerMethod",
+          klass: A,                       # class A
+          method_type: "ClassMethod",     #   def self.method_a    # m1
+          method_name: "method_a",        #     E.new.method_e     # call site
+          file: "a.rb",
+          line_number: 2
       end
+
 
       let(:call_site) do
-        double "CallSite",
-          klass: A,
-          file: "a.rb",
-          line_number: 4,
-          method_name: "method_a",
-          method_type: "ClassMethod",
-          method_definition_file: "a.rb",
-          method_definition_line: 2
+        double "CallSite",      # class A
+          file: "a.rb",         #   def self.method_a    # m1
+          line_number: 3,       #     E.new.method_e     # call site
+          container_method: container_method,
+          called_method: called_method
       end
 
-      subject { described_class.new(call_site, called_code) }
+      let(:called_method) do
+        double "CalledCode",
+          klass: E,                       # class E
+          method_type: "InstanceMethod",  #   def method_e        # m2
+          method_name: "method_e",        #
+          file: "e.rb",
+          line_number: 2
+      end
+
+      subject { described_class.new(call_site) }
 
       before do
         wipe_db!
@@ -41,19 +43,19 @@ module Delfos
       it "#params" do
         params = subject.params
 
-        expect(params).to eq("k1" => "A",
-                             "k2" => "E",
-                             "m1_type" => "ClassMethod",
-                             "m1_name" => "method_a",
+        expect(params).to eq("k1" => "A",                   # class A
+                             "m1_type" => "ClassMethod",    #   def self.method_a    # m1
+                             "m1_name" => "method_a",       #     E.new.method_e     # call site
                              "m1_file" => "a.rb",
                              "m1_line_number" => 2,
 
                              "cs_file" => "a.rb",
-                             "cs_line_number" => 4,
+                             "cs_line_number" => 3,
 
-                             "m2_type" => "InstanceMethod",
-                             "m2_name" => "method_e",
-                             "m2_file" => "some/filename",
+                             "k2" => "E",                   # class E
+                             "m2_type" => "InstanceMethod", #   def method_e        # m2
+                             "m2_name" => "method_e",       #
+                             "m2_file" => "e.rb",
                              "m2_line_number" => 2)
       end
 

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require_relative "neo4j"
 require_relative "call_stack/stack"
 
 module Delfos
@@ -19,8 +18,8 @@ module Delfos
       end
     end
 
-    def push(method_object)
-      stack.push(method_object)
+    def push(call_site)
+      stack.push(call_site)
     end
 
     def pop
@@ -32,7 +31,7 @@ module Delfos
     end
 
     def save!(call_sites, execution_number)
-      Delfos::MethodLogging.save_call_stack(call_sites, execution_number)
+      Delfos.call_site_logger.save_call_stack(call_sites, execution_number)
     end
   end
 end

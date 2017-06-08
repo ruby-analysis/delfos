@@ -14,7 +14,7 @@ module Delfos
       end
 
       def pop
-        popping_empty_stack! if self.stack_depth.zero?
+        raise PoppingEmptyStackError if self.stack_depth.zero?
 
         self.stack_depth -= 1
 
@@ -45,12 +45,6 @@ module Delfos
       end
 
       attr_writer :stack_depth, :step_count, :execution_count, :call_sites
-
-      private
-
-      def popping_empty_stack!
-        raise PoppingEmptyStackError
-      end
     end
 
     class PoppingEmptyStackError < StandardError

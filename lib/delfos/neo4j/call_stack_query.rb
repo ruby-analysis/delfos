@@ -48,7 +48,7 @@ module Delfos
             m#{i} :Method {
               type: {method_type#{i}},
               name: {method_name#{i}},
-              file: {method_definition_file#{i}},
+              file: {file#{i}},
               line_number: {method_definition_line#{i}}}
           )
 
@@ -72,14 +72,13 @@ module Delfos
 
       def call_site_params(cs, i)
         {
-          "klass#{i}"                  => cs.klass.to_s,
-          "method_name#{i}"            => cs.method_name,
-          "method_type#{i}"            => cs.method_type,
-          "method_definition_file#{i}" => cs.method_definition_file,
-          "execution_count#{i}"        => execution_count,
-          "method_definition_line#{i}" => cs.method_definition_line,
+          "klass#{i}"                  => cs.container_method.klass.to_s,
+          "method_name#{i}"            => cs.container_method.method_name,
+          "method_type#{i}"            => cs.container_method.method_type,
+          "method_definition_line#{i}" => cs.container_method.line_number,
           "file#{i}"                   => cs.file,
           "line_number#{i}"            => cs.line_number,
+          "execution_count#{i}"        => execution_count,
           "step_number#{i}"            => i + 1,
         }
       end
