@@ -42,7 +42,6 @@ describe "integration with default neo4j logging" do
 
       it do
         e_count, e2_count = result
-        byebug
 
         expect(e_count).to eq 1
         expect(e2_count).to eq 1
