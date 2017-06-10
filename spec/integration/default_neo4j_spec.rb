@@ -20,7 +20,7 @@ describe "integration with default neo4j logging" do
   end
 
   after do
-    Delfos.reset!
+    Delfos.finish!
   end
 
   context "with a and b fixture files" do
@@ -106,7 +106,7 @@ describe "integration with default neo4j logging" do
         expect(a_method_count).to eq 1
 
         expect(method_a).to eq("file" => "fixtures/a.rb",
-                               "line_number" => 3,
+                               "line_number" => 5,
                                "name" => "some_method",
                                "type" => "InstanceMethod")
 

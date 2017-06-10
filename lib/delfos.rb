@@ -35,8 +35,14 @@ module Delfos
       @neo4j ||= Delfos::Neo4j.config
     end
 
-    def reset!
-      Delfos::Setup.reset!
+    def finish!
+      Delfos::Neo4j.flush!
+      Delfos::Neo4j.update_distance!
+      disable!
+    end
+
+    def disable!
+      Delfos::Setup.disable!
     end
 
     def default_logger

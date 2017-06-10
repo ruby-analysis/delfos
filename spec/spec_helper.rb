@@ -29,13 +29,15 @@ RSpec.configure do |c|
   end
 
   c.before(:suite) do
-    Delfos.reset!
+    Delfos.finish!
   end
+
   c.after(:suite) do
     puts Delfos::MethodTrace::ALL_ERRORS
   end
+
   c.before(:each) do |e|
-    Delfos.reset!
+    Delfos.finish!
     ShowClassInstanceVariables.variables_for(Delfos)
 
     Delfos.logger = $delfos_test_logger if defined? $delfos_test_logger

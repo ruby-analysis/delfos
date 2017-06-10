@@ -32,7 +32,7 @@ module Delfos
       Delfos:: Neo4j::CallSiteLogger.new
     end
 
-    def reset!
+    def disable!
       disable_tracepoint!
 
       reset_call_stack!

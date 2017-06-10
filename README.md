@@ -72,14 +72,10 @@ end
 # and callsite information
 
 # When you are finished call from e.g. a console
+# This flushes neo4j queries, updates the distance metrics
+# and disables Delfos
 
-Delfos.flush!
-Delfos.update_distance!
-
-# to disable Delfos
-Delfos.reset!
-
-
+Delfos.finish!
 ```
 
 recording test runs with rspec
@@ -94,8 +90,7 @@ RSpec.configure do |c|
   end
 
   c.after(:suite) do
-    Delfos.flush!
-    Delfos.update_distance!
+    Delfos.finish!
   end
 end
 ```

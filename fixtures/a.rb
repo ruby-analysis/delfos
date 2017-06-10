@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require_relative "b"
+
 class A
   def some_method
     B.new.another_method(self) # cs1 e-step1
@@ -8,6 +10,10 @@ class A
 
   def to_s
     "a"
+  end
+
+  def self.boom!
+    raise "kaboom"
   end
 end
 
