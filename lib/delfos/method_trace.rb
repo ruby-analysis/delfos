@@ -42,9 +42,6 @@ module Delfos
         @on_raise ||= TracePoint.new(:raise) do |tp|
           next unless AppDirectories.include_files?(tp.path)
           RaiseHandler.new(tp).perform
-          #next unless relevant?(tp)
-          # TODO - how to determine if this is an unhandled exception ? so should pop_until_top
-          # CallStack.pop_until_top
         end
       end
     end

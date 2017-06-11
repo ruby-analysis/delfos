@@ -37,7 +37,10 @@ RSpec.configure do |c|
   end
 
   c.before(:each) do |e|
+    begin
     Delfos.finish!
+    rescue Delfos::Neo4j::QueryExecution::ExpiredTransaction
+    end
     ShowClassInstanceVariables.variables_for(Delfos)
 
     Delfos.logger = $delfos_test_logger if defined? $delfos_test_logger

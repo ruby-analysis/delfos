@@ -25,7 +25,7 @@ module Delfos
         )
       end
 
-      STACK_OFFSET = 6
+      STACK_OFFSET = 5
 
       def call_site
         @call_site ||= CodeLocation::CallSite.new(

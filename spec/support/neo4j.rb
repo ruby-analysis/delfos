@@ -10,7 +10,6 @@ module DelfosSpecNeo4jHelpers
   def wipe_db!
     require "delfos/neo4j"
     Delfos.setup_neo4j!
-    Delfos::Neo4j.flush!
 
     perform_query "MATCH (m)-[rel]->(n) DELETE m, rel, n"
     perform_query "MATCH (m) DELETE m"
@@ -29,7 +28,7 @@ RSpec.configure do |c|
     begin
       DelfosSpecNeo4jHelpers.wipe_db!
     rescue *Delfos::Neo4j::QueryExecution::HTTP_ERRORS,
-           Delfos::Neo4j::QueryExecution::ConnectionError => e
+      Delfos::Neo4j::QueryExecution::ConnectionError => e
       puts <<-ERROR
        ***************************************
        ***************************************

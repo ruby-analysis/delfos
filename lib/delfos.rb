@@ -35,8 +35,12 @@ module Delfos
       @neo4j ||= Delfos::Neo4j.config
     end
 
-    def finish!
+    def flush!
       Delfos::Neo4j.flush!
+    end
+
+    def finish!
+      flush!
       Delfos::Neo4j.update_distance!
       disable!
     end

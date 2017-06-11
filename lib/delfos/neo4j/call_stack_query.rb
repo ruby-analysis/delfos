@@ -1,11 +1,19 @@
 # frozen_string_literal: true
+require_relative "query_variables"
+
 module Delfos
   module Neo4j
     class CallStackQuery
+      include QueryVariablesAssignment
+
       def initialize(call_sites, execution_count)
         @call_sites = call_sites
 
         @execution_count = execution_count
+
+        call_sites.each do |cs|
+          assign_query_variables(cs.container_method)
+        end
       end
 
       def query
@@ -29,18 +37,26 @@ module Delfos
 
       attr_reader :call_sites, :execution_count
 
-      def map_call_sites
-        call_sites.compact.map.with_index do |c, i|
-          yield c, i
-        end
+      def map_call_sites(&block)
+        call_sites.map.with_index(&block)
       end
 
-      def call_site_query(_cs, i)
+      def klasses_query
+        query_variables.values.map do |v|
+          "MERGE ( #{v}:Class { name: {klass#{v.gsub("k", "")}} })"
+        end.join("\n")
+      end
+
+      def call_site_query(cs, i)
+        container_klass_key = query_variable(cs.container_method.klass)
+
         <<-QUERY
+          #{klasses_query if i.zero?}
+
           MERGE
 
           (
-            k#{i}:Class { name: {klass#{i}} }
+            #{container_klass_key}
           )
 
           - [:OWNS] ->
@@ -72,8 +88,10 @@ module Delfos
       end
 
       def container_method_params(m, i)
+        k = query_variable(m.klass).gsub(/k/, "")
+
         {
-          "klass#{i}"                  => m.klass.to_s,
+          "klass#{k}"                  => m.klass.to_s,
           "method_name#{i}"            => m.method_name,
           "method_type#{i}"            => m.method_type,
           "method_definition_line#{i}" => m.line_number,

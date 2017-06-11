@@ -16,6 +16,7 @@ module Delfos
 
           def flush!
             instance&.flush!
+            @instance = nil
           end
 
           attr_accessor :instance
