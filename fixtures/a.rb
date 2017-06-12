@@ -22,3 +22,6 @@ class D
 
   end
 end
+
+a = A.new.some_method
+# B.new.another_method a
