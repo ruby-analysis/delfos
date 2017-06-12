@@ -5,19 +5,21 @@ module Delfos
   class MethodTrace
     class ContainerMethod
       include EvalInCaller
-      STACK_OFFSET = 8
+      STACK_OFFSET = 9
 
       def determine
         # ensure evaluated and memoised with correct stack offset
         class_method
 
-        CodeLocation::Method.new(
+        code_location_method = CodeLocation::Method.new(
           object:       object,
           method_name:  meth,
           file:         file,
           line_number:  line,
           class_method: class_method,
         )
+
+        code_location_method#.tap{|o| puts o }
       end
 
       private
@@ -27,7 +29,24 @@ module Delfos
       end
 
       def class_method
-        @class_method ||= eval_in_caller('is_a?(Module)', STACK_OFFSET)
+        # TODO: This is nuts
+        # Evaluating "self.is_a?(Module)" is non-deterministic even though it's memoized
+        #
+        # Somehow in hell the following gives us a workaround
+        #
+        # You can try it out yourself with `puts class_method` when running
+        #
+        # spec/integration/neo4j/call_sites_spec.rb
+        # vs `puts code_location.inspect` on line 22 of this file
+        #
+        # and using this more sane implementation:
+        #
+        # @class_method ||= eval_in_caller('is_a?(Module)', STACK_OFFSET)
+        #
+        # The output value will be false the first time
+        # but true inside the code_location
+        @result ||= eval_in_caller('{self =>  is_a?(Module)}', STACK_OFFSET)
+        @class_method ||= @result.values.first
       end
 
       RUBY_IS_MAIN                = "self.class == Object && self&.to_s == 'main'"
