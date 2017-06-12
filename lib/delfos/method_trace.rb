@@ -25,23 +25,23 @@ module Delfos
       end
 
       def on_call
-        @on_call ||= TracePoint.new(:call) do |tp|
-          next unless AppDirectories.include_files?(tp.path)
-          CallHandler.new(tp).perform
-        end
+        @on_call ||= setup_trace_point(:call, CallHandler)
       end
 
       def on_return
-        @on_return ||= TracePoint.new(:return) do |tp|
-          next unless AppDirectories.include_files?(tp.path)
-          ReturnHandler.new(tp).perform
-        end
+        @on_return ||= setup_trace_point(:return, ReturnHandler)
       end
 
       def on_raise
-        @on_raise ||= TracePoint.new(:raise) do |tp|
+        @on_raise ||= setup_trace_point(:raise, RaiseHandler)
+      end
+
+      private
+
+      def setup_trace_point(type, klass)
+        TracePoint.new(type) do |tp|
           next unless AppDirectories.include_files?(tp.path)
-          RaiseHandler.new(tp).perform
+          klass.new(tp).perform
         end
       end
     end
