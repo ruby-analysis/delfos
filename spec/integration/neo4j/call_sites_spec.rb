@@ -51,6 +51,7 @@ describe "integration with default neo4j logging" do
       call_site_1_count, call_site_2_count, call_site_3_count =
         result
 
+      byebug
       expect(call_site_1_count).to eq 1
       expect(call_site_2_count).to eq 1
       expect(call_site_3_count).to eq 1

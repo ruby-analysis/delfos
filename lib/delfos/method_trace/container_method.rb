@@ -31,7 +31,7 @@ module Delfos
       end
 
       RUBY_IS_MAIN                = "self.class == Object && self&.to_s == 'main'"
-      RUBY_SOURCE_LOCATION        = "(__method__).source_location"
+      RUBY_SOURCE_LOCATION        = "(__method__).source_location if __method__"
       RUBY_CLASS_METHOD_SOURCE    = "method#{RUBY_SOURCE_LOCATION}"
       RUBY_INSTANCE_METHOD_SOURCE = "self.class.instance_method#{RUBY_SOURCE_LOCATION}"
 
@@ -40,11 +40,11 @@ module Delfos
       end
 
       def file
-        @file ||= eval_in_caller("(#{RUBY_IS_MAIN}) ? __FILE__ : (#{method_finder}.first)", STACK_OFFSET)
+        @file ||= eval_in_caller("(#{RUBY_IS_MAIN}) ? __FILE__ : ((#{method_finder})&.first)", STACK_OFFSET)
       end
 
       def line
-        @line ||= eval_in_caller("(#{RUBY_IS_MAIN}) ? 0 : (#{method_finder}.last)", STACK_OFFSET)
+        @line ||= eval_in_caller("(#{RUBY_IS_MAIN}) ? 0 : ((#{method_finder})&.last)", STACK_OFFSET)
       end
 
       def meth
