@@ -15,10 +15,6 @@ module Delfos
         @called_method    = called_method
       end
 
-      def paths
-        [raw_path, container_method_path, called_method_path]
-      end
-
       def container_method_path
         container_method.raw_path
       end

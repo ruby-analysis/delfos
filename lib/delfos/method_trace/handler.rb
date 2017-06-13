@@ -16,7 +16,7 @@ module Delfos
       end
 
       def relevant?
-        AppDirectories.include_files?(*call_site.paths)
+        AppDirectories.include_files?(call_site.called_method_path)
       end
 
       STACK_OFFSET = 5
