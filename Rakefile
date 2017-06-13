@@ -13,6 +13,4 @@ RSpec::Core::RakeTask.new(:spec) do |t|
   end
 end
 
-load "ext/delfos/file_system/pathname/compile.rake"
-
-task default: %i[compile spec]
+task default: %i[spec]

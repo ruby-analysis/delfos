@@ -18,7 +18,7 @@ module DelfosSpecHelpers
   end
 
   def pathname_klass
-    Delfos::FileSystem::Pathname
+    Pathname
   end
 
   def match_file_array(a, b)

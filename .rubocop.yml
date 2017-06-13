@@ -6,7 +6,6 @@ AllCops:
     - 'spec/**/*'
     - '**/*_spec.rb'
     - 'delfos.gemspec'
-    - 'lib/delfos/file_system/pathname_extensions.rb'
     - 'vendor/**/*'
     - 'fixtures/**/*'
     - 'db/**/*'
@@ -65,7 +64,7 @@ Style/SymbolArray:
 
 Style/ModuleFunction:
   Enabled: false
-      
+
 Style/TrailingCommaInArguments:
   # If `comma`, the cop requires a comma after the last argument, but only for
   # parenthesized method calls where each argument is on its own line.

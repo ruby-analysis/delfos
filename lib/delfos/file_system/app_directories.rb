@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative "common_path"
-require_relative "pathname"
 
 module Delfos
   module FileSystem
