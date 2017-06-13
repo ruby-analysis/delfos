@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "delfos/file_system/common_path"
 require "delfos/file_system/pathname"
 
@@ -11,7 +12,7 @@ module Delfos
     end
 
     def include_files?(*files)
-      files.all?{|f| include_file?(f) }
+      files.all? { |f| include_file?(f) }
     end
 
     def include_file?(file)

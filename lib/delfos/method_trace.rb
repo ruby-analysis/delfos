@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require_relative "method_trace/return_handler"
 require_relative "method_trace/call_handler"
 require_relative "method_trace/raise_handler"
 
 module Delfos
   class MethodTrace
-    ALL_ERRORS = {}
+    ALL_ERRORS = {}.freeze
 
     class << self
       def trace

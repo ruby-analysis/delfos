@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative "filename_helpers"
 
 module Delfos
@@ -28,7 +29,7 @@ module Delfos
       end
 
       def summary(reverse: false)
-        summary = [source_location, method_summary ]
+        summary = [source_location, method_summary]
 
         (reverse ? summary.reverse : summary).join " "
       end
@@ -42,7 +43,6 @@ module Delfos
       def source_location
         "#{file}:#{line_number}"
       end
-
 
       def separator
         class_method ? "." : "#"

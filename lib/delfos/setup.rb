@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Delfos
   module Setup
     extend self
@@ -13,7 +14,7 @@ module Delfos
     end
 
     def application_directories=(dirs)
-      dirs ||= %w(app lib)
+      dirs ||= %w[app lib]
       Delfos.application_directories = Array(dirs).map { |f| Pathname.new(f.to_s).expand_path }
     end
 

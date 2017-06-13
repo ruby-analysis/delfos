@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative "update"
 require "delfos"
 
@@ -50,7 +51,7 @@ module Delfos
 
         it "records the called classes" do
           called_klasses = parse_result(:called_klass)
-          expect(called_klasses).to match_array %w(This That SomeOther SoMuchCoupling HereIsSomeMore)
+          expect(called_klasses).to match_array %w[This That SomeOther SoMuchCoupling HereIsSomeMore]
         end
 
         describe "call_site" do

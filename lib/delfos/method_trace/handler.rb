@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "binding_of_caller"
 require "delfos/code_location/call_site"
 require "delfos/code_location/method"
@@ -30,7 +32,7 @@ module Delfos
           file:        eval_in_caller("__FILE__", stack_offset),
           line_number: eval_in_caller("__LINE__", stack_offset),
           container_method: container_method,
-          called_method:    called_method
+          called_method:    called_method,
         )
       end
 

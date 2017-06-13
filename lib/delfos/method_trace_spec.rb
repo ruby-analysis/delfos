@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "method_trace"
 require "./fixtures/a"
 
@@ -61,7 +63,7 @@ module Delfos
         expect(raise_handler).to receive(:perform).at_least(:once)
 
         described_class.on_raise.enable
-        expect{A.boom!}.to raise_error RuntimeError
+        expect { A.boom! }.to raise_error RuntimeError
       end
     end
   end

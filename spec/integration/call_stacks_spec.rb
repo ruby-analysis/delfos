@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "delfos"
 require "delfos/neo4j"
 
@@ -9,7 +10,6 @@ describe "integration" do
     Delfos.setup!(application_directories: ["fixtures"],
                   call_site_logger: call_site_logger,
                   logger: $delfos_test_logger)
-
   end
 
   context "recording call stacks" do
@@ -30,7 +30,7 @@ describe "integration" do
     it do
       index = 0
 
-      expect(call_site_logger).to receive(:save_call_stack) do |call_sites, execution_number|
+      expect(call_site_logger).to receive(:save_call_stack) do |_call_sites, execution_number|
         index += 1
         expect(execution_number).to eq index
 
@@ -40,7 +40,6 @@ describe "integration" do
         when 2
           expect_call_stack(call_stack, index, expected_call_stack_2)
         end
-
       end.exactly(2).times
 
       load "./fixtures/a_usage_2.rb"

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "call_handler"
 require "./fixtures/a_usage"
 
@@ -5,7 +7,7 @@ module Delfos
   class MethodTrace
     RSpec.describe CallHandler do
       let(:path) { "fixtures/a_usage.rb" }
-      let(:a){A.new }
+      let(:a) { A.new }
 
       let(:trace_point) do
         double "TracePoint",

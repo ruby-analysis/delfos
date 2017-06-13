@@ -46,14 +46,14 @@ Style/Documentation:
 
 # ->(i) { ... } vs. lambda { |i| ... }
 Style/LambdaCall:
-  EnforcedStyle:
+  EnforcedStyle: braces
   SupportedStyles:
     - call
     - braces
 
 # ["one", "two"] vs %w(one two), but also ["one", "another one"] vs. %w(...)
 Style/SymbolArray:
-  EnforcedStyle:
+  EnforcedStyle: percent
   SupportedStyles:
     - percent
     - brackets
@@ -64,10 +64,7 @@ Style/TrailingCommaInArguments:
   # If `consistent_comma`, the cop requires a comma after the last argument,
   # for all parenthesized method calls with arguments.
   EnforcedStyleForMultiline: comma
-  SupportedStyles:
-    - comma
-    - consistent_comma
-    - no_comma
+
 
 Style/TrailingCommaInLiteral:
   # If `comma`, the cop requires a comma after the last item in an array or
@@ -75,10 +72,7 @@ Style/TrailingCommaInLiteral:
   # If `consistent_comma`, the cop requires a comma after the last item of all
   # non-empty array and hash literals.
   EnforcedStyleForMultiline: comma
-  SupportedStyles:
-    - comma
-    - consistent_comma
-    - no_comma
+
 
 
 Style/StringLiterals:

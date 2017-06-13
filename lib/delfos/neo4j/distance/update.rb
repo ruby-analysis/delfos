@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "delfos/file_system/distance_calculation"
 require_relative "call_site_fetcher"
 

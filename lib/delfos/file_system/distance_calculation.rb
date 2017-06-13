@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative "relation"
 require_relative "path_determination"
 

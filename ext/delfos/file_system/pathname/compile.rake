@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "rake/extensiontask"
 gemspec = Gem::Specification.load("delfos.gemspec")
 

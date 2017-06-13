@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 ENV["NEO4J_HOST"]     ||= "http://localhost"
 ENV["NEO4J_PORT"]     ||= "7476"
 ENV["NEO4J_USERNAME"] ||= "neo4j"
@@ -28,7 +29,7 @@ RSpec.configure do |c|
     begin
       DelfosSpecNeo4jHelpers.wipe_db!
     rescue *Delfos::Neo4j::QueryExecution::HTTP_ERRORS,
-      Delfos::Neo4j::QueryExecution::ConnectionError => e
+           Delfos::Neo4j::QueryExecution::ConnectionError => e
       puts <<-ERROR
        ***************************************
        ***************************************

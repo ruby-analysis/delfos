@@ -15,4 +15,4 @@ end
 
 load "ext/delfos/file_system/pathname/compile.rake"
 
-task default: [:compile, :spec]
+task default: %i[compile spec]

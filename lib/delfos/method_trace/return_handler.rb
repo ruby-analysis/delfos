@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "handler"
 require "delfos/call_stack"
 
@@ -7,7 +9,11 @@ module Delfos
       def perform
         return unless relevant?
 
-        CallStack.pop rescue nil
+        begin
+          CallStack.pop
+        rescue
+          nil
+        end
       end
     end
   end

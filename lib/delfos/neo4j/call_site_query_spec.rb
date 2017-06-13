@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative "call_site_query"
 
 class A; end
@@ -17,7 +18,6 @@ module Delfos
           file: "a.rb",
           line_number: 2
       end
-
 
       let(:call_site) do
         double "CallSite",      # class A
@@ -110,7 +110,7 @@ module Delfos
           it "only has one class param" do
             params = subject.params
 
-            expect(params).to eq("k0" => "A",                   # class A
+            expect(params).to eq("k0" => "A", # class A
                                  "container_method_type" => "ClassMethod",    #   def self.method_a    # container_method
                                  "container_method_name" => "method_a",       #     E.new.method_e     # call site
                                  "container_method_file" => "a.rb",
@@ -167,7 +167,6 @@ module Delfos
             expect(strip_whitespace(query)).to eq strip_whitespace(expected)
           end
         end
-
       end
     end
   end

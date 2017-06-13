@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative "call_stack_query"
 require "./fixtures/a"
 
@@ -12,19 +13,18 @@ module Delfos
         let(:cs_3) { double "CallSite", file: "file_cs3", line_number: 6, container_method: cm_3, called_method: called_3 }
 
         let(:cm_1) { double "ContainerMethod", file: "file_container_method1", line_number: 1, klass: container_klass_1, method_name: "some_method",        method_type: "ClassMethod" }
-        let(:cm_2) { double "ContainerMethod", file: "file_container_method2", line_number: 2, klass: container_klass_2, method_name: "another_method",     method_type: "InstanceMethod"}
-        let(:cm_3) { double "ContainerMethod", file: "file_container_method3", line_number: 3, klass: container_klass_3, method_name: "yet_another_method", method_type: "ClassMethod"}
+        let(:cm_2) { double "ContainerMethod", file: "file_container_method2", line_number: 2, klass: container_klass_2, method_name: "another_method",     method_type: "InstanceMethod" }
+        let(:cm_3) { double "ContainerMethod", file: "file_container_method3", line_number: 3, klass: container_klass_3, method_name: "yet_another_method", method_type: "ClassMethod" }
         let(:container_klass_1) { A }
         let(:container_klass_2) { B }
         let(:container_klass_3) { A }
 
         let(:called_1) { double "CalledMethod", file: "file_called_method1", line_number: 7, klass: called_klass_1, method_name: "a_method", method_type: "ClassMethod" }
-        let(:called_2) { double "CalledMethod", file: "file_called_method2", line_number: 8, klass: called_klass_2, method_name: "b_method", method_type: "InstanceMethod"}
-        let(:called_3) { double "CalledMethod", file: "file_called_method3", line_number: 9, klass: called_klass_3, method_name: "c_method", method_type: "ClassMethod"}
+        let(:called_2) { double "CalledMethod", file: "file_called_method2", line_number: 8, klass: called_klass_2, method_name: "b_method", method_type: "InstanceMethod" }
+        let(:called_3) { double "CalledMethod", file: "file_called_method3", line_number: 9, klass: called_klass_3, method_name: "c_method", method_type: "ClassMethod" }
         let(:called_klass_1) { A }
         let(:called_klass_2) { B }
         let(:called_klass_3) { A }
-
 
         subject do
           described_class.new(call_sites, 1)
@@ -32,7 +32,7 @@ module Delfos
 
         describe "#query" do
           it do
-            expect(strip_whitespace subject.query).to eq strip_whitespace(<<~QUERY)
+            expect(strip_whitespace(subject.query)).to eq strip_whitespace(<<~QUERY)
               MERGE ( k0:Class { name: {klass0} })
               MERGE ( k1:Class { name: {klass1} })
               MERGE
@@ -139,9 +139,8 @@ module Delfos
             let(:container_klass_2) { A }
             let(:container_klass_3) { A }
 
-
             it do
-              expect(strip_whitespace subject.query).to eq strip_whitespace(<<~QUERY)
+              expect(strip_whitespace(subject.query)).to eq strip_whitespace(<<~QUERY)
                 MERGE ( k0:Class { name: {klass0} })
 
                 MERGE
@@ -247,31 +246,29 @@ module Delfos
 
         describe "#params" do
           it do
-            expect(subject.params).to eq({
-              "execution_count0" => 1,
-              "execution_count1" => 1,
-              "execution_count2" => 1,
-              "file0" => "file_cs1",
-              "file1" => "file_cs2",
-              "file2" => "file_cs3",
-              "klass0" => "A",
-              "klass1" => "B",
-              "line_number0" => 4,
-              "line_number1" => 5,
-              "line_number2" => 6,
-              "method_definition_line0" => 1,
-              "method_definition_line1" => 2,
-              "method_definition_line2" => 3,
-              "method_name0" => "some_method",
-              "method_name1" => "another_method",
-              "method_name2" => "yet_another_method",
-              "method_type0" => "ClassMethod",
-              "method_type1" => "InstanceMethod",
-              "method_type2" => "ClassMethod",
-              "step_number0" => 1,
-              "step_number1" => 2,
-              "step_number2" => 3,
-            })
+            expect(subject.params).to eq("execution_count0" => 1,
+                                         "execution_count1" => 1,
+                                         "execution_count2" => 1,
+                                         "file0" => "file_cs1",
+                                         "file1" => "file_cs2",
+                                         "file2" => "file_cs3",
+                                         "klass0" => "A",
+                                         "klass1" => "B",
+                                         "line_number0" => 4,
+                                         "line_number1" => 5,
+                                         "line_number2" => 6,
+                                         "method_definition_line0" => 1,
+                                         "method_definition_line1" => 2,
+                                         "method_definition_line2" => 3,
+                                         "method_name0" => "some_method",
+                                         "method_name1" => "another_method",
+                                         "method_name2" => "yet_another_method",
+                                         "method_type0" => "ClassMethod",
+                                         "method_type1" => "InstanceMethod",
+                                         "method_type2" => "ClassMethod",
+                                         "step_number0" => 1,
+                                         "step_number1" => 2,
+                                         "step_number2" => 3)
           end
         end
       end

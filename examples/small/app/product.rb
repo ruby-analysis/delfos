@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Product
   def initialize(price = nil, name = nil)
     @price = price
@@ -8,4 +10,3 @@ class Product
     @name = name
   end
 end
-

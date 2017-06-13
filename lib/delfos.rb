@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "delfos/setup"
 require "delfos/file_system/pathname_extensions"
 

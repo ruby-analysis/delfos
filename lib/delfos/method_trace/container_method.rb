@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "delfos/code_location/method"
 require "delfos/method_trace/eval_in_caller"
 
@@ -19,13 +21,13 @@ module Delfos
           class_method: class_method,
         )
 
-        code_location_method#.tap{|o| puts o }
+        code_location_method # .tap{|o| puts o }
       end
 
       private
 
       def object
-        @object ||= eval_in_caller('self', STACK_OFFSET)
+        @object ||= eval_in_caller("self", STACK_OFFSET)
       end
 
       def class_method
@@ -45,7 +47,7 @@ module Delfos
         #
         # The output value will be false the first time
         # but true inside the code_location
-        @result ||= eval_in_caller('{self =>  is_a?(Module)}', STACK_OFFSET)
+        @result ||= eval_in_caller("{self =>  is_a?(Module)}", STACK_OFFSET)
         @class_method ||= @result.values.first
       end
 

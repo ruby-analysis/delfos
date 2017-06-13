@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative "query_variables"
 
 module Delfos
@@ -15,9 +16,9 @@ module Delfos
 
         assign_query_variables(container_method, called_method)
 
-        #puts caller
-        #puts params
-        #puts query
+        # puts caller
+        # puts params
+        # puts query
       end
 
       def params

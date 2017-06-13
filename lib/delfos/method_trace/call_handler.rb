@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "handler"
 require "delfos/call_stack"
 

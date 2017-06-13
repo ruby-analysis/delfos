@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Delfos
   module FileSystem
     module CommonPath

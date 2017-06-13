@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative "common_path"
 require "delfos/file_system/pathname"
 

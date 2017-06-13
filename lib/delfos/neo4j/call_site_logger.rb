@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative "call_stack_query"
 require_relative "call_site_query"
 

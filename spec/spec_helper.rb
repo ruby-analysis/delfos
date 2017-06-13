@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 
 require "byebug"
@@ -36,11 +37,10 @@ RSpec.configure do |c|
     puts Delfos::MethodTrace::ALL_ERRORS
   end
 
-  c.before(:each) do |e|
+  c.before(:each) do |_e|
     begin
       Delfos.finish!
     rescue Delfos::Neo4j::QueryExecution::ExpiredTransaction
-
     end
     ShowClassInstanceVariables.variables_for(Delfos)
 

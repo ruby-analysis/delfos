@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative "query_variables"
 
 module Delfos
@@ -43,7 +44,7 @@ module Delfos
 
       def klasses_query
         query_variables.values.map do |v|
-          "MERGE ( #{v}:Class { name: {klass#{v.gsub("k", "")}} })"
+          "MERGE ( #{v}:Class { name: {klass#{v.delete("k")}} })"
         end.join("\n")
       end
 
@@ -88,7 +89,7 @@ module Delfos
       end
 
       def container_method_params(m, i)
-        k = query_variable(m.klass).gsub(/k/, "")
+        k = query_variable(m.klass).delete("k")
 
         {
           "klass#{k}"                  => m.klass.to_s,

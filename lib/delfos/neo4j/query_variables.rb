@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Delfos
   module Neo4j
     class QueryVariables < Hash
@@ -33,6 +35,5 @@ module Delfos
         @query_variables ||= QueryVariables.new
       end
     end
-
   end
 end

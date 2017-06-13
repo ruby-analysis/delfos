@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "delfos"
 
 describe "integration" do
@@ -8,7 +9,6 @@ describe "integration" do
     Delfos.setup!(application_directories: ["fixtures"],
                   call_site_logger: call_site_logger,
                   logger: $delfos_test_logger)
-
   end
 
   context "instance method calls a class method" do
@@ -17,12 +17,12 @@ describe "integration" do
         [
           "instance_method_calls_a_class_method_usage.rb:0 Object#(main)",
           "instance_method_calls_a_class_method_usage.rb:3",
-          "instance_method_calls_a_class_method.rb:2 InstanceMethodCallsAClassMethod#an_instance_method"
+          "instance_method_calls_a_class_method.rb:2 InstanceMethodCallsAClassMethod#an_instance_method",
         ],
         [
           "instance_method_calls_a_class_method.rb:2 InstanceMethodCallsAClassMethod#an_instance_method",
           "instance_method_calls_a_class_method.rb:3",
-          "instance_method_calls_a_class_method.rb:8 HasClassMethod.a_class_method"
+          "instance_method_calls_a_class_method.rb:8 HasClassMethod.a_class_method",
         ],
       ]
     end
@@ -39,7 +39,7 @@ describe "integration" do
       load "./fixtures/instance_method_calls_a_class_method_usage.rb"
     end
 
-    def expect_call_sites(call_site, index, call_sites)
+    def expect_call_sites(call_site, index, _call_sites)
       expect_call_site(call_site, *expected_call_sites[index])
     end
 

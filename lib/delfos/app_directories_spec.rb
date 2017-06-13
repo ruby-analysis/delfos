@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative "app_directories"
 
 module Delfos
@@ -19,7 +20,6 @@ module Delfos
       Delfos.application_directories = [path_spec, path_fixtures]
     end
 
-
     describe ".exclude_file?" do
       context "with a file to include" do
         let(:file) { a_path }
@@ -27,7 +27,7 @@ module Delfos
         it do
           expect(described_class.exclude_file?(file)).to eq false
 
-          #reads from cache
+          # reads from cache
           expect(described_class).not_to receive(:should_include?)
           expect(described_class.exclude_file?(file)).to eq false
         end
@@ -39,7 +39,7 @@ module Delfos
         it do
           expect(described_class.exclude_file?(file)).to eq true
 
-          #reads from cache
+          # reads from cache
           expect(described_class).not_to receive(:should_include?)
           expect(described_class.exclude_file?(file)).to eq true
         end

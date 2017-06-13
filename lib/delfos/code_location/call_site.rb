@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative "filename_helpers"
 
 module Delfos
@@ -27,7 +28,7 @@ module Delfos
         {
           call_site: "#{file}:#{line_number}",
           container_method: container_method.summary,
-          called_method:    called_method.summary
+          called_method:    called_method.summary,
         }
       end
     end

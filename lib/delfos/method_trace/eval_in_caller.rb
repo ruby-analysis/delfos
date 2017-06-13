@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Delfos
   class MethodTrace
     module EvalInCaller

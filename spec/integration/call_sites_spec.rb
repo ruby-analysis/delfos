@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "delfos"
 
 describe "integration" do
@@ -8,7 +9,6 @@ describe "integration" do
     Delfos.setup!(application_directories: ["fixtures"],
                   call_site_logger: call_site_logger,
                   logger: $delfos_test_logger)
-
   end
 
   context "records call sites" do
@@ -39,7 +39,7 @@ describe "integration" do
       load "./fixtures/a_usage.rb"
     end
 
-    def expect_call_sites(call_site, index, call_sites)
+    def expect_call_sites(call_site, index, _call_sites)
       expect_call_site(call_site, *expected_call_sites[index])
     end
 

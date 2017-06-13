@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative "relation"
 
 describe Delfos::FileSystem::Relation do
@@ -11,22 +12,22 @@ describe Delfos::FileSystem::Relation do
       it "returns just files" do
         result = relation.other_files
 
-        match_file_array result, %w(
+        match_file_array result, %w[
           tree/another_top_level_file
           tree/even_more
           tree/some_file
           tree/yet_another_file
-        )
+        ]
       end
 
       it "returns just directories" do
         result = relation.other_directories
 
-        match_file_array result, %w(
+        match_file_array result, %w[
           tree/another_sub_directory
           tree/sub_directory
           tree/yet_another_directory
-        )
+        ]
       end
     end
 
@@ -36,22 +37,22 @@ describe Delfos::FileSystem::Relation do
       it "returns just files" do
         result = relation.other_files
 
-        match_file_array result, %w(
+        match_file_array result, %w[
           tree/another_top_level_file
           tree/even_more
           tree/some_file
           tree/yet_another_file
-        )
+        ]
       end
 
       it "returns just directories" do
         result = relation.other_directories
 
-        match_file_array result, %w(
+        match_file_array result, %w[
           tree/another_sub_directory
           tree/sub_directory
           tree/yet_another_directory
-        )
+        ]
       end
     end
   end
@@ -171,11 +172,11 @@ describe Delfos::FileSystem::Relation do
   end
 
   it do
-    match_file_array instance.other_files, %w(
+    match_file_array instance.other_files, %w[
       tree/sub_directory/some_more
       tree/sub_directory/even_more
       tree/sub_directory/file_in_sub_directory
-    )
+    ]
   end
 
   context "traversing all files" do
@@ -183,11 +184,11 @@ describe Delfos::FileSystem::Relation do
     let(:b) { t("tree/sub_directory") }
 
     it do
-      match_file_array instance.traversed_files, %w(
+      match_file_array instance.traversed_files, %w[
         tree/sub_directory/some_more
         tree/sub_directory/even_more
         tree/sub_directory/file_in_sub_directory
-      )
+      ]
     end
   end
 
@@ -196,10 +197,10 @@ describe Delfos::FileSystem::Relation do
     let(:b) { t("tree/sub_directory") }
 
     it do
-      match_file_array instance.traversed_files, %w(
+      match_file_array instance.traversed_files, %w[
         tree/sub_directory/even_more
         tree/sub_directory/file_in_sub_directory
-      )
+      ]
     end
   end
 
@@ -208,19 +209,19 @@ describe Delfos::FileSystem::Relation do
     let(:b) { t("tree/sub_directory/file_in_sub_directory") }
 
     it do
-      match_file_array instance.traversed_files, %w(
+      match_file_array instance.traversed_files, %w[
         tree/sub_directory/some_more
         tree/sub_directory/file_in_sub_directory
-      )
+      ]
     end
   end
 
   it do
-    match_file_array instance.other_directories, %w(
+    match_file_array instance.other_directories, %w[
       tree/sub_directory/another_directory/
       tree/sub_directory/second_level/
       tree/sub_directory/yet_another_directory/
-    )
+    ]
   end
 
   context "traversing up some directories" do
@@ -228,10 +229,10 @@ describe Delfos::FileSystem::Relation do
     let(:b) { t("tree/sub_directory/second_level") }
 
     it do
-      match_file_array instance.traversed_directories, %w(
+      match_file_array instance.traversed_directories, %w[
         tree/sub_directory/yet_another_directory
         tree/sub_directory/second_level
-      )
+      ]
     end
   end
 
@@ -240,11 +241,11 @@ describe Delfos::FileSystem::Relation do
     let(:b) { t("tree/sub_directory/yet_another_directory") }
 
     it do
-      match_file_array instance.traversed_directories, %w(
+      match_file_array instance.traversed_directories, %w[
         tree/sub_directory/another_directory
         tree/sub_directory/second_level
         tree/sub_directory/yet_another_directory
-      )
+      ]
     end
   end
 
@@ -253,10 +254,10 @@ describe Delfos::FileSystem::Relation do
     let(:b) { t("tree/sub_directory/second_level") }
 
     it do
-      match_file_array instance.traversed_directories, %w(
+      match_file_array instance.traversed_directories, %w[
         tree/sub_directory/another_directory
         tree/sub_directory/second_level
-      )
+      ]
     end
   end
 
@@ -265,10 +266,10 @@ describe Delfos::FileSystem::Relation do
     let(:b) { t("tree/sub_directory/yet_another_directory") }
 
     it do
-      match_file_array instance.traversed_directories, %w(
+      match_file_array instance.traversed_directories, %w[
         tree/sub_directory/second_level
         tree/sub_directory/yet_another_directory
-      )
+      ]
     end
   end
   context "traversing all directories" do
@@ -276,11 +277,11 @@ describe Delfos::FileSystem::Relation do
     let(:b) { t("tree/sub_directory/another_directory") }
 
     it do
-      match_file_array instance.traversed_directories, %w(
+      match_file_array instance.traversed_directories, %w[
         tree/sub_directory/another_directory/
         tree/sub_directory/second_level/
         tree/sub_directory/yet_another_directory/
-      )
+      ]
     end
   end
 end
