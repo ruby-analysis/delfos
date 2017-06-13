@@ -12,10 +12,8 @@ ratings:
   - "**.rb"
 exclude_paths:
 - "delfos.gemspec"
-- "lib/delfos/file_system/pathname_extensions.rb"
 - "spec/**/*.rb"
 - "**/*_spec.rb"
 - "fixtures/**/*"
 - "**/vendor/**/*"
 - "examples"
-

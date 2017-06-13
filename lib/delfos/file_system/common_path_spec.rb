@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative "common_path"
-require "delfos/file_system/pathname"
 
 module Delfos
   module FileSystem
@@ -21,10 +20,7 @@ module Delfos
       end
 
       before do
-        allow(Pathname).to receive(:new) do |path|
-          directory = (path.to_s[-1] == "/") || !path.to_s[/\.rb$/]
-          pathname(path, directory: directory)
-        end
+        allow_any_instance_of(Pathname).to receive(:directory?).and_return true
       end
 
       describe "#included_in?" do
