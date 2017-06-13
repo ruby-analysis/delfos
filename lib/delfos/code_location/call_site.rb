@@ -23,8 +23,8 @@ module Delfos
         called_method.raw_path
       end
 
-      def to_s
-        "#<#{self.class.name} file: #{file}, line_number: #{line_number}, container_method: #{container_method}, called_method: #{called_method}>"
+      def summary
+        "call_site:   #{file}:#{line_number}  #{container_method.summary(reverse: true)}\ncalled_code: #{called_method.summary}"
       end
     end
   end

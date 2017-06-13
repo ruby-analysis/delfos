@@ -20,15 +20,32 @@ module Delfos
       end
 
       def method_name
-        @method_name.to_s
+        (@method_name || "(main)").to_s
       end
 
       def method_type
         class_method ? "ClassMethod" : "InstanceMethod"
       end
 
-      def to_s
-        "#<#{self.class.name} klass: #{klass}, line_number: #{line_number}, file: #{file}, method_name: #{method_name}>"
+      def summary(reverse: false)
+        summary = [source_location, method_summary ]
+
+        (reverse ? summary.reverse : summary).join " "
+      end
+
+      private
+
+      def method_summary
+        "#{klass}#{separator}#{method_name}"
+      end
+
+      def source_location
+        "#{file}:#{line_number}"
+      end
+
+
+      def separator
+        class_method ? "." : "#"
       end
     end
   end
