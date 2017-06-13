@@ -4,7 +4,7 @@ require "binding_of_caller"
 require "delfos/code_location/call_site"
 require "delfos/code_location/method"
 require "delfos/call_stack"
-require "delfos/app_directories"
+require "delfos/file_system/app_directories"
 require "delfos/method_trace/eval_in_caller"
 require "delfos/method_trace/container_method"
 
@@ -20,7 +20,7 @@ module Delfos
       end
 
       def relevant?
-        AppDirectories.include_files?(call_site.called_method_path)
+        FileSystem::AppDirectories.include_file?(call_site.called_method_path)
       end
 
       STACK_OFFSET = 6

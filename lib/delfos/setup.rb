@@ -66,7 +66,7 @@ module Delfos
     end
 
     def reset_app_directories!
-      ignoring_undefined("Delfos::AppDirectories", &:reset!)
+      ignoring_undefined("Delfos::FileSystem::AppDirectories", &:reset!)
     end
 
     def reset_top_level_variables!

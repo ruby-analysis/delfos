@@ -42,7 +42,7 @@ module Delfos
 
       def setup_trace_point(type, klass)
         TracePoint.new(type) do |tp|
-          next unless AppDirectories.include_files?(tp.path)
+          next unless FileSystem::AppDirectories.include_file?(tp.path)
           klass.new(tp).perform
         end
       end
