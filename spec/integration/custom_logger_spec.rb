@@ -36,7 +36,7 @@ describe "integration with a customer call_stack_logger" do
       expect(call_site.container_method) .to be_a Delfos::CodeLocation::Method
     end.exactly(11).times
 
-    loading_code.
+    loading_code.()
   end
 
   it "saves the call stack" do
@@ -46,6 +46,6 @@ describe "integration with a customer call_stack_logger" do
       expect(execution_count)   .to eq 1
     end
 
-    loading_code.
+    loading_code.()
   end
 end
