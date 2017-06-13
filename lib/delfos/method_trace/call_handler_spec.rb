@@ -1,5 +1,4 @@
 require_relative "call_handler"
-require "./fixtures/evaluator"
 require "./fixtures/a_usage"
 
 module Delfos
@@ -59,8 +58,8 @@ module Delfos
 
       describe "#perform" do
         let(:call_site_logger) { double "call_site_logger", log: nil }
-        let(:call_site) { double "call_site", paths: paths }
-        let(:paths) { ["fixtures/a.rb"] }
+        let(:call_site) { double "call_site", called_method_path: called_method_path }
+        let(:called_method_path) { "fixtures/a.rb" }
 
         before do
           allow(Delfos).to receive(:call_site_logger).and_return call_site_logger
@@ -77,7 +76,7 @@ module Delfos
         end
 
         context "with relevant call sites" do
-          let(:paths) { ["fixtures/a.rb"] }
+          let(:called_method_path) { "fixtures/a.rb" }
           let(:application_directories) { ["fixtures"] }
 
           it "pushes the call site on the stack" do

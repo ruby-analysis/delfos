@@ -30,16 +30,17 @@ describe "integration with a customer call_stack_logger" do
         expect(call_site)                  .to be_a Delfos::CodeLocation::CallSite
         expect(call_site.called_method)    .to be_a Delfos::CodeLocation::Method
         expect(call_site.container_method) .to be_a Delfos::CodeLocation::Method
-      end.exactly(11).times
+      end.exactly(3).times
 
       loading_code.call
     end
 
-    it "saves the call stack" do
+    pending "Issue #14 - saves the call stack" do
+      # this is not necessarily the correct failing test yet
       expect(call_site_logger).to receive(:save_call_stack) do |call_sites, execution_count|
         puts call_sites
         expect(call_sites)        .to be_an Array
-        expect(call_sites.length) .to eq 11
+        expect(call_sites.length) .to eq 11 
         expect(execution_count)   .to eq 1
       end
 

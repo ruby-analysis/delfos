@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 require "delfos"
 require "delfos/neo4j"
-require "./fixtures/b.rb"
-require "./fixtures/a.rb"
-require "./fixtures/sub_classes/sub_classes.rb"
-require "./fixtures/class_method_calls_instance_method.rb"
-require "./fixtures/instance_method_calls_class_method.rb"
 
 describe "integration with default neo4j logging" do
   let(:result) do
@@ -21,7 +16,7 @@ describe "integration with default neo4j logging" do
 
   context "class method calls an instance method" do
     before(:each) do
-      ClassMethodCallsAnInstanceMethod.a_class_method
+      load "./fixtures/class_method_calls_an_instance_method_usage.rb"
 
       Delfos::Neo4j.flush!
     end
@@ -48,21 +43,21 @@ describe "integration with default neo4j logging" do
 
       expect(a_method_count).to eq 1
 
-      expect(method_a).to eq("file" => "fixtures/class_method_calls_instance_method.rb",
+      expect(method_a).to eq("file" => "fixtures/class_method_calls_an_instance_method.rb",
                              "line_number" => 2,
                              "name" => "a_class_method",
                              "type" => "ClassMethod")
 
       expect(b_method_count).to eq 1
 
-      expect(method_b).to eq("file" => "fixtures/class_method_calls_instance_method.rb",
+      expect(method_b).to eq("file" => "fixtures/class_method_calls_an_instance_method.rb",
                              "line_number" => 8,
                              "name" => "an_instance_method",
                              "type" => "InstanceMethod")
 
       expect(call_site_count).to eq 1
 
-      expect(call_site).to eq("file" => "fixtures/class_method_calls_instance_method.rb",
+      expect(call_site).to eq("file" => "fixtures/class_method_calls_an_instance_method.rb",
                               "line_number" => 3)
     end
   end

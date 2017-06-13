@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 require "delfos"
 require "delfos/neo4j"
-require "./fixtures/b.rb"
-require "./fixtures/a.rb"
-require "./fixtures/sub_classes/sub_classes.rb"
-require "./fixtures/class_method_calls_instance_method.rb"
-require "./fixtures/instance_method_calls_class_method.rb"
 
 describe "integration with default neo4j logging" do
   let(:result) do
@@ -17,6 +12,7 @@ describe "integration with default neo4j logging" do
     wipe_db!
 
     Delfos.setup!(application_directories: ["fixtures"], logger: $delfos_test_logger)
+    load "fixtures/a_usage.rb"
   end
 
   context "recording instance methods" do

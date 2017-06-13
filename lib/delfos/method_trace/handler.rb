@@ -19,7 +19,7 @@ module Delfos
         AppDirectories.include_files?(call_site.called_method_path)
       end
 
-      STACK_OFFSET = 5
+      STACK_OFFSET = 6
 
       def stack_offset
         self.offset ||= STACK_OFFSET

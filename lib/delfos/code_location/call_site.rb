@@ -24,7 +24,11 @@ module Delfos
       end
 
       def summary
-        "call_site:   #{file}:#{line_number}  #{container_method.summary(reverse: true)}\ncalled_code: #{called_method.summary}"
+        {
+          call_site: "#{file}:#{line_number}",
+          container_method: container_method.summary,
+          called_method:    called_method.summary
+        }
       end
     end
   end
