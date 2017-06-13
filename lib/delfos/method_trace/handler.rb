@@ -10,7 +10,9 @@ require "delfos/method_trace/container_method"
 
 module Delfos
   class MethodTrace
-    Handler = Struct.new(:trace_point, :offset) do
+    Handler = Struct.new(:trace_point, :offset)
+
+    class Handler
       include EvalInCaller
 
       def self.perform(trace_point)

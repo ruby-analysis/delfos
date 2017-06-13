@@ -24,8 +24,8 @@ module DelfosSpecHelpers
   def match_file_array(a, b)
     format = ->(f) { f.to_s.gsub(Regexp.escape(fixture_path.to_s), "") }
 
-    a = a.map &format
-    b = b.map &format
+    a = a.map(&format)
+    b = b.map(&format)
 
     expect(a).to match_array(b.map { |f| t(f) }.map(&format))
   end

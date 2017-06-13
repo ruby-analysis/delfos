@@ -78,7 +78,7 @@ module Delfos
 
           (cs#{i}:CallSite {file: {file#{i}}, line_number: {line_number#{i}}})
 
-          #{i == 0 ? "CREATE (e:CallStack)" : ""}
+          #{i.zero? ? "CREATE (e:CallStack)" : ""}
 
           MERGE (e)
             -

@@ -46,14 +46,10 @@ module Delfos
       def fetch_existing_constraints
         response = QueryExecution::Http.new(constraints_uri).get
 
-        if response.code == "200"
-          JSON.parse response.body
-        else
-          raise IOError.new uri, response
-        end
-      end
+        raise IOError.new uri, response unless response.code == "200"
 
-      private
+        JSON.parse response.body
+      end
 
       def constraints_uri
         Delfos.neo4j.uri_for("/db/data/schema/constraint")

@@ -32,18 +32,30 @@ module Delfos
         end
 
         def perform
-          self.class.check_for_error(uri, response)
-
-          raise InvalidQuery.new(json["errors"], query, params) if errors?
-
-          transaction_url = URI.parse  header("location") if header("location")
-          commit_url      = URI.parse  json["commit"]     if json["commit"]
-          expires         = Time.parse json["transaction"]["expires"] if json["transaction"]
+          validate!
 
           [transaction_url, commit_url, expires]
         end
 
         private
+
+        def transaction_url
+          URI.parse  header("location") if header("location")
+        end
+
+        def commit_url
+          URI.parse  json["commit"] if json["commit"]
+        end
+
+        def expires
+          Time.parse json["transaction"]["expires"] if json["transaction"]
+        end
+
+        def validate!
+          self.class.check_for_error(uri, response)
+
+          raise InvalidQuery.new(json["errors"], query, params) if errors?
+        end
 
         def header(name)
           response.each_header.to_a.find { |n, _| n == name }&.last

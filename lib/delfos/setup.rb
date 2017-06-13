@@ -88,6 +88,7 @@ module Delfos
     def with_rescue
       yield
     rescue Delfos::Neo4j::QueryExecution::ExpiredTransaction
+      puts # no-op
     end
   end
 end

@@ -19,10 +19,10 @@ module Delfos
 
         self.stack_depth -= 1
 
-        if stack_depth.zero? && call_sites.length.positive?
-          @on_empty&.call(call_sites, execution_count)
-          self.call_sites = []
-        end
+        return unless stack_depth.zero? && call_sites.length.positive?
+
+        @on_empty&.call(call_sites, execution_count)
+        self.call_sites = []
       end
 
       def pop_until_top!

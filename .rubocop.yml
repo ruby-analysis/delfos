@@ -2,6 +2,11 @@ AllCops:
   TargetRubyVersion: 2.3
   DisplayStyleGuide: true
   Exclude:
+    - 'tmp/**/*'
+    - 'spec/**/*'
+    - '**/*_spec.rb'
+    - 'delfos.gemspec'
+    - 'lib/delfos/file_system/pathname_extensions.rb'
     - 'vendor/**/*'
     - 'fixtures/**/*'
     - 'db/**/*'
@@ -11,7 +16,7 @@ Rails:
 Metrics/LineLength:
   Max: 120
 
-Style/AlignParameters:
+Layout/AlignParameters:
   # Alignment of parameters in multi-line method calls.
   #
   # The `with_first_parameter` style aligns the following lines along the same
@@ -31,7 +36,7 @@ Style/AlignParameters:
     - with_fixed_indentation
 
 # Multi-line method chaining should be done with trailing dots.
-Style/DotPosition:
+Layout/DotPosition:
   EnforcedStyle: trailing
   SupportedStyles:
     - leading
@@ -58,6 +63,9 @@ Style/SymbolArray:
     - percent
     - brackets
 
+Style/ModuleFunction:
+  Enabled: false
+      
 Style/TrailingCommaInArguments:
   # If `comma`, the cop requires a comma after the last argument, but only for
   # parenthesized method calls where each argument is on its own line.

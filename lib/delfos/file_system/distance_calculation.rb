@@ -13,9 +13,9 @@ module Delfos
       def initialize(path_a, path_b)
         @path_a, @path_b = PathDetermination.for(path_a, path_b)
 
-        unless @path_a && @path_b
-          raise PathNotFound, "path_a: #{path_a} -> #{@path_a.inspect}, path_b: #{path_b} -> #{@path_b.inspect}"
-        end
+        return if @path_a && @path_b
+
+        raise PathNotFound, "path_a: #{path_a} -> #{@path_a.inspect}, path_b: #{path_b} -> #{@path_b.inspect}"
       end
 
       attr_reader :traversal_a, :traversal_b

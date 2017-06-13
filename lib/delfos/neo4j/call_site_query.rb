@@ -15,10 +15,6 @@ module Delfos
         @called_method = call_site.called_method
 
         assign_query_variables(container_method, called_method)
-
-        # puts caller
-        # puts params
-        # puts query
       end
 
       def params

@@ -33,10 +33,6 @@ RSpec.configure do |c|
     Delfos.finish!
   end
 
-  c.after(:suite) do
-    puts Delfos::MethodTrace::ALL_ERRORS
-  end
-
   c.before(:each) do |_e|
     begin
       Delfos.finish!
