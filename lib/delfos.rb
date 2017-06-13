@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "delfos/setup"
 require "delfos/file_system/pathname_extensions"
 
@@ -35,8 +36,18 @@ module Delfos
       @neo4j ||= Delfos::Neo4j.config
     end
 
-    def reset!
-      Delfos::Setup.reset!
+    def flush!
+      Delfos::Neo4j.flush!
+    end
+
+    def finish!
+      flush!
+      Delfos::Neo4j.update_distance!
+      disable!
+    end
+
+    def disable!
+      Delfos::Setup.disable!
     end
 
     def default_logger

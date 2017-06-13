@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "delfos/file_system/distance_calculation"
 require_relative "call_site_fetcher"
 
@@ -11,13 +12,7 @@ module Delfos
           return if results.length.negative?
 
           results.each do |start_file, call_site_id, finish_file, called_id|
-            begin
-              calc = FileSystem::DistanceCalculation.new(start_file, finish_file)
-
-              update(call_site_id, called_id, calc)
-            rescue FileSystem::DistanceCalculation::PathNotFound => e
-              Delfos.logger.error("Whilst updating distance #{start_file}->#{finish_file} call_site_id: #{call_site_id} called_id: #{called_id} - #{e.message} #{e.backtrace}")
-            end
+            handle(start_file, call_site_id, finish_file, called_id)
           end
 
           Neo4j.flush!
@@ -47,6 +42,22 @@ module Delfos
                  ]
                -> (called)
           QUERY
+        end
+
+        private
+
+        def handle(start_file, call_site_id, finish_file, called_id)
+          calc = FileSystem::DistanceCalculation.new(start_file, finish_file)
+
+          update(call_site_id, called_id, calc)
+        rescue FileSystem::DistanceCalculation::PathNotFound => e
+          error(e, start_file, call_site_id, finish_file, called_id)
+        end
+
+        def error(e, start_file, call_site_id, finish_file, called_id)
+          Delfos.logger.error("Whilst updating distance #{start_file}->#{finish_file} ",
+            "call_site_id: #{call_site_id}",
+            "called_id: #{called_id} - #{e.message} #{e.backtrace}")
         end
       end
     end

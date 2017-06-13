@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module TimeoutHelpers
   TIMEOUT_VALUE = ENV["TIMEOUT"].to_f
 

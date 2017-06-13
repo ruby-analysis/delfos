@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "delfos/neo4j/query_execution/transactional"
 
 module Delfos

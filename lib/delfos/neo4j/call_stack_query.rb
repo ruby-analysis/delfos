@@ -1,11 +1,20 @@
 # frozen_string_literal: true
+
+require_relative "query_variables"
+
 module Delfos
   module Neo4j
     class CallStackQuery
+      include QueryVariablesAssignment
+
       def initialize(call_sites, execution_count)
         @call_sites = call_sites
 
         @execution_count = execution_count
+
+        call_sites.each do |cs|
+          assign_query_variables(cs.container_method)
+        end
       end
 
       def query
@@ -19,6 +28,7 @@ module Delfos
 
         map_call_sites do |c, i|
           params.merge!(call_site_params(c, i))
+          params.merge!(container_method_params(c.container_method, i))
         end
 
         params
@@ -28,18 +38,26 @@ module Delfos
 
       attr_reader :call_sites, :execution_count
 
-      def map_call_sites
-        call_sites.compact.map.with_index do |c, i|
-          yield c, i
-        end
+      def map_call_sites(&block)
+        call_sites.map.with_index(&block)
       end
 
-      def call_site_query(_cs, i)
+      def klasses_query
+        query_variables.values.map do |v|
+          "MERGE ( #{v}:Class { name: {klass#{v.delete("k")}} })"
+        end.join("\n")
+      end
+
+      def call_site_query(cs, i)
+        container_klass_key = query_variable(cs.container_method.klass)
+
         <<-QUERY
+          #{klasses_query if i.zero?}
+
           MERGE
 
           (
-            k#{i}:Class { name: {klass#{i}} }
+            #{container_klass_key}
           )
 
           - [:OWNS] ->
@@ -48,7 +66,7 @@ module Delfos
             m#{i} :Method {
               type: {method_type#{i}},
               name: {method_name#{i}},
-              file: {method_definition_file#{i}},
+              file: {file#{i}},
               line_number: {method_definition_line#{i}}}
           )
 
@@ -60,7 +78,7 @@ module Delfos
 
           (cs#{i}:CallSite {file: {file#{i}}, line_number: {line_number#{i}}})
 
-          #{i == 0 ? "CREATE (e:CallStack)" : ""}
+          #{i.zero? ? "CREATE (e:CallStack)" : ""}
 
           MERGE (e)
             -
@@ -70,16 +88,22 @@ module Delfos
         QUERY
       end
 
+      def container_method_params(m, i)
+        k = query_variable(m.klass).delete("k")
+
+        {
+          "klass#{k}"                  => m.klass.to_s,
+          "method_name#{i}"            => m.method_name,
+          "method_type#{i}"            => m.method_type,
+          "method_definition_line#{i}" => m.line_number,
+        }
+      end
+
       def call_site_params(cs, i)
         {
-          "klass#{i}"                  => cs.klass.to_s,
-          "method_name#{i}"            => cs.method_name,
-          "method_type#{i}"            => cs.method_type,
-          "method_definition_file#{i}" => cs.method_definition_file,
-          "execution_count#{i}"        => execution_count,
-          "method_definition_line#{i}" => cs.method_definition_line,
           "file#{i}"                   => cs.file,
           "line_number#{i}"            => cs.line_number,
+          "execution_count#{i}"        => execution_count,
           "step_number#{i}"            => i + 1,
         }
       end

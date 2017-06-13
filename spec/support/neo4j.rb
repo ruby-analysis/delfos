@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 ENV["NEO4J_HOST"]     ||= "http://localhost"
 ENV["NEO4J_PORT"]     ||= "7476"
 ENV["NEO4J_USERNAME"] ||= "neo4j"
@@ -10,7 +11,6 @@ module DelfosSpecNeo4jHelpers
   def wipe_db!
     require "delfos/neo4j"
     Delfos.setup_neo4j!
-    Delfos::Neo4j.flush!
 
     perform_query "MATCH (m)-[rel]->(n) DELETE m, rel, n"
     perform_query "MATCH (m) DELETE m"

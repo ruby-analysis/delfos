@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+
+require_relative "../call_stack"
 require_relative "stack"
 
 module Delfos

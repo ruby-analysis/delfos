@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Delfos
   module CallStack
     class Stack
@@ -14,14 +15,14 @@ module Delfos
       end
 
       def pop
-        popping_empty_stack! if self.stack_depth.zero?
+        raise PoppingEmptyStackError if self.stack_depth.zero?
 
         self.stack_depth -= 1
 
-        if stack_depth.zero? && call_sites.length.positive?
-          @on_empty&.call(call_sites, execution_count)
-          self.call_sites = []
-        end
+        return unless stack_depth.zero? && call_sites.length.positive?
+
+        @on_empty&.call(call_sites, execution_count)
+        self.call_sites = []
       end
 
       def pop_until_top!
@@ -45,12 +46,6 @@ module Delfos
       end
 
       attr_writer :stack_depth, :step_count, :execution_count, :call_sites
-
-      private
-
-      def popping_empty_stack!
-        raise PoppingEmptyStackError
-      end
     end
 
     class PoppingEmptyStackError < StandardError

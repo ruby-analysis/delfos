@@ -1,0 +1,3 @@
+require_relative "class_method_calls_an_instance_method"
+
+ClassMethodCallsAnInstanceMethod.a_class_method

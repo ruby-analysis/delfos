@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "spec_helper"
 require_relative "retryable"
 
@@ -47,7 +48,7 @@ module Delfos
                     raise QueryExecution::ExpiredTransaction.new("some commit url".inspect, "")
                   end
 
-                  m.call
+                  m.()
                 end
               end
 

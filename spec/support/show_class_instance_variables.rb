@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module ShowClassInstanceVariables
   def self.variables_for(n)
     return unless n.is_a?(Module)
