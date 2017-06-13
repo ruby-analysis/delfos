@@ -35,12 +35,23 @@ describe "integration with a customer call_stack_logger" do
     end
 
     pending "Issue #14 - saves the call stack" do
-      # this is not necessarily the correct failing test yet
       expect(call_site_logger).to receive(:save_call_stack) do |call_sites, execution_count|
-        expect(call_sites)        .to be_an Array
-        expect(call_sites.length) .to eq 11
+        expect(call_sites.first.summary).to eq({
+          :call_site => "fixtures/app/include_this/start_here.rb:3",
+          :called_method => "include_this/called_app_class.rb:5 IncludeThis::CalledAppClass#some_called_method",
+          :container_method => "fixtures/app/include_this/start_here.rb:0 Object#(main)"
+        })
+
+        expect(call_sites.last.summary).to eq({
+          :call_site => "include_this/called_app_class.rb:10",
+          :called_method => "include_this/called_app_class.rb:13 IncludeThis::CalledAppClass#final_method",
+          :container_method => "include_this/called_app_class.rb:9 IncludeThis::CalledAppClass#next_method",
+        })
+
+
+        expect(call_sites.length) .to eq 2
         expect(execution_count)   .to eq 1
-      end
+      end.exactly(:once)
 
       loading_code.()
     end
