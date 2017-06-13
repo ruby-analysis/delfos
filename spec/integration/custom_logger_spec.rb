@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 require "delfos"
 require "delfos/neo4j"
-require "./fixtures/test_runner"
 
 describe "integration with a customer call_stack_logger" do
   let(:loading_code) do
     lambda do
-      TestRunner.run_custom_logger_spec
+      load "fixtures/a_usage.rb"
     end
   end
 
@@ -34,7 +33,7 @@ describe "integration with a customer call_stack_logger" do
       expect(call_site)                  .to be_a Delfos::CodeLocation::CallSite
       expect(call_site.called_method)    .to be_a Delfos::CodeLocation::Method
       expect(call_site.container_method) .to be_a Delfos::CodeLocation::Method
-    end.exactly(18).times
+    end.exactly(11).times
 
     loading_code.call
   end

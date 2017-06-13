@@ -38,8 +38,9 @@ RSpec.configure do |c|
 
   c.before(:each) do |e|
     begin
-    Delfos.finish!
+      Delfos.finish!
     rescue Delfos::Neo4j::QueryExecution::ExpiredTransaction
+
     end
     ShowClassInstanceVariables.variables_for(Delfos)
 

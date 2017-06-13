@@ -17,8 +17,7 @@ describe "integration with default neo4j logging" do
     wipe_db!
 
     Delfos.setup!(application_directories: ["fixtures"], logger: $delfos_test_logger)
-    a = A.new
-    a.some_method
+    load "./fixtures/a_usage.rb"
   end
 
   context "recording call stacks" do

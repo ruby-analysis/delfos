@@ -18,8 +18,7 @@ describe "integration with default neo4j logging" do
 
     Delfos.setup!(application_directories: ["fixtures"], logger: $delfos_test_logger)
 
-    a = A.new
-    a.some_method
+    load "./fixtures/a_usage.rb"
   end
 
   context "with a call to super inside new" do
