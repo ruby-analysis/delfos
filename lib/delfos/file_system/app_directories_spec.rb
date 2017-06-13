@@ -16,8 +16,10 @@ module Delfos
         described_class.reset!
 
         Delfos.call_site_logger = call_site_logger
+
         path_fixtures = Pathname.new(File.expand_path(__FILE__)) + "../../../../fixtures"
         path_spec     = Pathname.new(File.expand_path(__FILE__)) + "../.."
+
         Delfos.application_directories = [path_spec, path_fixtures]
       end
 

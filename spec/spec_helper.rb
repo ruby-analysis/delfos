@@ -12,6 +12,7 @@ require "ostruct"
 
 require_relative "support/timeout" if ENV["TIMEOUT"]
 
+require_relative "support/call_sites"
 require_relative "support/neo4j"
 require_relative "support/web_mock"
 require_relative "support/helper_methods"

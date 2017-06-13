@@ -10,7 +10,7 @@ require "delfos/method_trace/container_method"
 
 module Delfos
   class MethodTrace
-    Handler = Struct.new(:trace_point, :offset)
+    Handler = Struct.new(:trace_point)
 
     class Handler
       include EvalInCaller
@@ -25,14 +25,10 @@ module Delfos
 
       STACK_OFFSET = 6
 
-      def stack_offset
-        self.offset ||= STACK_OFFSET
-      end
-
       def call_site
         @call_site ||= CodeLocation::CallSite.new(
-          file:        eval_in_caller("__FILE__", stack_offset),
-          line_number: eval_in_caller("__LINE__", stack_offset),
+          file:        eval_in_caller("__FILE__", STACK_OFFSET),
+          line_number: eval_in_caller("__LINE__", STACK_OFFSET),
           container_method: container_method,
           called_method:    called_method,
         )
