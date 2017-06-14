@@ -54,8 +54,13 @@ module Delfos
 
       describe "#perform" do
         let(:call_site_logger) { double "call_site_logger", log: nil }
-        let(:call_site) { double "call_site", called_method_path: called_method_path }
+        let(:call_site) do
+          double "call_site",
+            called_method_path: called_method_path,
+            container_method_path: container_method_path
+        end
         let(:called_method_path) { "fixtures/a.rb" }
+        let(:container_method_path) { "fixtures/a.rb" }
 
         before do
           allow(Delfos).to receive(:call_site_logger).and_return call_site_logger
@@ -73,6 +78,7 @@ module Delfos
 
         context "with relevant call sites" do
           let(:called_method_path) { "fixtures/a.rb" }
+          let(:container_method_path) { "fixtures/a.rb" }
           let(:application_directories) { ["fixtures"] }
 
           it "pushes the call site on the stack" do

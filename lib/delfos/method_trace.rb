@@ -1,19 +1,14 @@
 # frozen_string_literal: true
 
-require_relative "method_trace/return_handler"
 require_relative "method_trace/call_handler"
-require_relative "method_trace/raise_handler"
-require_relative "file_system"
+require_relative "call_stack"
 
 module Delfos
   module MethodTrace
-    ALL_ERRORS = {}.freeze
-
     class << self
       def trace!
         on_call.enable
         on_return.enable
-        on_raise.enable
       end
 
       def disable!
@@ -23,28 +18,38 @@ module Delfos
         @on_return&.disable
         @on_return = nil
 
-        @on_raise&.disable
-        @on_raise = nil
+        @last = nil
       end
 
       def on_call
-        @on_call ||= setup_trace_point(:call, CallHandler)
+        @on_call ||= setup_trace_point(:call) do |tp|
+          CallHandler.new(tp).perform
+        end
       end
 
       def on_return
-        @on_return ||= setup_trace_point(:return, ReturnHandler)
-      end
-
-      def on_raise
-        @on_raise ||= setup_trace_point(:raise, RaiseHandler)
+        @on_return ||= setup_trace_point(:return) do |tp|
+          next if check_for_bug!(tp)
+          CallStack.pop
+        end
       end
 
       private
 
-      def setup_trace_point(type, klass)
+      # FIXME: There seems to be a bug where the last TracePoint in a chain
+      # when returning to (main) is duplicated. Can't get to the source of this.
+      # But the only effect seems to be popping the stacking beyond the end
+      # so this is a workaround
+      def check_for_bug!(tp)
+        bug_scenario = @last == tp && CallStack.height.zero?
+        @last = tp
+        bug_scenario
+      end
+
+      def setup_trace_point(type)
         TracePoint.new(type) do |tp|
           next unless Delfos.include_file?(tp.path)
-          klass.new(tp).perform
+          yield tp
         end
       end
     end

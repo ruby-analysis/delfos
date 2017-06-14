@@ -3,13 +3,8 @@
 require "delfos"
 
 describe "integration with a customer call_stack_logger" do
-  let(:loading_code) do
-    lambda do
-      load "fixtures/app/include_this/start_here.rb"
-    end
-  end
-
   let(:call_site_logger) { double "call stack logger", log: nil, save_call_stack: nil }
+
   before do
     WebMock.disable_net_connect! allow_localhost: false
 
@@ -20,41 +15,70 @@ describe "integration with a customer call_stack_logger" do
   end
 
   after do
+    Delfos.disable!
     WebMock.disable_net_connect! allow_localhost: true
   end
 
   context "with app code calling lib code which calls back into lib code" do
     it "logs the call sites" do
       cl = Delfos::MethodTrace::CodeLocation
-      expect(call_site_logger).to receive(:log) do |call_site|
-        expect(call_site)                  .to be_a cl::CallSite
-        expect(call_site.called_method)    .to be_a cl::Method
-        expect(call_site.container_method) .to be_a cl::Method
-      end.exactly(3).times
 
-      loading_code.()
+      count = 0
+
+      expect(call_site_logger).to receive(:log) do |call_site|
+        count = count + 1
+
+        case count
+        when 1
+          expect(call_site.summary).to eq({
+            #TODO - fix the paths to be consistent
+            container_method:  "fixtures/app/include_this/start_here.rb:0 Object#(main)",
+            call_site:         "fixtures/app/include_this/start_here.rb:3",
+            called_method:     "include_this/called_app_class.rb:5 IncludeThis::CalledAppClass#some_called_method",
+          })
+
+        when 2
+          expect(call_site.summary).to eq({
+            container_method: "include_this/called_app_class.rb:9 IncludeThis::CalledAppClass#next_method",
+            call_site:        "include_this/called_app_class.rb:10",
+            called_method:    "include_this/called_app_class.rb:13 IncludeThis::CalledAppClass#final_method",
+          })
+        end
+        expect(call_site)                  .to be_a cl::CallSite
+      end.exactly(2).times
+
+      load "fixtures/app/include_this/start_here.rb"
     end
 
-    pending "Issue #14 - saves the call stack" do
+    it "Saves the call stack" do
+      count = 0
+
       expect(call_site_logger).to receive(:save_call_stack) do |call_sites, execution_count|
-        expect(call_sites.first.summary).to eq({
-          :call_site => "fixtures/app/include_this/start_here.rb:3",
-          :called_method => "include_this/called_app_class.rb:5 IncludeThis::CalledAppClass#some_called_method",
-          :container_method => "fixtures/app/include_this/start_here.rb:0 Object#(main)"
-        })
+        count = count + 1
 
-        expect(call_sites.last.summary).to eq({
-          :call_site => "include_this/called_app_class.rb:10",
-          :called_method => "include_this/called_app_class.rb:13 IncludeThis::CalledAppClass#final_method",
-          :container_method => "include_this/called_app_class.rb:9 IncludeThis::CalledAppClass#next_method",
-        })
+        case count
+        when 1
+
+          expect(call_sites.first.summary).to eq({
+            container_method: "fixtures/app/include_this/start_here.rb:0 Object#(main)",
+            call_site:        "fixtures/app/include_this/start_here.rb:3",
+            called_method:    "include_this/called_app_class.rb:5 IncludeThis::CalledAppClass#some_called_method",
+          })
 
 
-        expect(call_sites.length) .to eq 2
+          expect(call_sites.length).to eq 2
+          expect(call_sites.last.summary).to eq({
+            container_method: "include_this/called_app_class.rb:9 IncludeThis::CalledAppClass#next_method",
+            call_site:        "include_this/called_app_class.rb:10",
+            called_method:    "include_this/called_app_class.rb:13 IncludeThis::CalledAppClass#final_method",
+          })
+
+        end
+
         expect(execution_count)   .to eq 1
       end.exactly(:once)
 
-      loading_code.()
+      load "fixtures/app/include_this/start_here.rb"
     end
   end
 end

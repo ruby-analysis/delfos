@@ -15,34 +15,34 @@ describe "integration" do
   context "recording call stacks" do
     let(:expected_call_stack_1) do
       [
-        ["a_usage_2.rb:0 Object#(main)", "a_usage_2.rb:3", "a.rb:5 A#some_method"],
-        ["a.rb:5 A#some_method",         "a.rb:6",         "b.rb:3 B#another_method"],
-        ["b.rb:3 B#another_method",      "b.rb:4",         "b.rb:3 B#another_method"],
+        ["a_usage_3.rb:0 Object#(main)", "a_usage_3.rb:3", "a.rb:11 A#to_s"],
+        # etc
+
       ]
     end
 
     let(:expected_call_stack_2) do
       [
-        ["a_usage_2.rb:0 Object#(main)", "a_usage_2.rb:4", "a.rb:11 A#to_s"],
+        ["a_usage_3.rb:0 Object#(main)", "a_usage_3.rb:4", "a.rb:11 A#to_s"],
       ]
     end
 
     it do
       index = 0
 
-      expect(call_site_logger).to receive(:save_call_stack) do |_call_sites, execution_number|
+      expect(call_site_logger).to receive(:save_call_stack) do |call_stack, execution_number|
         index += 1
         expect(execution_number).to eq index
 
         case index
         when 1
-          expect_call_stack(call_stack, index, expected_call_stack_1)
+          expect_call_stack(call_stack, expected_call_stack_1)
         when 2
-          expect_call_stack(call_stack, index, expected_call_stack_2)
+          expect_call_stack(call_stack, expected_call_stack_2)
         end
       end.exactly(2).times
 
-      load "./fixtures/a_usage_2.rb"
+      load "./fixtures/a_usage_3.rb"
     end
   end
 end

@@ -27,6 +27,10 @@ module Delfos
       stack.pop
     end
 
+    def height
+      stack.height
+    end
+
     def pop_until_top!
       stack.pop_until_top!
     end

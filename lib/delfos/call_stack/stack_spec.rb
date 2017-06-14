@@ -28,12 +28,12 @@ module Delfos
         end
 
         it "increments the stack depth each time" do
-          expect(subject.stack_depth).to eq 0
+          expect(subject.height).to eq 0
           subject.push(anything)
-          expect(subject.stack_depth).to eq 1
+          expect(subject.height).to eq 1
 
           subject.push(anything)
-          expect(subject.stack_depth).to eq 2
+          expect(subject.height).to eq 2
         end
 
         it "increments the step counter each time" do
@@ -106,23 +106,23 @@ module Delfos
           expect(subject.step_count).to eq 3
 
           2.times { subject.pop }
-          expect(subject.stack_depth).to eq 0 # sanity check
+          expect(subject.height).to eq 0 # sanity check
           expect(subject.step_count).to eq 0 # step count is reset
         end
 
         it "decrements the stack depth" do
-          expect(subject.stack_depth).to eq 0
+          expect(subject.height).to eq 0
           subject.push(anything)
-          expect(subject.stack_depth).to eq 1
+          expect(subject.height).to eq 1
 
           subject.push(anything)
-          expect(subject.stack_depth).to eq 2
+          expect(subject.height).to eq 2
 
           subject.pop
-          expect(subject.stack_depth).to eq 1
+          expect(subject.height).to eq 1
 
           subject.pop
-          expect(subject.stack_depth).to eq 0
+          expect(subject.height).to eq 0
 
           # stays at zero without going negative
           expect { subject.pop }.to raise_error Delfos::CallStack::PoppingEmptyStackError
@@ -133,22 +133,22 @@ module Delfos
 
           subject.push(anything)
           expect(subject.execution_count).to eq 1
-          expect(subject.stack_depth).to eq 1
+          expect(subject.height).to eq 1
 
           subject.push(anything)
           expect(subject.execution_count).to eq 1
-          expect(subject.stack_depth).to eq 2
+          expect(subject.height).to eq 2
 
           subject.pop
-          expect(subject.stack_depth).to eq 1
+          expect(subject.height).to eq 1
           expect(subject.execution_count).to eq 1 # remains same
 
           subject.pop
-          expect(subject.stack_depth).to eq 0
+          expect(subject.height).to eq 0
           expect(subject.execution_count).to eq 1 # remains same until next push(anything)
 
           subject.push(anything)
-          expect(subject.stack_depth).to eq 1
+          expect(subject.height).to eq 1
           expect(subject.execution_count).to eq 2 # now it increments
         end
       end

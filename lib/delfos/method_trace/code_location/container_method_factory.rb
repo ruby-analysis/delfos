@@ -7,7 +7,7 @@ module Delfos
     module CodeLocation
       class ContainerMethodFactory
         include EvalInCaller
-        STACK_OFFSET = 11
+        STACK_OFFSET = 12
 
         def self.create
           new.create
