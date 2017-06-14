@@ -10,7 +10,7 @@ module Delfos
       self.call_site_logger = call_site_logger
 
       require "delfos/method_trace"
-      ::Delfos::MethodTrace.trace
+      ::Delfos::MethodTrace.trace!
     end
 
     def application_directories=(dirs)

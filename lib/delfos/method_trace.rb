@@ -10,7 +10,7 @@ module Delfos
     ALL_ERRORS = {}.freeze
 
     class << self
-      def trace
+      def trace!
         on_call.enable
         on_return.enable
         on_raise.enable
