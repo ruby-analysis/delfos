@@ -3,23 +3,18 @@
 require "delfos"
 
 describe "integration with a customer call_stack_logger" do
-  let(:loading_code) do
-    lambda do
-      load "fixtures/app/include_this/start_here.rb"
-    end
-  end
-
   let(:call_site_logger) { double "call stack logger", log: nil, save_call_stack: nil }
   before do
     WebMock.disable_net_connect! allow_localhost: false
 
     Delfos.setup!(
-      application_directories: ["fixtures/app/include_this"],
+      application_directories: ["fixtures"],
       call_site_logger: call_site_logger,
     )
   end
 
   after do
+    Delfos.disable!
     WebMock.disable_net_connect! allow_localhost: true
   end
 
@@ -32,10 +27,10 @@ describe "integration with a customer call_stack_logger" do
         expect(call_site.container_method) .to be_a cl::Method
       end.exactly(3).times
 
-      loading_code.()
+      load "fixtures/app/include_this/start_here.rb"
     end
 
-    pending "Issue #14 - saves the call stack" do
+    it "Issue #14 - saves the call stack" do
       expect(call_site_logger).to receive(:save_call_stack) do |call_sites, execution_count|
         expect(call_sites.first.summary).to eq({
           :call_site => "fixtures/app/include_this/start_here.rb:3",
@@ -49,12 +44,12 @@ describe "integration with a customer call_stack_logger" do
           :container_method => "include_this/called_app_class.rb:9 IncludeThis::CalledAppClass#next_method",
         })
 
-
         expect(call_sites.length) .to eq 2
         expect(execution_count)   .to eq 1
       end.exactly(:once)
 
-      loading_code.()
+      #load "fixtures/app/include_this/start_here.rb"
+      load "fixtures/a_usage_2.rb"
     end
   end
 end
