@@ -7,7 +7,7 @@ module Delfos
   module MethodTrace
     CallHandler = Struct.new(:trace_point)
 
-    class CallHandler 
+    class CallHandler
       def perform
         return unless relevant?
 

@@ -15,7 +15,7 @@ module Delfos
           Method.new(attrs)
         end
 
-        STACK_OFFSET = 7
+        STACK_OFFSET = 8
 
         def new_callsite(attrs)
           CallSite.new(
