@@ -9,28 +9,28 @@ module Delfos
 
       def push(method_object)
         call_sites.push(method_object)
-        self.stack_depth += 1
+        self.height += 1
 
-        self.execution_count += self.stack_depth == 1 ? 1 : 0
+        self.execution_count += self.height == 1 ? 1 : 0
       end
 
       def pop
-        raise PoppingEmptyStackError if self.stack_depth.zero?
+        raise PoppingEmptyStackError if self.height.zero?
 
-        self.stack_depth -= 1
+        self.height -= 1
 
-        return unless stack_depth.zero? && call_sites.length.positive?
+        return unless height.zero? && call_sites.length.positive?
 
         @on_empty&.call(call_sites, execution_count)
         self.call_sites = []
       end
 
       def pop_until_top!
-        pop while self.stack_depth.positive?
+        pop while self.height.positive?
       end
 
-      def stack_depth
-        @stack_depth ||= 0
+      def height
+        @height ||= 0
       end
 
       def execution_count
@@ -45,7 +45,7 @@ module Delfos
         call_sites.length
       end
 
-      attr_writer :stack_depth, :step_count, :execution_count, :call_sites
+      attr_writer :height, :step_count, :execution_count, :call_sites
     end
 
     class PoppingEmptyStackError < StandardError

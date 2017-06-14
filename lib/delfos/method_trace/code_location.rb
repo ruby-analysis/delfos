@@ -17,12 +17,12 @@ module Delfos
 
         STACK_OFFSET = 8
 
-        def new_callsite(attrs)
+        def new_callsite(container_method:, called_method:, stack_offset: STACK_OFFSET)
           CallSite.new(
-            attrs.merge(
-              file:        eval_in_caller("__FILE__", STACK_OFFSET),
-              line_number: eval_in_caller("__LINE__", STACK_OFFSET),
-            ),
+            container_method: container_method,
+            called_method:    called_method,
+            file:             eval_in_caller("__FILE__", stack_offset),
+            line_number:      eval_in_caller("__LINE__", stack_offset),
           )
         end
 

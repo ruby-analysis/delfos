@@ -16,6 +16,8 @@ module Delfos
 
         @on_return&.disable
         @on_return = nil
+
+        @last = nil
       end
 
       def on_call
@@ -26,15 +28,31 @@ module Delfos
 
       def on_return
         @on_return ||= setup_trace_point(:return) do |tp|
+          next if check_for_bug!(tp)
           CallStack.pop
         end
       end
 
       private
 
+      # FIXME: There seems to be a bug where the last TracePoint in a chain
+      # when returning to (main) is duplicated. Can't get to the source of this.
+      # But the only effect seems to be popping the stacking beyond the end
+      # so this is a workaround
+      def check_for_bug!(tp)
+        bug_scenario = @last == tp && CallStack.height.zero?
+        @last = tp
+        bug_scenario
+      end
+
+
       def setup_trace_point(type)
         TracePoint.new(type) do |tp|
           next unless Delfos.include_file?(tp.path)
+          # put
+          # puts "inside on_call:   #{@on_call.object_id}" if type == :call
+          # puts "inside on_return: #{@on_return.object_id}" if type == :return
+          # puts "  " + tp.inspect
 
           yield tp
         end

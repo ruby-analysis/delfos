@@ -40,7 +40,8 @@ module Delfos
       private
 
       def relevant?
-        Delfos.include_file?(call_site.called_method_path)
+        Delfos.include_file?(call_site.called_method_path) &&
+          Delfos.include_file?(call_site.container_method_path)
       end
     end
   end
