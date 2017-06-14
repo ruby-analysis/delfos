@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../eval_in_caller"
+require_relative "eval_in_caller"
 
 module Delfos
   module MethodTrace
@@ -17,15 +17,13 @@ module Delfos
           # ensure evaluated and memoised with correct stack offset
           class_method
 
-          code_location_method = CodeLocation.new_method(
+          CodeLocation.new_method(
             object:       object,
             method_name:  meth,
             file:         file,
             line_number:  line,
             class_method: class_method,
           )
-
-          code_location_method # .tap{|o| puts o }
         end
 
         private

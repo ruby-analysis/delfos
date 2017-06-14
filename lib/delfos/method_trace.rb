@@ -43,7 +43,7 @@ module Delfos
 
       def setup_trace_point(type, klass)
         TracePoint.new(type) do |tp|
-          next unless FileSystem.include_file?(tp.path)
+          next unless Delfos.include_file?(tp.path)
           klass.new(tp).perform
         end
       end
