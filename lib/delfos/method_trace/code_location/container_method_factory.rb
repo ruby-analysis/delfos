@@ -17,7 +17,7 @@ module Delfos
           # ensure evaluated and memoised with correct stack offset
           class_method
 
-          CodeLocation.new_method(
+          CodeLocation.method_from(
             object:       object,
             method_name:  meth,
             file:         file,

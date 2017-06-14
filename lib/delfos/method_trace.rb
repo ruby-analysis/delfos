@@ -37,9 +37,9 @@ module Delfos
       private
 
       # FIXME: There seems to be a bug where the last TracePoint in a chain
-      # when returning to (main) is duplicated. Can't get to the source of this.
-      # But the only effect seems to be popping the stacking beyond the end
-      # so this is a workaround
+      # when returning to (main) is duplicated. Can't get to the source of
+      # this.  But the only effect seems to be popping the stacking beyond
+      # the end so this is a workaround
       def check_for_bug!(tp)
         bug_scenario = @last == tp && CallStack.height.zero?
         @last = tp

@@ -17,18 +17,18 @@ module Delfos
       end
 
       def call_site
-        @call_site ||= CodeLocation.new_callsite(
+        @call_site ||= CodeLocation.callsite_from(
           container_method: container_method,
           called_method:    called_method,
         )
       end
 
       def container_method
-        @container_method ||= CodeLocation.new_container_method
+        @container_method ||= CodeLocation.create_container_method
       end
 
       def called_method
-        @called_method ||= CodeLocation.new_method(
+        @called_method ||= CodeLocation.method_from(
           object:       trace_point.self,
           method_name:  trace_point.method_id,
           file:         trace_point.path,

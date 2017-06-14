@@ -11,13 +11,13 @@ module Delfos
       class << self
         include EvalInCaller
 
-        def new_method(attrs)
+        def method_from(attrs)
           Method.new(attrs)
         end
 
         STACK_OFFSET = 8
 
-        def new_callsite(container_method:, called_method:, stack_offset: STACK_OFFSET)
+        def callsite_from(container_method:, called_method:, stack_offset: STACK_OFFSET)
           CallSite.new(
             container_method: container_method,
             called_method:    called_method,
@@ -26,7 +26,7 @@ module Delfos
           )
         end
 
-        def new_container_method
+        def create_container_method
           ContainerMethodFactory.create
         end
       end
