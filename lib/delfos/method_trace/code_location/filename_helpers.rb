@@ -30,9 +30,10 @@ module Delfos
         end
 
         def relative_path(file, dir)
+          dir = File.expand_path(dir)
           match = dir.to_s.split("/")[0..-2].join("/")
 
-          if file[match]
+          if match.length.positive? && file[match]
             file = file.gsub(match, "").
                    gsub(%r{^/}, "")
           end

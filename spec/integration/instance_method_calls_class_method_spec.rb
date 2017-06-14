@@ -15,7 +15,7 @@ describe "integration" do
     let(:expected_call_sites) do
       [
         [
-          "instance_method_calls_a_class_method_usage.rb:0 Object#(main)",
+          "instance_method_calls_a_class_method_usage.rb:3 Object#(main)",
           "instance_method_calls_a_class_method_usage.rb:3",
           "instance_method_calls_a_class_method.rb:2 InstanceMethodCallsAClassMethod#an_instance_method",
         ],

@@ -14,7 +14,7 @@ describe "integration" do
   context "records call sites" do
     let(:expected_call_sites) do
       [
-        ["a_usage.rb:0 Object#(main)",   "a_usage.rb:3",  "a.rb:5 A#some_method"],
+        ["a_usage.rb:3 Object#(main)",   "a_usage.rb:3",  "a.rb:5 A#some_method"],
         ["a.rb:5 A#some_method",         "a.rb:6",        "b.rb:3 B#another_method"],
         ["b.rb:3 B#another_method",      "b.rb:4",        "a.rb:11 A#to_s"],
         ["b.rb:3 B#another_method",      "b.rb:6",        "b.rb:33 C#method_with_no_more_method_calls"],

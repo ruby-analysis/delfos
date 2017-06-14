@@ -15,7 +15,7 @@ describe "integration" do
   context "recording call stacks" do
     let(:expected_call_stack_1) do
       [
-        ["a_usage_3.rb:0 Object#(main)", "a_usage_3.rb:3", "a.rb:11 A#to_s"],
+        ["a_usage_3.rb:3 Object#(main)", "a_usage_3.rb:3", "a.rb:11 A#to_s"],
         # etc
 
       ]
@@ -23,7 +23,7 @@ describe "integration" do
 
     let(:expected_call_stack_2) do
       [
-        ["a_usage_3.rb:0 Object#(main)", "a_usage_3.rb:4", "a.rb:11 A#to_s"],
+        ["a_usage_3.rb:4 Object#(main)", "a_usage_3.rb:4", "a.rb:11 A#to_s"],
       ]
     end
 
