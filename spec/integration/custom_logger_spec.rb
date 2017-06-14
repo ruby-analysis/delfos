@@ -3,7 +3,7 @@
 require "delfos"
 require "delfos/neo4j"
 
-describe "integration with a customer call_stack_logger" do
+describe "integration with a custom call_stack_logger" do
   let(:loading_code) do
     lambda do
       load "fixtures/a_usage.rb"

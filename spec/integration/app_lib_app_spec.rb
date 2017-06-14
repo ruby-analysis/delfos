@@ -2,7 +2,7 @@
 
 require "delfos"
 
-describe "integration with a customer call_stack_logger" do
+describe "integration with a custom call_stack_logger" do
   let(:call_site_logger) { double "call stack logger", log: nil, save_call_stack: nil }
 
   before do

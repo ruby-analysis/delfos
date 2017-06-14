@@ -39,7 +39,7 @@ For the code in files [fixtures/a.rb](fixtures/a.rb) and [fixtures/b.rb](fixture
     <-[:OWNS]-(:Class{name:"B"})
 ```
 
-## Example usage with customer logger
+## Example usage with custom logger
 See https://github.com/ruby-analysis/delfos-custom-call-site-logger-example
 
 ![custom-call-site-logger](examples/custom-call-site-logger.gif)
