@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
 require "binding_of_caller"
-require "delfos/code_location/call_site"
-require "delfos/code_location/method"
-require "delfos/call_stack"
+require_relative "code_location/call_site"
+require_relative "code_location/method"
+require_relative "eval_in_caller"
+require_relative "container_method"
 require "delfos/file_system/app_directories"
-require "delfos/method_trace/eval_in_caller"
-require "delfos/method_trace/container_method"
 
 module Delfos
   class MethodTrace

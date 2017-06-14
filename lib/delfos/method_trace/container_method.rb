@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "delfos/code_location/method"
-require "delfos/method_trace/eval_in_caller"
+require_relative "code_location/method"
+require_relative "eval_in_caller"
 
 module Delfos
   class MethodTrace
