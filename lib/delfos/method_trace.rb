@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative "method_trace/call_handler"
 require_relative "call_stack"
 
@@ -45,15 +46,9 @@ module Delfos
         bug_scenario
       end
 
-
       def setup_trace_point(type)
         TracePoint.new(type) do |tp|
           next unless Delfos.include_file?(tp.path)
-          # put
-          # puts "inside on_call:   #{@on_call.object_id}" if type == :call
-          # puts "inside on_return: #{@on_return.object_id}" if type == :return
-          # puts "  " + tp.inspect
-
           yield tp
         end
       end
