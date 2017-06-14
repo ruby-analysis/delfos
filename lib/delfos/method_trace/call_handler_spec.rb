@@ -4,7 +4,7 @@ require_relative "call_handler"
 require "./fixtures/a_usage"
 
 module Delfos
-  class MethodTrace
+  module MethodTrace
     RSpec.describe CallHandler do
       let(:path) { "fixtures/a_usage.rb" }
       let(:a) { A.new }

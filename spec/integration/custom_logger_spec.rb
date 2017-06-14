@@ -31,9 +31,9 @@ describe "integration with a customer call_stack_logger" do
 
   it "logs the call sites" do
     expect(call_site_logger).to receive(:log) do |call_site|
-      expect(call_site)                  .to be_a Delfos::CodeLocation::CallSite
-      expect(call_site.called_method)    .to be_a Delfos::CodeLocation::Method
-      expect(call_site.container_method) .to be_a Delfos::CodeLocation::Method
+      expect(call_site)                  .to be_a Delfos::MethodTrace::CodeLocation::CallSite
+      expect(call_site.called_method)    .to be_a Delfos::MethodTrace::CodeLocation::Method
+      expect(call_site.container_method) .to be_a Delfos::MethodTrace::CodeLocation::Method
     end.exactly(11).times
 
     loading_code.()

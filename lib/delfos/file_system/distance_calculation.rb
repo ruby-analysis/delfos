@@ -5,10 +5,12 @@ require_relative "path_determination"
 
 module Delfos
   module FileSystem
+    Error = Class.new(::StandardError)
+
     class DistanceCalculation
       attr_reader :path_a, :path_b
 
-      PathNotFound = Class.new(ArgumentError)
+      PathNotFound = Class.new(Error)
 
       def initialize(path_a, path_b)
         @path_a, @path_b = PathDetermination.for(path_a, path_b)

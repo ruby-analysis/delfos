@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
 require "binding_of_caller"
-require_relative "code_location/call_site"
-require_relative "code_location/method"
+require_relative "code_location"
 require_relative "eval_in_caller"
-require_relative "container_method"
-require "delfos/file_system/app_directories"
+require "delfos/file_system"
 
 module Delfos
-  class MethodTrace
+  module MethodTrace
     Handler = Struct.new(:trace_point)
 
     class Handler
@@ -19,13 +17,13 @@ module Delfos
       end
 
       def relevant?
-        FileSystem::AppDirectories.include_file?(call_site.called_method_path)
+        FileSystem.include_file?(call_site.called_method_path)
       end
 
       STACK_OFFSET = 6
 
       def call_site
-        @call_site ||= CodeLocation::CallSite.new(
+        @call_site ||= CodeLocation.new_callsite(
           file:        eval_in_caller("__FILE__", STACK_OFFSET),
           line_number: eval_in_caller("__LINE__", STACK_OFFSET),
           container_method: container_method,
@@ -34,11 +32,11 @@ module Delfos
       end
 
       def container_method
-        @container_method ||= ContainerMethod.new.determine
+        @container_method ||= CodeLocation.new_container_method
       end
 
       def called_method
-        @called_method ||= CodeLocation::Method.new(
+        @called_method ||= CodeLocation.new_method(
           object:       trace_point.self,
           method_name:  trace_point.method_id,
           file:         trace_point.path,

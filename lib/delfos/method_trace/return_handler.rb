@@ -4,7 +4,7 @@ require_relative "handler"
 require "delfos/call_stack"
 
 module Delfos
-  class MethodTrace
+  module MethodTrace
     class ReturnHandler < Handler
       def perform
         return unless relevant?

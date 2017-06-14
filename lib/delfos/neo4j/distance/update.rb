@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "delfos/file_system/distance_calculation"
+require "delfos/file_system"
 require_relative "call_site_fetcher"
 
 module Delfos
@@ -47,10 +47,10 @@ module Delfos
         private
 
         def handle(start_file, call_site_id, finish_file, called_id)
-          calc = FileSystem::DistanceCalculation.new(start_file, finish_file)
+          calc = FileSystem.distance_calculation(start_file, finish_file)
 
           update(call_site_id, called_id, calc)
-        rescue FileSystem::DistanceCalculation::PathNotFound => e
+        rescue FileSystem::Error => e
           error(e, start_file, call_site_id, finish_file, called_id)
         end
 

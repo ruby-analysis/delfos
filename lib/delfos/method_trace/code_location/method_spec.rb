@@ -3,46 +3,48 @@
 require_relative "method"
 
 module Delfos
-  module CodeLocation
-    describe Method do
-      describe "#file" do
-        let(:code_location) do
-          described_class.new(object: anything,
-                              method_name: anything,
-                              class_method: anything,
-                              file: filename,
-                              line_number: (1..1000).to_a.sample)
-        end
-        let(:dir) { "/Users/mark/code/some_app" }
-
-        before do
-          expect(Delfos).to receive(:application_directories).and_return [
-            "/Users/mark/code/some_app/app",
-            "/Users/mark/code/some_app/lib",
-          ]
-        end
-
-        context "with a file in one of the defined directories" do
-          let(:filename) { "#{dir}/app/models/user.rb" }
-
-          it do
-            expect(code_location.file).to eq "app/models/user.rb"
+  module MethodTrace
+    module CodeLocation
+      describe Method do
+        describe "#file" do
+          let(:code_location) do
+            described_class.new(object: anything,
+                                method_name: anything,
+                                class_method: anything,
+                                file: filename,
+                                line_number: (1..1000).to_a.sample)
           end
-        end
+          let(:dir) { "/Users/mark/code/some_app" }
 
-        context "with a file in another directory" do
-          let(:filename) { "#{dir}/lib/some_file.rb" }
-
-          it do
-            expect(code_location.file).to eq "lib/some_file.rb"
+          before do
+            expect(Delfos).to receive(:application_directories).and_return [
+              "/Users/mark/code/some_app/app",
+              "/Users/mark/code/some_app/lib",
+            ]
           end
-        end
 
-        context "with a file in neither directory" do
-          let(:filename) { "/some_big/long/path/lib/any_file.rb" }
+          context "with a file in one of the defined directories" do
+            let(:filename) { "#{dir}/app/models/user.rb" }
 
-          it do
-            expect(code_location.file).to eq filename
+            it do
+              expect(code_location.file).to eq "app/models/user.rb"
+            end
+          end
+
+          context "with a file in another directory" do
+            let(:filename) { "#{dir}/lib/some_file.rb" }
+
+            it do
+              expect(code_location.file).to eq "lib/some_file.rb"
+            end
+          end
+
+          context "with a file in neither directory" do
+            let(:filename) { "/some_big/long/path/lib/any_file.rb" }
+
+            it do
+              expect(code_location.file).to eq filename
+            end
           end
         end
       end

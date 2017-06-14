@@ -3,9 +3,10 @@
 require_relative "method_trace/return_handler"
 require_relative "method_trace/call_handler"
 require_relative "method_trace/raise_handler"
+require_relative "file_system"
 
 module Delfos
-  class MethodTrace
+  module MethodTrace
     ALL_ERRORS = {}.freeze
 
     class << self
@@ -42,7 +43,7 @@ module Delfos
 
       def setup_trace_point(type, klass)
         TracePoint.new(type) do |tp|
-          next unless FileSystem::AppDirectories.include_file?(tp.path)
+          next unless FileSystem.include_file?(tp.path)
           klass.new(tp).perform
         end
       end
