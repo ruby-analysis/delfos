@@ -36,15 +36,8 @@ module Delfos
     end
 
     describe "on_return" do
-      before do
-        expect(MethodTrace::ReturnHandler).
-          to receive(:new).
-          and_return(return_handler).
-          at_least(:once)
-      end
-
       it do
-        expect(return_handler).to receive(:perform).at_least(:once)
+        expect(CallStack).to receive(:pop).at_least(:once)
 
         described_class.on_return.enable
         A.new.some_method
@@ -59,7 +52,7 @@ module Delfos
           at_least(:once)
       end
 
-      it do
+      pending do
         expect(raise_handler).to receive(:perform).at_least(:once)
 
         described_class.on_raise.enable
