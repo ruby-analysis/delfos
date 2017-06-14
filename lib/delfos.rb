@@ -12,6 +12,11 @@ module Delfos
       Delfos::Setup.perform!(call_site_logger: call_site_logger, application_directories: application_directories)
     end
 
+    def include_file?(file)
+      require "delfos/file_system"
+      FileSystem.include_file?(file)
+    end
+
     def call_site_logger
       Delfos::Setup.call_site_logger
     end

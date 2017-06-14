@@ -23,7 +23,7 @@ module Delfos
       private
 
       def should_include?(file)
-        FileSystem::CommonPath.included_in?(expand_path(file), Delfos.application_directories)
+        CommonPath.included_in?(expand_path(file), Delfos.application_directories)
       end
 
       def expand_path(f)

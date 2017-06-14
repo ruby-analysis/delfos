@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "file_system/distance_calculation"
 require_relative "file_system/app_directories"
 

@@ -34,7 +34,7 @@ module Delfos
 
           if file[match]
             file = file.gsub(match, "").
-              gsub(%r{^/}, "")
+                   gsub(%r{^/}, "")
           end
 
           file
