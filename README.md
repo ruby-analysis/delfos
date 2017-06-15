@@ -3,6 +3,7 @@
 [![CircleCI](https://circleci.com/gh/ruby-analysis/delfos.svg?style=svg)](https://circleci.com/gh/ruby-analysis/delfos)
 [![Dependency Status](http://img.shields.io/gemnasium/ruby-analysis/delfos.svg?style=flat-square)](https://gemnasium.com/ruby-analysis/delfos)
 [![Code Climate](http://img.shields.io/codeclimate/github/ruby-analysis/delfos.svg?style=flat-square)](https://codeclimate.com/github/ruby-analysis/delfos)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/00d569c5fc98456bbadda05ee2144b5f)](https://www.codacy.com/app/markthedeveloper/delfos?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ruby-analysis/delfos&amp;utm_campaign=Badge_Grade)
 [![Gem Version](http://img.shields.io/gem/v/delfos.svg?style=flat-square)](https://rubygems.org/gems/delfos)
 
 # Background
