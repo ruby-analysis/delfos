@@ -2,12 +2,15 @@
 
 require "delfos/call_stack"
 require_relative "code_location"
+require_relative "code_location/filename_helpers"
 
 module Delfos
   module MethodTrace
     CallHandler = Struct.new(:trace_point)
 
     class CallHandler
+      include CodeLocation::FilenameHelpers
+
       def perform
         return unless relevant?
 
@@ -40,8 +43,7 @@ module Delfos
       private
 
       def relevant?
-        Delfos.include_file?(call_site.called_method_path) &&
-          Delfos.include_file?(call_site.container_method_path)
+        Delfos.include_file?(call_site.called_method_path)
       end
     end
   end

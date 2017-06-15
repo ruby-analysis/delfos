@@ -7,6 +7,10 @@ module IncludeThis
     end
 
     def next_method
+      penultimate
+    end
+
+    def penultimate
       final_method
     end
 

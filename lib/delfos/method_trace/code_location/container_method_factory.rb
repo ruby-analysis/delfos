@@ -1,16 +1,23 @@
 # frozen_string_literal: true
 
 require_relative "eval_in_caller"
+require_relative "filename_helpers"
 
 module Delfos
   module MethodTrace
     module CodeLocation
       class ContainerMethodFactory
         include EvalInCaller
+        include FilenameHelpers
         STACK_OFFSET = 12
+        attr_reader :stack_offset
 
-        def self.create
-          new.create
+        def self.create(stack_offset: STACK_OFFSET)
+          new(stack_offset: stack_offset).create
+        end
+
+        def initialize(stack_offset:)
+          @stack_offset = stack_offset
         end
 
         def create
@@ -29,32 +36,32 @@ module Delfos
         private
 
         def object
-          @object ||= eval_in_caller("self", STACK_OFFSET)
+          @object ||= eval_in_caller("self", stack_offset)
         end
 
         def class_method
-          # TODO: This is nuts - see issue #16 - https://github.com/ruby-analysis/delfos/issues/16
+          # FIXME: This is nuts - see issue #16 - https://github.com/ruby-analysis/delfos/issues/16
           #
           # Evaluating "self.is_a?(Module)" is non-deterministic even though it's memoized
           #
           # Somehow in hell the following gives us a workaround
           #
-          # You can try it out yourself with `puts class_method` when running
+          # You can try it out yourself with `puts class_method at the start of #create` when running
           #
           # spec/integration/neo4j/call_sites_spec.rb
-          # vs `puts code_location.inspect` on line 22 of this file
+          # vs `puts replace_with_return_value_of_create_method.inspect`
           #
           # and using this more sane implementation:
           #
           # @class_method ||= eval_in_caller('is_a?(Module)', STACK_OFFSET)
           #
-          # The output value will be false the first time
-          # but true inside the code_location
+          # The output value is false the first memoised time
+          # but true in the result
           @result ||= eval_in_caller("{self =>  is_a?(Module)}", STACK_OFFSET)
           @class_method ||= @result.values.first
         end
 
-        RUBY_IS_MAIN                = "self.class == Object && self&.to_s == 'main'"
+        RUBY_IS_MAIN                = "self.class == Object && self&.to_s == 'main' && __method__.nil?"
         RUBY_SOURCE_LOCATION        = "(__method__).source_location if __method__"
         RUBY_CLASS_METHOD_SOURCE    = "method#{RUBY_SOURCE_LOCATION}"
         RUBY_INSTANCE_METHOD_SOURCE = "self.class.instance_method#{RUBY_SOURCE_LOCATION}"
@@ -64,15 +71,15 @@ module Delfos
         end
 
         def file
-          @file ||= eval_in_caller("(#{RUBY_IS_MAIN}) ? __FILE__ : ((#{method_finder})&.first)", STACK_OFFSET)
+          @file ||= eval_in_caller("(#{RUBY_IS_MAIN}) ? __FILE__ : ((#{method_finder})&.first)", stack_offset)
         end
 
         def line
-          @line ||= eval_in_caller("(#{RUBY_IS_MAIN}) ? 0 : ((#{method_finder})&.last)", STACK_OFFSET)
+          @line ||= eval_in_caller("(#{RUBY_IS_MAIN}) ? __LINE__ : ((#{method_finder})&.last)", stack_offset)
         end
 
         def meth
-          @meth ||= eval_in_caller("__method__", STACK_OFFSET)
+          @meth ||= eval_in_caller("__method__", stack_offset)
         end
       end
     end
