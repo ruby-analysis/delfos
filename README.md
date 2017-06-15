@@ -1,5 +1,6 @@
 # Delfos
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/00d569c5fc98456bbadda05ee2144b5f)](https://www.codacy.com/app/markthedeveloper/delfos?utm_source=github.com&utm_medium=referral&utm_content=ruby-analysis/delfos&utm_campaign=badger)
 [![CircleCI](https://circleci.com/gh/ruby-analysis/delfos.svg?style=svg)](https://circleci.com/gh/ruby-analysis/delfos)
 [![Dependency Status](http://img.shields.io/gemnasium/ruby-analysis/delfos.svg?style=flat-square)](https://gemnasium.com/ruby-analysis/delfos)
 [![Code Climate](http://img.shields.io/codeclimate/github/ruby-analysis/delfos.svg?style=flat-square)](https://codeclimate.com/github/ruby-analysis/delfos)
