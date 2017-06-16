@@ -8,6 +8,7 @@ class E; end
 module Delfos
   module Neo4j
     describe CallSiteQuery do
+      let(:container_method_line_number) { 2 }
       let(:container_method_klass) { A }
       let(:called_method_klass) { E }
       let(:container_method) do
@@ -16,7 +17,7 @@ module Delfos
           method_type: "ClassMethod",     #   def self.method_a    # called_method
           method_name: "method_a",        #     E.new.method_e     # call site
           file: "a.rb",
-          line_number: 2
+          line_number: container_method_line_number
       end
 
       let(:call_site) do
@@ -126,7 +127,7 @@ module Delfos
           end
         end
 
-        describe "#query_for" do
+        describe "#query" do
           it "only creates one class node" do
             query = subject.query
 
@@ -166,6 +167,15 @@ module Delfos
 
             expect(strip_whitespace(query)).to eq strip_whitespace(expected)
           end
+        end
+      end
+
+      context "with missing container method line number" do
+        let(:container_method_line_number) { nil }
+
+        it do
+          expect(subject.query      ).not_to include "line_number: {container_method_line_number}"
+          expect(subject.params.keys).not_to include "container_method_line_number"
         end
       end
     end

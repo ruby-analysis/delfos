@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module ProductAttributes
   def self.included(klass)
     klass.class_eval do
