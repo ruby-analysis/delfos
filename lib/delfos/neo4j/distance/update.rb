@@ -58,7 +58,8 @@ module Delfos
           Delfos.logger.error([
             "Whilst updating distance #{start_file}->#{finish_file} ",
             "call_site_id: #{call_site_id}",
-            "called_id: #{called_id} - #{e.message} #{e.backtrace}"].join("\n"))
+            "called_id: #{called_id} - #{e.message} #{e.backtrace}",
+          ].join("\n"))
         end
       end
     end

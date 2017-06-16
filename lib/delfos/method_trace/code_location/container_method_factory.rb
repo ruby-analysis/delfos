@@ -42,7 +42,7 @@ module Delfos
         def class_method
           return @class_method if defined?(@class_method)
 
-          @class_method = eval_in_caller('is_a?(Module)', STACK_OFFSET)
+          @class_method = eval_in_caller("is_a?(Module)", STACK_OFFSET)
         end
 
         RUBY_IS_MAIN                = "self.class == Object && self&.to_s == 'main' && __method__.nil?"
