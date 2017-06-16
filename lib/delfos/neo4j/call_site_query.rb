@@ -18,14 +18,11 @@ module Delfos
       end
 
       def params
-        params = klass_params
+        params = calculate_params
 
-        add_method_info(params, "container_method", container_method)
-
-        params["cs_file"]        = call_site.file
-        params["cs_line_number"] = call_site.line_number
-
-        add_method_info(params, "called_method", called_method)
+        if container_method.line_number.nil?
+          params.delete "container_method_line_number"
+        end
 
         params
       end
@@ -52,7 +49,7 @@ module Delfos
           #{klasses_query}
 
           MERGE (#{query_variable(container_method.klass)}) - [:OWNS] ->
-            #{method_node("container_method")}
+            #{method_node("container_method", include_line_number: include_container_method_line_number?)}
 
           MERGE (container_method) - [:CONTAINS] ->
             (cs:CallSite
@@ -69,17 +66,36 @@ module Delfos
         QUERY
       end
 
-      def method_node(id)
+      def method_node(id, include_line_number: true)
         <<-NODE
           (#{id}:Method
             {
               type: {#{id}_type},
               name: {#{id}_name},
-              file: {#{id}_file},
-              line_number: {#{id}_line_number}
+              file: {#{id}_file}#{"," if include_line_number}
+              #{"line_number: {#{id}_line_number}" if include_line_number}
             }
           )
         NODE
+      end
+
+      private
+
+      def include_container_method_line_number?
+        params.keys.include?("container_method_line_number")
+      end
+
+      def calculate_params
+        params = klass_params
+
+        add_method_info(params, "container_method", container_method)
+
+        params["cs_file"]        = call_site.file
+        params["cs_line_number"] = call_site.line_number
+
+        add_method_info(params, "called_method", called_method)
+
+        params
       end
     end
   end
