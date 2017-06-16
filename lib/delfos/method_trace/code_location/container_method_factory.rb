@@ -40,25 +40,9 @@ module Delfos
         end
 
         def class_method
-          # FIXME: This is nuts - see issue #16 - https://github.com/ruby-analysis/delfos/issues/16
-          #
-          # Evaluating "self.is_a?(Module)" is non-deterministic even though it's memoized
-          #
-          # Somehow in hell the following gives us a workaround
-          #
-          # You can try it out yourself with `puts class_method at the start of #create` when running
-          #
-          # spec/integration/neo4j/call_sites_spec.rb
-          # vs `puts replace_with_return_value_of_create_method.inspect`
-          #
-          # and using this more sane implementation:
-          #
-          # @class_method ||= eval_in_caller('is_a?(Module)', STACK_OFFSET)
-          #
-          # The output value is false the first memoised time
-          # but true in the result
-          @result ||= eval_in_caller("{self =>  is_a?(Module)}", STACK_OFFSET)
-          @class_method ||= @result.values.first
+          return @class_method if defined?(@class_method)
+
+          @class_method = eval_in_caller('is_a?(Module)', STACK_OFFSET)
         end
 
         RUBY_IS_MAIN                = "self.class == Object && self&.to_s == 'main' && __method__.nil?"
