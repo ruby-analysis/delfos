@@ -15,6 +15,7 @@ module Delfos
 
     def application_directories=(dirs)
       dirs ||= %w[app lib]
+      require "pathname"
       Delfos.application_directories = Array(dirs).map { |f| Pathname.new(f.to_s).expand_path }
     end
 
