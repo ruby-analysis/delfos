@@ -58,7 +58,7 @@ module Delfos
 
     def reset_batch!
       Delfos.batch_size = nil
-      
+
       ignoring_undefined "Delfos::Neo4j::Batch::Retryable" do |b|
         begin
           with_rescue { b.flush! }

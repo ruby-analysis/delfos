@@ -12,7 +12,7 @@ module Delfos
         Errno::ECONNRESET,
         Errno::EHOSTUNREACH,
         Errno::EINVAL,
-        Errno::ENETDOWN, 
+        Errno::ENETDOWN,
         Errno::ENETUNREACH,
         Errno::ETIMEDOUT,
         Net::HTTPBadResponse,
