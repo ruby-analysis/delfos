@@ -15,7 +15,7 @@ module Delfos
     end
 
     def execute(query, params = {})
-      Batch::Retryable.execute!(query, params: params)
+      Batch::Retryable.execute!(query, params: params, size: Delfos.batch_size)
     end
 
     def flush!

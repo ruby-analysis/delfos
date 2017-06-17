@@ -7,12 +7,19 @@ module Delfos
     module QueryExecution
       HTTP_ERRORS = [
         EOFError,
-        Errno::ECONNRESET,
+        Errno::EAGAIN,
         Errno::ECONNREFUSED,
+        Errno::ECONNRESET,
+        Errno::EHOSTUNREACH,
         Errno::EINVAL,
+        Errno::ENETDOWN, 
+        Errno::ENETUNREACH,
+        Errno::ETIMEDOUT,
         Net::HTTPBadResponse,
         Net::HTTPHeaderSyntaxError,
         Net::ProtocolError,
+        Net::ReadTimeout,
+        SocketError,
         Timeout::Error,
       ].freeze
 
