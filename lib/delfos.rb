@@ -21,7 +21,7 @@ module Delfos
     end
 
     def max_query_size
-      @max_query_size ||= 100_000
+      @max_query_size ||= 10_000
     end
 
     def include_file?(file)
