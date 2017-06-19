@@ -5,17 +5,23 @@ require "delfos/setup"
 module Delfos
   class << self
     attr_accessor :application_directories
-    attr_writer :logger, :neo4j, :batch_size
+    attr_writer :logger, :neo4j, :batch_size, :max_query_size
 
-    def setup!(logger: nil, call_site_logger: nil, application_directories: nil, batch_size: nil)
-      self.logger     = logger     if logger
-      self.batch_size = batch_size if batch_size
+    def setup!(logger: nil, call_site_logger: nil, application_directories: nil,
+               batch_size: nil, max_query_size: nil)
+      self.logger         = logger         if logger
+      self.batch_size     = batch_size     if batch_size
+      self.max_query_size = max_query_size if max_query_size
 
       Delfos::Setup.perform!(call_site_logger: call_site_logger, application_directories: application_directories)
     end
 
     def batch_size
       @batch_size ||= 100
+    end
+
+    def max_query_size
+      @max_query_size ||= 100_000
     end
 
     def include_file?(file)

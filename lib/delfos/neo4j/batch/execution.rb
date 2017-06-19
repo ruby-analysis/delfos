@@ -9,8 +9,8 @@ module Delfos
         attr_reader :size, :current_transaction_url, :commit_url, :expires, :query_count
 
         def initialize(size:, clock: Time)
-          @size                    = size
-          @clock                   = clock
+          @size               = size
+          @clock              = clock
           reset!
         end
 
@@ -33,6 +33,7 @@ module Delfos
 
         def perform_query(query, params)
           transactional_query = QueryExecution::Transactional.new(query, params, url)
+          @total_query_length += transactional_query.query_length
           transaction_url, @commit_url, @expires = transactional_query.perform
           @current_transaction_url ||= transaction_url # the transaction_url is only returned with the first request
           @query_count += 1
@@ -57,7 +58,7 @@ module Delfos
         def flush_if_required!
           check_for_expiry!
 
-          if batch_full? || expires_soon?
+          if batch_full? || expires_soon? || large_query?
             flush!
             return true
           end
@@ -73,11 +74,16 @@ module Delfos
           @expires && (@clock.now + 10 > @expires)
         end
 
+        def large_query?
+          @total_query_length >= Delfos.max_query_size
+        end
+
         def reset!
-          @query_count = 0
+          @query_count             = 0
+          @total_query_length      = 0
           @current_transaction_url = nil
-          @commit_url = nil
-          @expires = nil
+          @commit_url              = nil
+          @expires                 = nil
         end
       end
     end

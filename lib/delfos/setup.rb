@@ -77,6 +77,7 @@ module Delfos
       Delfos.logger                  = nil
       Delfos.application_directories = nil
       Delfos.call_site_logger        = nil
+      Delfos.max_query_size          = nil
       @call_site_logger              = nil
       Delfos.neo4j                   = nil
     end

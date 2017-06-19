@@ -40,11 +40,11 @@ module Delfos
         private
 
         def transaction_url
-          URI.parse  header("location") if header("location")
+          URI.parse(header("location")) if header("location")
         end
 
         def commit_url
-          URI.parse  json["commit"] if json["commit"]
+          URI.parse(json["commit"]) if json["commit"]
         end
 
         def expires
