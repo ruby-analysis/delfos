@@ -66,7 +66,9 @@ module Delfos
 
     def default_logger
       require "logger"
-      Logger.new(STDOUT)
+      Logger.new(STDOUT).tap do |l|
+        l.level = Logger::ERROR
+      end
     end
   end
 end
