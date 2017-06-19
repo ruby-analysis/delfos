@@ -52,7 +52,7 @@ module Delfos
         def check_for_expiry!
           return if @expires.nil? || (@clock.now <= @expires)
 
-          raise QueryExecution::ExpiredTransaction.new(@comit_url, "")
+          raise QueryExecution::ExpiredTransaction.new(@commit_url, "")
         end
 
         def flush_if_required!

@@ -8,7 +8,7 @@ module Delfos
     attr_writer :logger, :neo4j, :batch_size, :max_query_size
 
     def setup!(logger: nil, call_site_logger: nil, application_directories: nil,
-               batch_size: nil, max_query_size: nil)
+      batch_size: nil, max_query_size: nil)
       self.logger         = logger         if logger
       self.batch_size     = batch_size     if batch_size
       self.max_query_size = max_query_size if max_query_size
@@ -21,7 +21,7 @@ module Delfos
     end
 
     def max_query_size
-      @max_query_size ||= 10_000
+      @max_query_size ||= 50_000
     end
 
     def include_file?(file)
@@ -56,6 +56,7 @@ module Delfos
 
     def finish!
       flush!
+      call_site_logger.finish!
       Delfos::Neo4j.update_distance!
       disable!
     end

@@ -76,6 +76,7 @@ module Delfos
 
         def retry_batch!
           Delfos.logger.error do
+            sleep 1 + (retry_count**1.2)
             "Transaction expired - retrying batch. #{queries.count} queries retry_count: #{retry_count}"
           end
 

@@ -5,9 +5,10 @@ module Delfos
     extend self
     attr_accessor :neo4j
 
-    def perform!(call_site_logger: nil, application_directories: nil)
+    def perform!(call_site_logger: nil, application_directories: nil, query_output_file: nil)
       self.application_directories = application_directories
       self.call_site_logger = call_site_logger
+      self.query_output_file = query_output_file if query_output_file
 
       require "delfos/method_trace"
       ::Delfos::MethodTrace.trace!
@@ -17,6 +18,10 @@ module Delfos
       dirs ||= %w[app lib]
       require "pathname"
       Delfos.application_directories = Array(dirs).map { |f| Pathname.new(f.to_s).expand_path }
+    end
+
+    def query_output_file
+      @query_output_file ||= "./delfos_query_output.cypher"
     end
 
     def call_site_logger
@@ -31,7 +36,7 @@ module Delfos
       Delfos.setup_neo4j!
 
       require "delfos/neo4j/call_site_logger"
-      Delfos:: Neo4j::CallSiteLogger.new
+      Delfos:: Neo4j::CallSiteLogger.new(output_path: query_output_file)
     end
 
     def disable!
