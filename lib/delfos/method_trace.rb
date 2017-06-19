@@ -7,6 +7,8 @@ module Delfos
   module MethodTrace
     class << self
       def trace!
+        @last_returned = nil
+
         on_call.enable
         on_return.enable
       end

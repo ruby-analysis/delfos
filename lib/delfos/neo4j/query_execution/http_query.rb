@@ -16,10 +16,14 @@ module Delfos
           @uri = uri
         end
 
+        def query_length
+          request_body.length
+        end
+
         private
 
         def request_body
-          {
+          @request_body ||= {
             "statements": [{ "statement": formatted_query, "parameters": params }],
           }.to_json
         end

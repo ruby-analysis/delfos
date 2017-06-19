@@ -21,7 +21,8 @@ module Delfos
         let(:now)       { Time.parse("Wed, 14 Dec 2016 10:33:44 GMT") }
         let(:clock)     { double "clock", now: now }
 
-        let(:transactional) { double "transactional" }
+        let(:transactional) { double "transactional", query_length: query_length }
+        let(:query_length) { 100 }
 
         let(:body) do
           <<-RESPONSE
@@ -62,10 +63,10 @@ module Delfos
               allow(QueryExecution::Transactional).
                 to receive(:commit!)
 
-              Array.new(executions) { batch.execute!(anything, params: {}) }
+              executions.times { batch.execute!(anything, params: {}) }
             end
 
-            context "with fewer queries than the batch size" do
+             context "with fewer queries than the batch size" do
               let(:size) { 5 }
               let(:executions) { 4 }
 
@@ -77,41 +78,50 @@ module Delfos
               it "keeps track of the query count" do
                 expect(batch.query_count).to eq executions
               end
-            end
 
-            context "just before commiting" do
-              let(:size) { 6 }
-              let(:executions) { 5 }
+              context "but with a large total query size" do
+                let(:query_length) { 100_001 }
 
-              it "has an accurate query count" do
-                expect(batch.query_count).to eq 5
+                it do
+                  expect(QueryExecution::Transactional).
+                    to have_received(:commit!).exactly(4).times
+                end
               end
+             end
 
-              it do
-                expect(QueryExecution::Transactional).
-                  not_to have_received(:commit!)
-              end
-            end
+             context "just before commiting" do
+               let(:size) { 6 }
+               let(:executions) { 5 }
 
-            context "with one more execution than the batch size" do
-              let(:size) { 8 }
-              let(:executions) { 9 }
+               it "has an accurate query count" do
+                 expect(batch.query_count).to eq 5
+               end
 
-              it "resets the count" do
-                expect(batch.query_count).to eq 1
-              end
+               it do
+                 expect(QueryExecution::Transactional).
+                   not_to have_received(:commit!)
+               end
+             end
 
-              it do
-                expect(QueryExecution::Transactional).
-                  to have_received(:commit!).
-                  with(commit_url)
-              end
+             context "with one more execution than the batch size" do
+               let(:size) { 8 }
+               let(:executions) { 9 }
 
-              it "starts the next batch" do
-                batch.execute!(anything, params: {})
-                expect(batch.query_count).to eq 2
-              end
-            end
+               it "resets the count" do
+                 expect(batch.query_count).to eq 1
+               end
+
+               it do
+                 expect(QueryExecution::Transactional).
+                   to have_received(:commit!).
+                   with(commit_url)
+               end
+
+               it "starts the next batch" do
+                 batch.execute!(anything, params: {})
+                 expect(batch.query_count).to eq 2
+               end
+             end
           end
 
           context "beyond the expiry time" do
