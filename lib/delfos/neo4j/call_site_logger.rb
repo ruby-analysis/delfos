@@ -12,7 +12,7 @@ module Delfos
                          FileSystemLogger.new(output_path: output_path)
                        else
                          Neo4j
-        end
+                       end
       end
 
       def finish!

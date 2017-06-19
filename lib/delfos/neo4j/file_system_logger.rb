@@ -13,7 +13,7 @@ module Delfos
         file.puts params.to_s.gsub("\n", "\\n")
         file.puts "\n\n----"
         @count += 1
-        file.flush if @count % 100 == 0
+        file.flush if (@count % 100).zero?
       end
 
       def finish!
