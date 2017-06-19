@@ -7,20 +7,28 @@ module Delfos
     module Batch
       class Retryable
         class << self
-          def execute!(query, params: {}, size: nil)
-            ensure_instance(size).execute!(query, params: params)
+          MUTEX = Mutex.new
+
+          def reset!
+            MUTEX.synchronize do
+              Thread.current[:_delfos__retryable_batch] = nil
+            end
           end
 
-          def ensure_instance(size)
-            self.instance ||= new(size: size || 1_000)
+          def ensure_instance(size: nil)
+            MUTEX.synchronize do
+              Thread.current[:_delfos__retryable_batch] ||= new(size: size || 1_000)
+            end
+          end
+
+          def execute!(query, params: {}, size: nil)
+            ensure_instance(size: size).execute!(query, params: params)
           end
 
           def flush!
-            instance&.flush!
-            @instance = nil
+            ensure_instance&.flush!
+            reset!
           end
-
-          attr_accessor :instance
         end
 
         attr_reader :size, :queries, :execution
