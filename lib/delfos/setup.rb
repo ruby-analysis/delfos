@@ -82,6 +82,9 @@ module Delfos
       Delfos.neo4j                   = nil
     end
 
+    # This method allows resetting in between every spec.  So we avoid load
+    # order issues in cases where we have not run particular specs that require
+    # and define these constants
     def ignoring_undefined(k)
       o = Object.const_get(k)
       yield(o)
