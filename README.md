@@ -26,8 +26,9 @@ For the code in files [fixtures/a.rb](fixtures/a.rb) and [fixtures/b.rb](fixture
 ## Neo4j example recorded data model
 
 ```cypher
-(:CallStack) - [:STEP{number: 1}]
-            -> (cs:CallSite{file: "file.rb", line_number: 1})
+(:CallStack{uuid: "111298a0-2d9c-468f-8e2c-1816a8c01899"})
+  - [:STEP{number: 1}] ->
+  (cs:CallSite{file: "file.rb", line_number: 1})
 
 (cs) <- [:CONTAINS] - (m:Method{type:"InstanceMethod"})
 
@@ -104,35 +105,42 @@ end
 * `call_site_logger` Defaults to recording to neo4j.
 
 ### call_site_logger
-You can supply an object for the `call_site_logger` that responds to `#log` and `#save_call_sites`
+You can supply an object for the `call_site_logger` that responds to `#log`
 
-#### `call_site_logger#log`
-`#log` receives the following objects : `(call_site)`
+`#log` receives the following arguments : `(call_site, stack_uuid, stack_step)`
 
 Where:
   * `call_site` has the following methods:
     * `container_method`, `called_method`, `file`, `line_number`
+  * `stack_uuid` is a unique identifier for the current call stack
+  * `stack_step` is the index of this call_site within the current call stack
   * `container_method` & `called_method` have the following methods defined:
     * `file`
     * `line_number`
-    * `object` - refers to the self defined at that line during runtime
+    * `object` - self at that point during runtime
     * `class_method` - boolean
 
-#### `call_site_logger#save_call_sites`
-`#save_call_sites` receives the following objects : `(call_sites, execution_count)`
-  * `call_sites`  An ordered array of call sites. Which are the same as the `call_site` defined above
-  * `execution_count`  The number of this execution count during this run of `Delfos` # TODO: make this universally unique.
-
-
 # File system distance
-As well as recording the call stacks, call sites, file and line number,
+
 Delfos also records the distance across the file system.  The distance is
 defined as basically the visual distance in an ordinary filesystem tree view
 like vim's NERDTree view.
 
-This means files that traverse a large number of directories to call other
-files end up with a 'worse' score than files which call files which are
-alphabetically next to each other in the same directory.
+The file system distance is updated as a separate task after all `(CallSite)`
+nodes have been added to the graph. This can be done by calling
+`Delfos::Neo4j.update_distance!`.
+
+You may do this in an after suite hook like this:
+
+```
+config.after(:suite) do
+  Delfos.finish!
+end
+```
+
+The scoring algorithm asserts that files that traverse a large number of
+directories to call other files end up with a 'worse' score than files which
+call files which are alphabetically next to each other in the same directory.
 
 There is also a score recorded for number of possible files traversed. So
 projects which have large numbers of files per directory are also penalised.
@@ -211,10 +219,12 @@ Following are some ideas of where to take this project next:
 ## Analysis
 
 ### UI
-I would like to create a UI for visualizing call stacks with their respective file system traversals.
+I would like to create a UI for visualizing call stacks with their respective
+file system traversals.
 
 ### Command line tool
-I want to detect common software design mistakes in a way which is useful/actionable like rubocop.
+I want to detect common software design mistakes in a way which is
+useful/actionable like rubocop.
 
 
 # Development
