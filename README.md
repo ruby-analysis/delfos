@@ -123,6 +123,50 @@ Where:
     * `object` - self at that point during runtime
     * `class_method` - boolean
 
+# Offline mode
+
+B y default delfos tries to push queries in batches to neo4j during runtime.
+This tends to work fine for small projects and for manually interacting with an application,
+but starts to fallover when running against a whole test suite.
+Whilst, you can tweak the batch size and experiment with `sleep`ing in between specs, it is 
+probably preferable to save the queries offline for later processing.
+o
+```
+config.before(:suite) do
+  Delfos.setup! offline_query_saving: true
+endt
+
+```
+
+Then you can run the command line binary to import the data. E.g.
+
+```bash
+NEO4J_PORT=8001 NEO4J_HOST=localhost delfos_import
+```
+
+This splits the data into files of 10,000 queries each, in `./tmp/delfos`
+then executes them synchronously against neo4j.
+Any queries that generate exceptions are logged in their corresponding error file.
+
+E.g.
+
+```
+cat tmp/delfos/delfos_queries_ab.errors
+{"step_number"=>1, "stack_uuid"=>"80dfd309-eb42-4ceb-aa85-8c3d6d137954", "call_site_file"=>"spec/bundler/plugin/api/source_spec.rb", "call_site_line_number"=>78, "container_method_klass_name"=>"RSpec::ExampleGroups::BundlerPluginAPISource::ToLock::WithAdditionalOptionsToLock", "container_method_type"=>"InstanceMethod", "container_method_name"=>"(main)", "container_method_file"=>nil, "container_method_line_number"=>-1, "called_method_klass_name"=>nil, "called_method_type"=>"InstanceMethod", "called_method_name"=>"to_lock", "called_method_file"=>"lib/bundler/plugin/api/source.rb", "called_method_line_number"=>254}
+```
+
+In general these error files probably represent bugs in Delfos so feel free to raise an issue with
+replication steps.
+
+If the errors are obvious (e.g. an incorrectly determined method name), you could edit them and re-import with
+
+```
+cp ./tmp/delfos/delfos_queries_ab.errors fixed_query_parameters
+
+NEO4J_PORT=8001 NEO4J_HOST=localhost delfos_import fixed_query_parameters
+```
+
+
 # File system distance
 
 Delfos also records the distance across the file system.  The distance is
