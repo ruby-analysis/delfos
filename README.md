@@ -19,7 +19,69 @@ For more on the background behind this project see [SOLID](solid.md) or [This ta
 
 ## Example output to neo4j
 
-For the code in files [fixtures/a.rb](fixtures/a.rb) and [fixtures/b.rb](fixtures/b.rb).
+For the following code:
+
+```ruby
+class A
+  def some_method
+    B.new.another_method(self) # cs1 e-step1
+    C.new.method_with_no_more_method_calls # cs3 e-step
+    D.some_class_method
+  end
+
+  def to_s
+    "a"
+  end
+
+  def self.boom!
+    raise "kaboom"
+  end
+end
+
+class D
+  def self.some_class_method
+
+  end
+end
+```
+
+```ruby
+# frozen_string_literal: true
+class B
+  def another_method(that)
+    that.to_s
+
+    C.new.method_with_no_more_method_calls # cs2 e-step
+
+    C.new.third(self)
+  end
+
+  def cyclic_dependency(s)
+    s.fourth
+  end
+end
+
+class C
+  def third(other)
+    other.cyclic_dependency(self)
+  end
+
+  def fourth
+    fifth
+  end
+
+  def fifth
+    sixth
+  end
+
+  def sixth
+    # execution chain ends here
+  end
+
+  def method_with_no_more_method_calls
+  end
+end
+```
 
 ![screenshot](examples/neo4j-sample.png)
 
