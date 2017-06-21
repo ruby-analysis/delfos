@@ -86,12 +86,6 @@ module Delfos
             subject.perform
           end
 
-          it "logs the call site" do
-            expect(call_site_logger).
-              to receive(:log).
-              with(call_site)
-            subject.perform
-          end
         end
       end
     end

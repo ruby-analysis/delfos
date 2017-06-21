@@ -50,14 +50,14 @@ module Delfos
       @neo4j ||= Delfos::Neo4j.config
     end
 
-    def flush!
-      Delfos::Neo4j.flush!
-    end
-
     def finish!
       flush!
       Delfos::Neo4j.update_distance!
       disable!
+    end
+
+    def flush!
+      Delfos::Neo4j.flush!
     end
 
     def disable!
@@ -66,6 +66,7 @@ module Delfos
 
     def default_logger
       require "logger"
+
       Logger.new(STDOUT).tap do |l|
         l.level = Logger::ERROR
       end

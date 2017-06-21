@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "neo4j/call_site_logger"
 require_relative "neo4j/query_execution/sync"
 require_relative "neo4j/batch/retryable"
 require_relative "neo4j/schema"

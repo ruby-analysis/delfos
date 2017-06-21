@@ -15,8 +15,6 @@ module Delfos
         return unless relevant?
 
         CallStack.push(call_site)
-
-        Delfos.call_site_logger.log(call_site)
       end
 
       def call_site

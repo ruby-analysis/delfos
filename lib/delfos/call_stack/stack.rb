@@ -1,10 +1,15 @@
 # frozen_string_literal: true
 
+require "securerandom"
+
 module Delfos
   module CallStack
     class Stack
+      attr_reader :uuid
+
       def initialize(on_empty: nil)
         @on_empty = on_empty
+        @uuid = SecureRandom.uuid
       end
 
       def push(method_object)
@@ -21,7 +26,7 @@ module Delfos
 
         return unless height.zero? && call_sites.length.positive?
 
-        @on_empty&.call(call_sites, execution_count)
+        @on_empty&.call
         self.call_sites = []
       end
 

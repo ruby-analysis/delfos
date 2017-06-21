@@ -9,6 +9,7 @@ module Delfos
       def trace!
         on_call.enable
         on_return.enable
+        @last_returned = nil
       end
 
       def disable!

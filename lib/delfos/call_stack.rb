@@ -15,12 +15,13 @@ module Delfos
 
     def stack
       CALL_STACK_MUTEX.synchronize do
-        Thread.current[:_delfos__call_stack] ||= Stack.new(on_empty: method(:save!))
+        Thread.current[:_delfos__call_stack] ||= Stack.new(on_empty: method(:reset!))
       end
     end
 
     def push(call_site)
       stack.push(call_site)
+      Delfos.call_site_logger.log(call_site, stack.uuid, stack.step_count)
     end
 
     def pop
@@ -33,10 +34,6 @@ module Delfos
 
     def pop_until_top!
       stack.pop_until_top!
-    end
-
-    def save!(call_sites, execution_number)
-      Delfos.call_site_logger.save_call_stack(call_sites, execution_number)
     end
   end
 end

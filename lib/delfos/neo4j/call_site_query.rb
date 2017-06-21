@@ -7,12 +7,14 @@ module Delfos
     class CallSiteQuery
       include QueryVariablesAssignment
 
-      attr_reader :container_method, :call_site, :called_method
+      attr_reader :container_method, :call_site, :called_method, :stack_uuid, :step_number
 
-      def initialize(call_site)
-        @call_site = call_site
+      def initialize(call_site, stack_uuid, step_number)
+        @call_site        = call_site
         @container_method = call_site.container_method
-        @called_method = call_site.called_method
+        @called_method    = call_site.called_method
+        @stack_uuid       = stack_uuid
+        @step_number      = step_number
 
         assign_query_variables(container_method, called_method)
       end
@@ -52,17 +54,27 @@ module Delfos
             #{method_node("container_method", include_line_number: include_container_method_line_number?)}
 
           MERGE (container_method) - [:CONTAINS] ->
-            (cs:CallSite
+            (call_site:CallSite
               {
-                file: {cs_file},
-                line_number: {cs_line_number}
+                file: {call_site_file},
+                line_number: {call_site_line_number}
               }
             )
 
           MERGE (#{query_variable(called_method.klass)}) - [:OWNS] ->
             #{method_node("called_method")}
 
-          MERGE (cs) - [:CALLS] -> (called_method)
+          MERGE (call_site) - [:CALLS] -> (called_method)
+
+          #{call_stack_query}
+        QUERY
+      end
+
+      def call_stack_query
+        <<-QUERY
+          MERGE (call_stack:CallStack{uuid: {stack_uuid}})
+
+          MERGE (call_stack) - [:STEP {number: {step_number}}] -> (call_site)
         QUERY
       end
 
@@ -87,11 +99,13 @@ module Delfos
 
       def calculate_params
         params = klass_params
+        params["step_number"] = step_number
+        params["stack_uuid"] = stack_uuid
 
         add_method_info(params, "container_method", container_method)
 
-        params["cs_file"]        = call_site.file
-        params["cs_line_number"] = call_site.line_number
+        params["call_site_file"]        = call_site.file
+        params["call_site_line_number"] = call_site.line_number
 
         add_method_info(params, "called_method", called_method)
 

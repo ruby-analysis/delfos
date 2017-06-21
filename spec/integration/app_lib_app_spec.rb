@@ -61,40 +61,5 @@ describe "integration with a custom call_stack_logger" do
 
       load "fixtures/app/include_this/start_here.rb"
     end
-
-    it "Saves the call stack" do
-      count = 0
-
-      expect(call_site_logger).to receive(:save_call_stack) do |call_sites, execution_count|
-        expect(call_sites[0].summary).to eq({
-          container_method: "fixtures/app/include_this/start_here.rb:3 Object#(main)",
-          call_site:        "fixtures/app/include_this/start_here.rb:3",
-          called_method:    "include_this/called_app_class.rb:5 IncludeThis::CalledAppClass#some_called_method",
-        })
-
-        expect(call_sites[1].summary).to eq({
-          container_method: "exclude_this/exclude_this.rb:10 ExcludeThis#further",
-          call_site:        "exclude_this/exclude_this.rb:11",
-          called_method:    "include_this/called_app_class.rb:9 IncludeThis::CalledAppClass#next_method",
-        })
-
-        expect(call_sites[2].summary).to eq({
-          :call_site => "include_this/called_app_class.rb:10",
-          :called_method => "include_this/called_app_class.rb:13 IncludeThis::CalledAppClass#penultimate",
-          :container_method => "include_this/called_app_class.rb:9 IncludeThis::CalledAppClass#next_method",
-        })
-
-        expect(call_sites[3].summary).to eq({
-          :call_site => "include_this/called_app_class.rb:14",
-          :called_method => "include_this/called_app_class.rb:17 IncludeThis::CalledAppClass#final_method",
-          :container_method => "include_this/called_app_class.rb:13 IncludeThis::CalledAppClass#penultimate",
-        })
-
-        expect(call_sites.length).to eq 4
-        expect(execution_count)   .to eq 1
-      end.exactly(:once)
-
-      load "fixtures/app/include_this/start_here.rb"
-    end
   end
 end

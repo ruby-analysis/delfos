@@ -6,14 +6,8 @@ require_relative "stack"
 module Delfos
   module CallStack
     describe Stack do
-      let(:call_stack_query) { double "execution chain query", query: query, params: params }
-      let(:params) { { some: "params" } }
-      let(:query) { "some query" }
-
       before do
         Delfos::CallStack.reset!
-        allow(Delfos::Neo4j::CallStackQuery).to receive(:new).and_return(call_stack_query)
-        allow(Delfos::Neo4j).to receive(:execute).with(query, params)
       end
 
       describe "#push(anything)" do
@@ -82,11 +76,7 @@ module Delfos
             subject.pop
             expect(callback).not_to have_received(:call)
             subject.pop
-            expect(callback).to have_received(:call).with([anything, anything], 1)
-
-            subject.push(anything)
-            subject.pop
-            expect(callback).to have_received(:call).with([anything], 2)
+            expect(callback).to have_received(:call)
           end
         end
 

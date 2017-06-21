@@ -30,8 +30,8 @@ module Delfos
     def default_call_site_logger
       Delfos.setup_neo4j!
 
-      require "delfos/neo4j/call_site_logger"
-      Delfos:: Neo4j::CallSiteLogger.new
+      require "delfos/neo4j/live_call_site_logger"
+      Delfos:: Neo4j::LiveCallSiteLogger.new
     end
 
     def disable!

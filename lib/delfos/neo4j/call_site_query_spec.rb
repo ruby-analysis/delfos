@@ -8,6 +8,8 @@ class E; end
 module Delfos
   module Neo4j
     describe CallSiteQuery do
+      let(:step_number) { 0 }
+      let(:stack_uuid) { "some-uuid" }
       let(:container_method_line_number) { 2 }
       let(:container_method_klass) { A }
       let(:called_method_klass) { E }
@@ -37,7 +39,7 @@ module Delfos
           line_number: 2
       end
 
-      subject { described_class.new(call_site) }
+      subject { described_class.new(call_site, stack_uuid, step_number) }
 
       before do
         wipe_db!
@@ -52,8 +54,10 @@ module Delfos
                              "container_method_file" => "a.rb",
                              "container_method_line_number" => 2,
 
-                             "cs_file" => "a.rb",
-                             "cs_line_number" => 3,
+                             "call_site_file"        => "a.rb",
+                             "call_site_line_number" => 3,
+                             "stack_uuid" => stack_uuid,
+                             "step_number" => step_number,
 
                              "k1" => "E",                              # class E
                              "called_method_type" => "InstanceMethod", #   def method_e        # m2
@@ -80,10 +84,10 @@ module Delfos
            )
 
           MERGE (container_method) - [:CONTAINS] ->
-            (cs:CallSite
+            (call_site:CallSite
               {
-                file: {cs_file},
-                line_number: {cs_line_number}
+                file: {call_site_file},
+                line_number: {call_site_line_number}
               }
             )
 
@@ -97,7 +101,10 @@ module Delfos
              }
            )
 
-          MERGE (cs) - [:CALLS] -> (called_method)
+          MERGE (call_site) - [:CALLS] -> (called_method)
+          MERGE (call_stack:CallStack{uuid: {stack_uuid}})
+          MERGE (call_stack) - [:STEP {number: {step_number}}] -> (call_site)
+                    
         QUERY
 
         expect(strip_whitespace(query)).to eq strip_whitespace(expected)
@@ -117,8 +124,10 @@ module Delfos
                                  "container_method_file" => "a.rb",
                                  "container_method_line_number" => 2,
 
-                                 "cs_file" => "a.rb",
-                                 "cs_line_number" => 3,
+                                 "call_site_file" => "a.rb",
+                                 "call_site_line_number" => 3,
+                                 "stack_uuid" => stack_uuid,
+                                 "step_number" => step_number,
 
                                  "called_method_type" => "InstanceMethod", #   def method_e        # called_method
                                  "called_method_name" => "method_e",       #
@@ -145,10 +154,10 @@ module Delfos
                )
 
               MERGE (container_method) - [:CONTAINS] ->
-                (cs:CallSite
+                (call_site:CallSite
                   {
-                    file: {cs_file},
-                    line_number: {cs_line_number}
+                    file: {call_site_file},
+                    line_number: {call_site_line_number}
                   }
                 )
 
@@ -162,7 +171,10 @@ module Delfos
                  }
                )
 
-              MERGE (cs) - [:CALLS] -> (called_method)
+              MERGE (call_site) - [:CALLS] -> (called_method)
+
+              MERGE (call_stack:CallStack{uuid: {stack_uuid}})
+              MERGE (call_stack) - [:STEP {number: {step_number}}] -> (call_site)
             QUERY
 
             expect(strip_whitespace(query)).to eq strip_whitespace(expected)

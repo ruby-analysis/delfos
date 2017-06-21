@@ -61,21 +61,6 @@ describe "integration with a custom call_stack_logger" do
 
       load code_to_run
     end
-
-    it "records execution chains" do
-      count = 0
-
-      expect(call_site_logger).to receive(:save_call_stack) do |call_sites, execution_count|
-        if count.zero?
-          count = count + 1
-          expect(call_sites.length).to eq 4
-        else
-          expect(call_sites.length).to eq 1
-        end
-      end.exactly(:twice)
-
-      load code_to_run
-    end
   end
 
   context "with code that raises and rescues" do
@@ -116,38 +101,6 @@ describe "integration with a custom call_stack_logger" do
         end
         expect(call_site).to be_a cl::CallSite
       end.exactly(4).times
-
-      load code_to_run
-    end
-
-    it "Saves the call stack" do
-      count = 0
-
-      expect(call_site_logger).to receive(:save_call_stack) do |call_sites, execution_count|
-        count = count + 1
-
-        case count
-        when 1
-
-          expect(call_sites.first.summary).to eq({
-            container_method: "fixtures/with_raise.rb:13 Object#(main)",
-            call_site:        "fixtures/with_raise.rb:13",
-            called_method:    "fixtures/with_raise.rb:5 Object#execution_1",
-          })
-
-          expect(call_sites.length).to eq 3
-
-        when 2
-          expect(call_sites.first.summary).to eq({
-            call_site:        "fixtures/with_raise.rb:14",
-            called_method:    "fixtures/with_raise.rb:10 Object#another_method",
-            container_method: "fixtures/with_raise.rb:14 Object#(main)",
-          })
-          expect(call_sites.length).to eq 1
-
-        end
-
-      end.exactly(:twice)
 
       load code_to_run
     end

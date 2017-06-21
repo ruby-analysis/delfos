@@ -49,12 +49,6 @@ module Delfos
           Delfos.neo4j.uri_for("/db/data/transaction")
         end
 
-        def check_for_expiry!
-          return if @expires.nil? || (@clock.now <= @expires)
-
-          raise QueryExecution::ExpiredTransaction.new(@comit_url, "")
-        end
-
         def flush_if_required!
           check_for_expiry!
 
@@ -64,6 +58,12 @@ module Delfos
           end
 
           false
+        end
+
+        def check_for_expiry!
+          return if @expires.nil? || (@clock.now <= @expires)
+
+          raise QueryExecution::ExpiredTransaction.new(@commit_url, "")
         end
 
         def batch_full?
