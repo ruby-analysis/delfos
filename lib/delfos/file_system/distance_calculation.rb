@@ -40,11 +40,11 @@ module Delfos
       end
 
       def sum_traversals
-        traversals.inject(0) { |a, e| a + e.distance }
+        traversals.sum(&:distance)
       end
 
       def sum_possible_traversals
-        traversals.inject(0) { |a, e| a + e.possible_length }
+        traversals.sum(&:possible_length)
       end
 
       def sibling_directories(path)

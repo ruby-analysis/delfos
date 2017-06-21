@@ -24,11 +24,16 @@ module Delfos
       self.batch_size     = batch_size
       self.max_query_size = max_query_size
 
-      Delfos::Setup.perform!(
+      Setup.perform!(
         call_site_logger: call_site_logger,
         application_directories: application_directories,
         offline_query_saving: offline_query_saving,
       )
+    end
+
+    def import_offline_queries(filename)
+      require "delfos/neo4j/offline/importer"
+      Neo4j::Offline::Importer.new(filename).perform
     end
 
     def batch_size
@@ -60,7 +65,7 @@ module Delfos
 
     def setup_neo4j!
       require "delfos/neo4j"
-      @neo4j ||= Delfos::Neo4j.config
+      @neo4j ||= Neo4j.config
     end
 
     def finish!
@@ -68,17 +73,17 @@ module Delfos
         Delfos.call_site_logger.finish!
       else
         flush!
-        Delfos::Neo4j.update_distance!
+        Neo4j.update_distance!
         disable!
       end
     end
 
     def flush!
-      Delfos::Neo4j.flush!
+      Neo4j.flush!
     end
 
     def disable!
-      Delfos::Setup.disable!
+      Setup.disable!
     end
 
     def default_logger

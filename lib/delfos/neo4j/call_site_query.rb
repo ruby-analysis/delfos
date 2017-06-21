@@ -1,58 +1,65 @@
 # frozen_string_literal: true
 
-require_relative "query_variables"
-
 module Delfos
   module Neo4j
     class CallSiteQuery
-      include QueryVariablesAssignment
-
-      attr_reader :container_method, :call_site, :called_method, :stack_uuid, :step_number
-
       def initialize(call_site, stack_uuid, step_number)
         @call_site        = call_site
         @container_method = call_site.container_method
         @called_method    = call_site.called_method
         @stack_uuid       = stack_uuid
         @step_number      = step_number
-
-        assign_query_variables(container_method, called_method)
       end
 
       def params
-        params = calculate_params
-
-        if container_method.line_number.nil?
-          params.delete "container_method_line_number"
-        end
-
-        params
-      end
-
-      def klass_params
-        query_variables.each_with_object({}) do |(klass, name), object|
-          object[name] = klass.to_s
-        end
-      end
-
-      def add_method_info(params, key, meth)
-        params["#{key}_type"]        = meth.method_type
-        params["#{key}_name"]        = meth.method_name
-        params["#{key}_file"]        = meth.file
-        params["#{key}_line_number"] = meth.line_number
+        @params ||= calculate_params
       end
 
       def query
-        klasses_query = query_variables.values.map do |name|
-          "MERGE (#{name}:Class {name: {#{name}}})"
-        end.join("\n")
+        BODY
+      end
 
-        <<-QUERY
-          #{klasses_query}
+      private
 
-          MERGE (#{query_variable(container_method.klass)}) - [:OWNS] ->
-            #{method_node("container_method", include_line_number: include_container_method_line_number?)}
+      # rubocop:disable Metrics/MethodLength
+      def calculate_params
+        params = {
+          "step_number"                  => @step_number,
+          "stack_uuid"                   => @stack_uuid,
 
+          "call_site_file"               => @call_site        .file,
+          "call_site_line_number"        => @call_site        .line_number,
+
+          "container_method_klass_name"  => @container_method .klass_name,
+          "container_method_type"        => @container_method .method_type,
+          "container_method_name"        => @container_method .method_name,
+          "container_method_file"        => @container_method .file,
+          "container_method_line_number" => @container_method .line_number || -1,
+
+          "called_method_klass_name"     => @called_method    .klass_name,
+          "called_method_type"           => @called_method    .method_type,
+          "called_method_name"           => @called_method    .method_name,
+          "called_method_file"           => @called_method    .file,
+          "called_method_line_number"    => @called_method    .line_number,
+        }
+
+        params
+      end
+      # rubocop:enable Metrics/MethodLength,Metrics/LineLength,Metrics/AbcSize
+
+      BODY = <<-QUERY
+          MERGE (container_method_klass:Class {name: {container_method_klass_name}})
+          MERGE (called_method_klass:Class {name: {called_method_klass_name}})
+
+          MERGE (container_method_klass) - [:OWNS] ->
+            (container_method:Method
+              {
+                type: {container_method_type},
+                name: {container_method_name},
+                file: {container_method_file},
+                line_number: {container_method_line_number}
+              }
+            )
           MERGE (container_method) - [:CONTAINS] ->
             (call_site:CallSite
               {
@@ -61,56 +68,22 @@ module Delfos
               }
             )
 
-          MERGE (#{query_variable(called_method.klass)}) - [:OWNS] ->
-            #{method_node("called_method")}
+          MERGE (called_method_klass) - [:OWNS] ->
+            (called_method:Method
+              {
+                type: {called_method_type},
+                name: {called_method_name},
+                file: {called_method_file},
+                line_number: {called_method_line_number}
+              }
+            )
 
           MERGE (call_site) - [:CALLS] -> (called_method)
 
-          #{call_stack_query}
-        QUERY
-      end
-
-      def call_stack_query
-        <<-QUERY
           MERGE (call_stack:CallStack{uuid: {stack_uuid}})
 
           MERGE (call_stack) - [:STEP {number: {step_number}}] -> (call_site)
-        QUERY
-      end
-
-      def method_node(id, include_line_number: true)
-        <<-NODE
-          (#{id}:Method
-            {
-              type: {#{id}_type},
-              name: {#{id}_name},
-              file: {#{id}_file}#{"," if include_line_number}
-              #{"line_number: {#{id}_line_number}" if include_line_number}
-            }
-          )
-        NODE
-      end
-
-      private
-
-      def include_container_method_line_number?
-        params.keys.include?("container_method_line_number")
-      end
-
-      def calculate_params
-        params = klass_params
-        params["step_number"] = step_number
-        params["stack_uuid"] = stack_uuid
-
-        add_method_info(params, "container_method", container_method)
-
-        params["call_site_file"]        = call_site.file
-        params["call_site_line_number"] = call_site.line_number
-
-        add_method_info(params, "called_method", called_method)
-
-        params
-      end
+      QUERY
     end
   end
 end

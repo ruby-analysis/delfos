@@ -2,7 +2,8 @@
 
 require_relative "relation"
 
-describe Delfos::FileSystem::Relation do
+# rubocop:disable Style/AsciiComments
+RSpec.describe Delfos::FileSystem::Relation do
   describe "#others" do
     let(:relation) { described_class.new(path, anything) }
 
@@ -76,7 +77,7 @@ describe Delfos::FileSystem::Relation do
   #      yet_another_file
 end
 
-describe Delfos::FileSystem::Relation do
+RSpec.describe Delfos::FileSystem::Relation do
   let(:instance) { described_class.new(a, b) }
   let(:a) { t("tree/sub_directory/file_in_sub_directory") }
   let(:b) { t("tree/sub_directory") }
@@ -285,3 +286,4 @@ describe Delfos::FileSystem::Relation do
     end
   end
 end
+# rubocop:enable Style/AsciiComments

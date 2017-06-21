@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-
 require "delfos/neo4j"
-
 require_relative "execution"
-
 module Delfos
   module Neo4j
+    # rubocop:disable Metrics/ModuleLength
     module Batch
       RSpec.describe Execution do
         let(:size)      { 10 }
@@ -66,7 +64,7 @@ module Delfos
               executions.times { batch.execute!(anything, params: {}) }
             end
 
-             context "with fewer queries than the batch size" do
+            context "with fewer queries than the batch size" do
               let(:size) { 5 }
               let(:executions) { 4 }
 
@@ -87,41 +85,41 @@ module Delfos
                     to have_received(:commit!).exactly(4).times
                 end
               end
-             end
+            end
 
-             context "just before commiting" do
-               let(:size) { 6 }
-               let(:executions) { 5 }
+            context "just before commiting" do
+              let(:size) { 6 }
+              let(:executions) { 5 }
 
-               it "has an accurate query count" do
-                 expect(batch.query_count).to eq 5
-               end
+              it "has an accurate query count" do
+                expect(batch.query_count).to eq 5
+              end
 
-               it do
-                 expect(QueryExecution::Transactional).
-                   not_to have_received(:commit!)
-               end
-             end
+              it do
+                expect(QueryExecution::Transactional).
+                  not_to have_received(:commit!)
+              end
+            end
 
-             context "with one more execution than the batch size" do
-               let(:size) { 8 }
-               let(:executions) { 9 }
+            context "with one more execution than the batch size" do
+              let(:size) { 8 }
+              let(:executions) { 9 }
 
-               it "resets the count" do
-                 expect(batch.query_count).to eq 1
-               end
+              it "resets the count" do
+                expect(batch.query_count).to eq 1
+              end
 
-               it do
-                 expect(QueryExecution::Transactional).
-                   to have_received(:commit!).
-                   with(commit_url)
-               end
+              it do
+                expect(QueryExecution::Transactional).
+                  to have_received(:commit!).
+                  with(commit_url)
+              end
 
-               it "starts the next batch" do
-                 batch.execute!(anything, params: {})
-                 expect(batch.query_count).to eq 2
-               end
-             end
+              it "starts the next batch" do
+                batch.execute!(anything, params: {})
+                expect(batch.query_count).to eq 2
+              end
+            end
           end
 
           context "beyond the expiry time" do
@@ -129,7 +127,10 @@ module Delfos
 
             it "resets the batch" do
               Delfos.logger.level = Logger::FATAL
-              expect(-> { 2.times { batch.execute!(anything, params: anything) } }).to raise_error QueryExecution::ExpiredTransaction
+
+              expect(-> { 2.times { batch.execute!(anything, params: anything) } }).
+                to raise_error QueryExecution::ExpiredTransaction
+
               Delfos.logger.level = Logger::ERROR
 
               new_batch = described_class.new(size: size)
@@ -159,3 +160,4 @@ module Delfos
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

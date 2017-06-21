@@ -21,6 +21,7 @@ module DelfosSpecNeo4jHelpers
   end
 end
 
+# rubocop:disable Metrics/BlockLength
 RSpec.configure do |c|
   c.include DelfosSpecNeo4jHelpers
 
@@ -51,7 +52,7 @@ RSpec.configure do |c|
        ***************************************
        ***************************************
       ERROR
-      exit -1
+      exit(-1)
     end
 
     Delfos::Neo4j.ensure_schema!
@@ -59,10 +60,11 @@ RSpec.configure do |c|
 
   c.after(:suite) do
     require "delfos/neo4j"
+
     begin
       Delfos::Neo4j.flush!
     rescue Delfos::Neo4j::QueryExecution::ExpiredTransaction
-      # no-op
+      Delfos.logger.debug "rescuing expired transaction"
     end
   end
 end

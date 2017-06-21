@@ -85,7 +85,6 @@ module Delfos
             expect(CallStack).to receive(:push)
             subject.perform
           end
-
         end
       end
     end

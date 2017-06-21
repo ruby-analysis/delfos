@@ -2,12 +2,12 @@
 
 require_relative "../call_stack"
 require_relative "stack"
-
 module Delfos
+  # rubocop:disable Metrics/ModuleLength
   module CallStack
-    describe Stack do
+    RSpec.describe Stack do
       before do
-        Delfos::CallStack.reset!
+        CallStack.reset!
       end
 
       describe "#push(anything)" do
@@ -145,3 +145,4 @@ module Delfos
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

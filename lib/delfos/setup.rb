@@ -29,13 +29,13 @@ module Delfos
 
     def default_call_site_logger
       if Delfos.offline_query_saving
-        require "delfos/neo4j/offline_call_site_logger"
-        Delfos:: Neo4j::OfflineCallSiteLogger.new
+        require "delfos/neo4j/offline/call_site_logger"
+        Delfos:: Neo4j::Offline::CallSiteLogger.new
       else
         Delfos.setup_neo4j!
 
-        require "delfos/neo4j/live_call_site_logger"
-        Delfos:: Neo4j::LiveCallSiteLogger.new
+        require "delfos/neo4j/live/call_site_logger"
+        Delfos:: Neo4j::Live::CallSiteLogger.new
       end
     end
 
@@ -114,7 +114,7 @@ module Delfos
     def filename_from(offline_query_saving)
       return offline_query_saving if offline_query_saving.is_a?(String)
 
-      "delfos_query_output.cypher"
+      "delfos_query_parameters.json"
     end
   end
 end

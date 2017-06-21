@@ -5,7 +5,7 @@ require_relative "method"
 module Delfos
   module MethodTrace
     module CodeLocation
-      describe Method do
+      RSpec.describe Method do
         describe "#file" do
           let(:code_location) do
             described_class.new(object: anything,

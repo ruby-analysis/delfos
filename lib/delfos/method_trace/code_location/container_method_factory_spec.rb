@@ -12,7 +12,7 @@ module Delfos
             require "./fixtures/container_method_factory_usage.rb"
 
             expect(CONTAINER_METHOD_CONSTANT).to be_a CodeLocation::Method
-            expect(CONTAINER_METHOD_CONSTANT.method_name).to eq  "container_method"
+            expect(CONTAINER_METHOD_CONSTANT.method_name).to eq "container_method"
             expect(CONTAINER_METHOD_CONSTANT.line_number).to eq 8
             expect(CONTAINER_METHOD_CONSTANT.file).to eq "fixtures/container_method_factory_usage.rb"
           end

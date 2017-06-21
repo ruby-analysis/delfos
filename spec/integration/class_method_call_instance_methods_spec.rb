@@ -3,7 +3,7 @@
 require "delfos"
 require "delfos/neo4j"
 
-describe "integration with default neo4j logging" do
+RSpec.describe "integration with default neo4j logging" do
   let(:result) do
     Delfos.flush!
     Delfos::Neo4j.execute_sync(query).first
@@ -12,7 +12,7 @@ describe "integration with default neo4j logging" do
   before(:each) do
     wipe_db!
 
-    Delfos.setup!(application_directories: ["fixtures"], logger: $delfos_test_logger)
+    Delfos.setup!(application_directories: ["fixtures"], logger: DelfosSpecs.logger)
   end
 
   context "class method calls an instance method" do

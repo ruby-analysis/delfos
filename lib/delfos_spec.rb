@@ -4,7 +4,7 @@ require "spec_helper"
 require "tempfile"
 require_relative "delfos"
 
-describe Delfos do
+RSpec.describe Delfos do
   before do
     Delfos::Setup.reset_top_level_variables!
   end
@@ -36,7 +36,7 @@ describe Delfos do
 
       it "has a default filename" do
         expect(Delfos.offline_query_saving).to eq true
-        expect(Delfos.offline_query_filename).to eq "delfos_query_output.cypher"
+        expect(Delfos.offline_query_filename).to eq "delfos_query_parameters.json"
       end
     end
 
@@ -57,5 +57,4 @@ describe Delfos do
       end
     end
   end
-
 end

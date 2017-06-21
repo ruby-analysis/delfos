@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -e
+
+# Credit to http://ruby-journal.com/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/
+# for the basis for this script
+
+NUMBER_OF_SPLIT_LINES=10000
+SPLIT_FILE_PREFIX='delfos_queries_'
+
+BIG_FILE_PATH=$1
+BIG_FILENAME=$(basename $BIG_FILE_PATH)
+
+rm -rf tmp/delfos
+mkdir -p ./tmp/delfos
+
+cp -rf $BIG_FILE_PATH ./tmp/delfos/$BIG_FILENAME
+
+SPLIT_FILES=$SPLIT_FILE_PREFIX*
+cd ./tmp/delfos
+
+split_file () {
+  echo "Split '$BIG_FILENAME' file into small chunks with size $NUMBER_OF_SPLIT_LINES lines"
+  split -l $NUMBER_OF_SPLIT_LINES $BIG_FILENAME $SPLIT_FILE_PREFIX
+}
+
+process_split_files () {
+  for f in $SPLIT_FILES
+  do
+    echo "Processing $f file..."
+    FILE=$f delfos_import_offline_queries
+  done
+}
+
+split_file
+process_split_files

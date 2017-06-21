@@ -2,13 +2,13 @@
 
 require "delfos"
 
-describe "integration" do
+RSpec.describe "integration" do
   let(:call_site_logger) { double "call_site_logger", log: nil, save_call_stack: nil }
 
   before(:each) do
     Delfos.setup!(application_directories: ["fixtures"],
                   call_site_logger: call_site_logger,
-                  logger: $delfos_test_logger)
+                  logger: DelfosSpecs.logger)
   end
 
   context "instance method calls a class method" do

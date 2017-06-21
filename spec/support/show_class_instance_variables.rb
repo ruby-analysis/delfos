@@ -7,6 +7,7 @@ module ShowClassInstanceVariables
 
   def self.variables_for(n)
     return unless n.is_a?(Module)
+    return if n.ancestors.include? Struct
 
     display_variables(n)
 
@@ -23,7 +24,7 @@ module ShowClassInstanceVariables
   def self.handle_nesting(klass, n)
     klass.constants.each do |k|
       k = klass.const_get(k)
-      next if k == klass || k == n
+      next if (k == klass) || (k == n)
 
       variables_for(k)
     end
@@ -45,7 +46,7 @@ module ShowClassInstanceVariables
       val = klass.instance_eval(iv.to_s)
 
       unless val.nil?
-        puts "non-nil class variable found after running #{self.last_executed_rspec_test}:\n  #{klass} #{iv}: #{val.inspect}"
+        puts "non-nil class variable found after running #{last_executed_rspec_test}:\n  #{klass} #{iv}: #{val.inspect}"
       end
     end
   end

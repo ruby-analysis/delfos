@@ -3,14 +3,16 @@ AllCops:
   DisplayStyleGuide: true
   Exclude:
     - 'tmp/**/*'
-    - 'spec/**/*'
-    - '**/*_spec.rb'
     - 'delfos.gemspec'
     - 'vendor/**/*'
     - 'fixtures/**/*'
+    - 'examples/**/*'
     - 'db/**/*'
 Rails:
   Enabled: false
+
+Metrics/BlockLength:
+  ExcludedMethods: ['describe', 'context']
 
 Metrics/LineLength:
   Max: 120
