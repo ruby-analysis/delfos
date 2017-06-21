@@ -4,7 +4,7 @@ set -e
 # Credit to http://ruby-journal.com/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/
 # for the basis for this script
 
-NUMBER_OF_SPLIT_LINES=1000
+NUMBER_OF_SPLIT_LINES=10000
 SPLIT_FILE_PREFIX='delfos_queries_'
 
 BIG_FILE_PATH=$1
