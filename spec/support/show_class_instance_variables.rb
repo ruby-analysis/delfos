@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 module ShowClassInstanceVariables
+  class << self
+    attr_accessor :last_executed_rspec_test
+  end
+
   def self.variables_for(n)
     return unless n.is_a?(Module)
 
@@ -41,7 +45,7 @@ module ShowClassInstanceVariables
       val = klass.instance_eval(iv.to_s)
 
       unless val.nil?
-        puts "non-nil class variable found:\n  #{klass} #{iv}: #{val.inspect}"
+        puts "non-nil class variable found after running #{self.last_executed_rspec_test}:\n  #{klass} #{iv}: #{val.inspect}"
       end
     end
   end

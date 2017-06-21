@@ -5,9 +5,13 @@ module Delfos
     extend self
     attr_accessor :neo4j
 
-    def perform!(call_site_logger: nil, application_directories: nil)
-      self.application_directories = application_directories
-      self.call_site_logger = call_site_logger
+    def perform!(call_site_logger: nil,
+      application_directories: nil,
+      offline_query_saving: nil)
+      self.application_directories = application_directories if application_directories
+      self.call_site_logger = call_site_logger if call_site_logger
+
+      assign_offline_attributes(offline_query_saving)
 
       require "delfos/method_trace"
       ::Delfos::MethodTrace.trace!
@@ -19,19 +23,20 @@ module Delfos
       Delfos.application_directories = Array(dirs).map { |f| Pathname.new(f.to_s).expand_path }
     end
 
-    def call_site_logger
-      @call_site_logger ||= default_call_site_logger
-    end
-
     def call_site_logger=(call_site_logger)
-      @call_site_logger = call_site_logger || default_call_site_logger
+      Delfos.call_site_logger = call_site_logger || default_call_site_logger
     end
 
     def default_call_site_logger
-      Delfos.setup_neo4j!
+      if Delfos.offline_query_saving
+        require "delfos/neo4j/offline_call_site_logger"
+        Delfos:: Neo4j::OfflineCallSiteLogger.new
+      else
+        Delfos.setup_neo4j!
 
-      require "delfos/neo4j/live_call_site_logger"
-      Delfos:: Neo4j::LiveCallSiteLogger.new
+        require "delfos/neo4j/live_call_site_logger"
+        Delfos:: Neo4j::LiveCallSiteLogger.new
+      end
     end
 
     def disable!
@@ -73,12 +78,13 @@ module Delfos
     end
 
     def reset_top_level_variables!
+      Delfos.offline_query_saving    = nil
+      Delfos.offline_query_filename  = nil
       Delfos.neo4j                   = nil
       Delfos.logger                  = nil
       Delfos.application_directories = nil
       Delfos.call_site_logger        = nil
       Delfos.max_query_size          = nil
-      @call_site_logger              = nil
       Delfos.neo4j                   = nil
     end
 
@@ -96,6 +102,19 @@ module Delfos
       yield
     rescue Delfos::Neo4j::QueryExecution::ExpiredTransaction
       puts # no-op
+    end
+
+    def assign_offline_attributes(offline_query_saving)
+      return unless offline_query_saving
+      Delfos.offline_query_saving = offline_query_saving
+
+      Delfos.offline_query_filename = filename_from(offline_query_saving)
+    end
+
+    def filename_from(offline_query_saving)
+      return offline_query_saving if offline_query_saving.is_a?(String)
+
+      "delfos_query_output.cypher"
     end
   end
 end

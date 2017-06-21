@@ -103,6 +103,9 @@ end
 * `application_directories` An array of application directories. Defaults to `app` and `lib`
 * `logger` For outputing debug information during method recording.
 * `call_site_logger` Defaults to recording to neo4j.
+* `batch_size` Default batch size for neo4j querie
+* `max_query_size` Max string length for neo4j queries before flushing
+* `offline_query_saving` sets the offline query output file path or defaults to `delfos_cypher_output.cypher`  if `true`
 
 ### call_site_logger
 You can supply an object for the `call_site_logger` that responds to `#log`

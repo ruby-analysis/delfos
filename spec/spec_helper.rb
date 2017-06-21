@@ -34,13 +34,17 @@ RSpec.configure do |c|
     Delfos.finish!
   end
 
-  c.before(:each) do |_e|
+  c.after(:each) do |example|
+    ShowClassInstanceVariables.last_executed_rspec_test = example.location
+  end
+
+  c.before(:each) do 
     begin
       Delfos.finish!
     rescue Delfos::Neo4j::QueryExecution::ExpiredTransaction
+      Delfos.finish!
     end
     ShowClassInstanceVariables.variables_for(Delfos)
-
     Delfos.logger = $delfos_test_logger if defined? $delfos_test_logger
   end
 end

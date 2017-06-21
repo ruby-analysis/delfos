@@ -4,16 +4,31 @@ require "delfos/setup"
 
 module Delfos
   class << self
-    attr_accessor :application_directories
+    attr_accessor :application_directories,
+      :offline_query_saving,
+      :offline_query_filename
+
     attr_writer :logger, :neo4j, :batch_size, :max_query_size
 
-    def setup!(logger: nil, call_site_logger: nil, application_directories: nil,
-      batch_size: nil, max_query_size: nil)
-      self.logger         = logger         if logger
-      self.batch_size     = batch_size     if batch_size
-      self.max_query_size = max_query_size if max_query_size
+    # rubocop:disable Metrics/ParameterLists
+    def setup!(
+      logger: nil,
+      call_site_logger: nil,
+      application_directories: nil,
+      batch_size: nil,
+      max_query_size: nil,
+      offline_query_saving: nil
+    )
+      # rubocop:enable Metrics/ParameterLists
+      self.logger         = logger
+      self.batch_size     = batch_size
+      self.max_query_size = max_query_size
 
-      Delfos::Setup.perform!(call_site_logger: call_site_logger, application_directories: application_directories)
+      Delfos::Setup.perform!(
+        call_site_logger: call_site_logger,
+        application_directories: application_directories,
+        offline_query_saving: offline_query_saving,
+      )
     end
 
     def batch_size
@@ -29,12 +44,10 @@ module Delfos
       FileSystem.include_file?(file)
     end
 
-    def call_site_logger
-      Delfos::Setup.call_site_logger
-    end
+    attr_writer :call_site_logger
 
-    def call_site_logger=(call_site_logger)
-      Delfos::Setup.call_site_logger = call_site_logger
+    def call_site_logger
+      @call_site_logger ||= Delfos::Setup.default_call_site_logger
     end
 
     def logger
@@ -51,9 +64,13 @@ module Delfos
     end
 
     def finish!
-      flush!
-      Delfos::Neo4j.update_distance!
-      disable!
+      if offline_query_saving
+        Delfos.call_site_logger.finish!
+      else
+        flush!
+        Delfos::Neo4j.update_distance!
+        disable!
+      end
     end
 
     def flush!
