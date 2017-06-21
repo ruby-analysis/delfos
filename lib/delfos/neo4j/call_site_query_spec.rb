@@ -11,11 +11,11 @@ module Delfos
       let(:step_number) { 0 }
       let(:stack_uuid) { "some-uuid" }
       let(:container_method_line_number) { 2 }
-      let(:container_method_klass) { A }
-      let(:called_method_klass) { E }
+      let(:container_method_klass_name) { "A" }
+      let(:called_method_klass_name) { "E" }
       let(:container_method) do
         double "ContainerMethod",
-          klass: container_method_klass,  # class A
+          klass_name: container_method_klass_name,  # class A
           method_type: "ClassMethod",     #   def self.method_a    # called_method
           method_name: "method_a",        #     E.new.method_e     # call site
           file: "a.rb",
@@ -32,7 +32,7 @@ module Delfos
 
       let(:called_method) do
         double "CalledCode",
-          klass: called_method_klass,     # class E
+          klass_name: called_method_klass_name,     # class E
           method_type: "InstanceMethod",  #   def method_e        # m2
           method_name: "method_e",        #
           file: "e.rb",
@@ -110,40 +110,13 @@ module Delfos
         expect(strip_whitespace(query)).to eq strip_whitespace(expected)
       end
 
-      context "with same container method and called method class" do
-        let(:container_method_klass) { A }
-        let(:called_method_klass) { A }
-
-        describe "#params" do
-          it "only has one class param" do
-            params = subject.params
-
-            expect(params).to eq("container_method_klass_name" => "A",        # class A
-                                 "container_method_type" => "ClassMethod",    #   def self.method_a    # container_method
-                                 "container_method_name" => "method_a",       #     E.new.method_e     # call site
-                                 "container_method_file" => "a.rb",
-                                 "container_method_line_number" => 2,
-
-                                 "call_site_file" => "a.rb",
-                                 "call_site_line_number" => 3,
-                                 "stack_uuid" => stack_uuid,
-                                 "step_number" => step_number,
-
-                                 "called_method_klass_name" => "A",        #   def method_e        # called_method
-                                 "called_method_type" => "InstanceMethod", #   def method_e        # called_method
-                                 "called_method_name" => "method_e",       #
-                                 "called_method_file" => "e.rb",
-                                 "called_method_line_number" => 2)
-          end
-        end
-      end
-
       context "with missing container method line number" do
         let(:container_method_line_number) { nil }
 
         it do
-          expect(subject.query      ).not_to include "line_number: {container_method_line_number}"
-          expect(subject.params.keys).not_to include "container_method_line_number"
+          expect(subject.query      ).to include "line_number: {container_method_line_number}"
+          expect(subject.params.keys).to include "container_method_line_number"
+          expect(subject.params["container_method_line_number"]).to eq -1
         end
       end
     end

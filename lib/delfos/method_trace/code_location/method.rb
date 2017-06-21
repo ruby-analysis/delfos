@@ -17,6 +17,10 @@ module Delfos
           @class_method = class_method
         end
 
+        def klass_name
+          klass.name
+        end
+
         def klass
           object.is_a?(Module) ? object : object.class
         end

@@ -15,12 +15,41 @@ module Delfos
         end
 
         def perform
-          File.open(filename, "r") do |f|
-            f.each_line.lazy.each do |params|
-              params = JSON.parse(params)
-              query = CallSiteQuery::Body.new(params).to_s
-              Neo4j.execute_sync(query, params)
+          each_line do |params, err|
+            params = JSON.parse(params)
+
+            execute(CallSiteQuery::BODY, params, err)
+          end
+        end
+
+        private
+
+        def execute(query, params, err)
+          Neo4j.execute_sync(query, params)
+        rescue Delfos::Neo4j::QueryExecution::InvalidQuery => e
+          Delfos.logger.error e.message.to_s
+          err.puts params
+        end
+
+        def each_line
+          with_errors do |err|
+            with_input do |f|
+              f.each_line.lazy.each do |params|
+                yield params, err
+              end
             end
+          end
+        end
+
+        def with_errors
+          File.open("#{filename}.errors", "w") do |err|
+            yield err
+          end
+        end
+
+        def with_input
+          File.open(filename, "r") do |f|
+            yield f
           end
         end
       end

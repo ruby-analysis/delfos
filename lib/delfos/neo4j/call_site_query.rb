@@ -16,53 +16,38 @@ module Delfos
       end
 
       def query
-        body.to_s
-      end
-
-      Body = Struct.new(:params) do
-        def to_s
-          if params.keys.include?("container_method_line_number")
-            QUERY
-          else
-            QUERY_WITHOUT_CONTAINER_METHOD_LINE_NUMBER
-          end
-        end
+        BODY
       end
 
       private
 
-      def body
-        @body ||= Body.new(params)
-      end
-
-      # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
+      # rubocop:disable Metrics/MethodLength
       def calculate_params
         params = {
-          "call_site_file"               => @call_site.file,
-          "call_site_line_number"        => @call_site.line_number,
           "step_number"                  => @step_number,
           "stack_uuid"                   => @stack_uuid,
-          "container_method_klass_name"  => @container_method.klass.to_s,
-          "container_method_type"        => @container_method.method_type,
-          "container_method_name"        => @container_method.method_name,
-          "container_method_file"        => @container_method.file,
-          "container_method_line_number" => @container_method.line_number,
-          "called_method_klass_name"     => @called_method.klass.to_s,
-          "called_method_type"           => @called_method.method_type,
-          "called_method_name"           => @called_method.method_name,
-          "called_method_file"           => @called_method.file,
-          "called_method_line_number"    => @called_method.line_number,
-        }
 
-        if @container_method.line_number.nil?
-          params.delete "container_method_line_number"
-        end
+          "call_site_file"               => @call_site        .file,
+          "call_site_line_number"        => @call_site        .line_number,
+
+          "container_method_klass_name"  => @container_method .klass_name,
+          "container_method_type"        => @container_method .method_type,
+          "container_method_name"        => @container_method .method_name,
+          "container_method_file"        => @container_method .file,
+          "container_method_line_number" => @container_method .line_number || -1,
+
+          "called_method_klass_name"     => @called_method    .klass_name,
+          "called_method_type"           => @called_method    .method_type,
+          "called_method_name"           => @called_method    .method_name,
+          "called_method_file"           => @called_method    .file,
+          "called_method_line_number"    => @called_method    .line_number,
+        }
 
         params
       end
       # rubocop:enable Metrics/MethodLength,Metrics/LineLength,Metrics/AbcSize
 
-      QUERY = <<-QUERY
+      BODY = <<-QUERY
           MERGE (container_method_klass:Class {name: {container_method_klass_name}})
           MERGE (called_method_klass:Class {name: {called_method_klass_name}})
 
@@ -99,13 +84,6 @@ module Delfos
 
           MERGE (call_stack) - [:STEP {number: {step_number}}] -> (call_site)
       QUERY
-
-      QUERY_WITHOUT_CONTAINER_METHOD_LINE_NUMBER =
-        QUERY.
-        split("\n").
-        reject { |l| l[/line_number: {container_method_line_number}/] }.
-        map { |l| l.gsub "{container_method_file},", "{container_method_file}" }.
-        join("\n")
     end
   end
 end
