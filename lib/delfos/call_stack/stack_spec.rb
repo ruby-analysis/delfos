@@ -7,7 +7,7 @@ module Delfos
   module CallStack
     describe Stack do
       before do
-        Delfos::CallStack.reset!
+        CallStack.reset!
       end
 
       describe "#push(anything)" do

@@ -18,8 +18,8 @@ module Delfos
           File.open(filename, "r") do |f|
             f.each_line.lazy.each do |params|
               params = JSON.parse(params)
-              query = Delfos::Neo4j::CallSiteQuery::Body.new(params).to_s
-              Delfos::Neo4j.execute_sync(query, params)
+              query = CallSiteQuery::Body.new(params).to_s
+              Neo4j.execute_sync(query, params)
             end
           end
         end
