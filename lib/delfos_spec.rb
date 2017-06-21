@@ -36,7 +36,7 @@ RSpec.describe Delfos do
 
       it "has a default filename" do
         expect(Delfos.offline_query_saving).to eq true
-        expect(Delfos.offline_query_filename).to eq "delfos_query_output.cypher"
+        expect(Delfos.offline_query_filename).to eq "delfos_query_parameters.json"
       end
     end
 

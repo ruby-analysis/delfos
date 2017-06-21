@@ -15,11 +15,13 @@ module Delfos
           let(:queries) { "fixtures/offline/import.cypher" }
           subject { described_class.new(queries) }
 
+          pending "it saves an error file with unprocessed query parameter"
+          pending "deletes the error file if there are no errors"
           # rubocop:disable Metrics/BlockLength
           it "executes the queries in the file" do
             count = 0
 
-            expect(Delfos::Neo4j).to receive(:execute) do |query, params|
+            expect(Delfos::Neo4j).to receive(:execute_sync) do |query, params|
               count += 1
               case count
               when 1

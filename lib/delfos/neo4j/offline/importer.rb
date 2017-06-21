@@ -3,6 +3,7 @@
 require "json"
 require "delfos/neo4j"
 require "delfos/neo4j/call_site_query"
+require "fileutils"
 
 module Delfos
   module Neo4j
@@ -27,8 +28,9 @@ module Delfos
         private
 
         def execute(query, params, err)
-          Neo4j.execute(query, params)
+          Neo4j.execute_sync(query, params)
         rescue Delfos::Neo4j::QueryExecution::InvalidQuery => e
+          @no_errors = false
           Delfos.logger.error e.message.to_s
           err.puts params
         end
@@ -44,9 +46,15 @@ module Delfos
         end
 
         def with_errors
-          File.open("#{filename}.errors", "w") do |err|
+          @no_errors = true
+
+          error_filename = "#{filename}.errors"
+
+          File.open(error_filename, "w") do |err|
             yield err
           end
+
+          FileUtils.rm_rf error_filename if @no_errors
         end
 
         def with_input
