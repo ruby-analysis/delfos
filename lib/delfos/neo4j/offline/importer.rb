@@ -32,7 +32,7 @@ module Delfos
         rescue Delfos::Neo4j::QueryExecution::InvalidQuery => e
           @no_errors = false
           Delfos.logger.error e.message.to_s
-          err.puts params
+          err.puts JSON.dump(params)
         end
 
         def each_line

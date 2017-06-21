@@ -155,7 +155,7 @@ cat tmp/delfos/delfos_queries_ab.errors
 ```
 
 ```json
-{"step_number"=>1, "stack_uuid"=>"80dfd309-eb42-4ceb-aa85-8c3d6d137954", "call_site_file"=>"spec/bundler/plugin/api/source_spec.rb", "call_site_line_number"=>78, "container_method_klass_name"=>"RSpec::ExampleGroups::BundlerPluginAPISource::ToLock::WithAdditionalOptionsToLock", "container_method_type"=>"InstanceMethod", "container_method_name"=>"(main)", "container_method_file"=>nil, "container_method_line_number"=>-1, "called_method_klass_name"=>nil, "called_method_type"=>"InstanceMethod", "called_method_name"=>"to_lock", "called_method_file"=>"lib/bundler/plugin/api/source.rb", "called_method_line_number"=>254}
+{"step_number":1,"stack_uuid":"80dfd309-eb42-4ceb-aa85-8c3d6d137954","call_site_file":"spec/bundler/plugin/api/source_spec.rb","call_site_line_number":78,"container_method_klass_name":"RSpec::ExampleGroups::BundlerPluginAPISource::ToLock::WithAdditionalOptionsToLock","container_method_type":"InstanceMethod","container_method_name":"(main)","container_method_file":null,"container_method_line_number":-1,"called_method_klass_name":null,"called_method_type":"InstanceMethod","called_method_name":"to_lock","called_method_file":"lib/bundler/plugin/api/source.rb","called_method_line_number":254}
 ```
 
 In general these error files probably represent bugs in Delfos so feel free to raise an issue with
