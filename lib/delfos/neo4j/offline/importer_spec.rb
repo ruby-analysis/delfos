@@ -19,7 +19,7 @@ module Delfos
           it "executes the queries in the file" do
             count = 0
 
-            expect(Delfos::Neo4j).to receive(:execute_sync) do |query, params|
+            expect(Delfos::Neo4j).to receive(:execute) do |query, params|
               count += 1
               case count
               when 1

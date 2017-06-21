@@ -20,12 +20,14 @@ module Delfos
 
             execute(CallSiteQuery::BODY, params, err)
           end
+
+          Neo4j.flush!
         end
 
         private
 
         def execute(query, params, err)
-          Neo4j.execute_sync(query, params)
+          Neo4j.execute(query, params)
         rescue Delfos::Neo4j::QueryExecution::InvalidQuery => e
           Delfos.logger.error e.message.to_s
           err.puts params
