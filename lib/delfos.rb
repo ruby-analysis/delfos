@@ -31,6 +31,11 @@ module Delfos
       )
     end
 
+    def import_offline_queries(filename)
+      require "delfos/neo4j/offline/importer"
+      Neo4j::Offline::Importer.new(filename).perform
+    end
+
     def batch_size
       @batch_size ||= 100
     end

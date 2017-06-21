@@ -29,13 +29,13 @@ module Delfos
 
     def default_call_site_logger
       if Delfos.offline_query_saving
-        require "delfos/neo4j/offline_call_site_logger"
-        Delfos:: Neo4j::OfflineCallSiteLogger.new
+        require "delfos/neo4j/offline/call_site_logger"
+        Delfos:: Neo4j::Offline::CallSiteLogger.new
       else
         Delfos.setup_neo4j!
 
-        require "delfos/neo4j/live_call_site_logger"
-        Delfos:: Neo4j::LiveCallSiteLogger.new
+        require "delfos/neo4j/live/call_site_logger"
+        Delfos:: Neo4j::Live::CallSiteLogger.new
       end
     end
 
