@@ -5,7 +5,7 @@ module Delfos
     module Offline
       RSpec.describe Importer do
         describe ".perform" do
-          let(:part_query) { "MERGE (k0:Class {name: {k0}}) MERGE (k1:Class {name: {k1}}) MERGE (k0) - [:OWNS] ->" }
+          let(:part_query) { "MERGE (container_method_klass:Class {name: {container_method_klass_name}}) MERGE (called_method_klass:Class {name: {called_method_klass_name}}) MERGE (container_method_klass) - [:OWNS] ->" }
           let(:queries) { "fixtures/offline/import.cypher" }
           subject{described_class.new(queries)}
 
@@ -16,7 +16,7 @@ module Delfos
               count += 1
               case count
               when 1
-                expect(query).to include part_query
+                expect(strip_whitespace query).to include strip_whitespace(part_query)
                 expect(params).to match ({
                   "call_site_file"               => "fixtures/a_usage.rb",
                   "call_site_line_number"        => 3,
@@ -28,8 +28,8 @@ module Delfos
                   "container_method_line_number" => 3,
                   "container_method_name"        => "(main)",
                   "container_method_type"        => "InstanceMethod",
-                  "k0"                           => "Object",
-                  "k1"                           => "A",
+                  "container_method_klass_name"  => "Object",
+                  "called_method_klass_name"     => "A",
                   "stack_uuid"                   => "e0b5221b-acda-44be-a75c-98590e963344",
                   "step_number"                  => 1,
                 })
@@ -45,8 +45,8 @@ module Delfos
                   "container_method_line_number" => 5,
                   "container_method_name"        => "some_method",
                   "container_method_type"        => "InstanceMethod",
-                  "k0"                           => "A",
-                  "k1"                           => "D",
+                  "container_method_klass_name"  => "A",
+                  "called_method_klass_name"     => "D",
                   "stack_uuid"                   => "e0b5221b-acda-44be-a75c-98590e963344",
                   "step_number"                  => 11,
                 })

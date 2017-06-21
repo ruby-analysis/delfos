@@ -63,7 +63,8 @@ module Delfos
           s.
             gsub(/^\s+/, "").
             gsub(/ +/, " ").
-            gsub("\n\n", "\n")
+            gsub("\n\n", "\n").
+            tr("\n", " ")
         end
       end
     end

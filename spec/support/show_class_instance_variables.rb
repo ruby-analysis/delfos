@@ -7,6 +7,7 @@ module ShowClassInstanceVariables
 
   def self.variables_for(n)
     return unless n.is_a?(Module)
+    return if n.ancestors.include? Struct
 
     display_variables(n)
 
@@ -23,7 +24,7 @@ module ShowClassInstanceVariables
   def self.handle_nesting(klass, n)
     klass.constants.each do |k|
       k = klass.const_get(k)
-      next if k == klass || k == n
+      next if (k == klass) || (k == n)
 
       variables_for(k)
     end

@@ -17,19 +17,12 @@ RSpec.describe "integration .finish!" do
 
       lines = File.readlines(tempfile.path)
 
-      # length of lines after first call stack completion
-      expect(lines.length).to eq 8
-
       Delfos.finish!
 
       lines = File.readlines(tempfile.path)
       expect(lines.length).to eq 11
 
-      query, params = lines.first.split("\t")
-
-      expect(query).to include "MERGE (k0:Class {name: {k0}}) MERGE (k1:Class {name: {k1}})"
-
-      expect(JSON.parse(params)).to match({
+      expect(JSON.parse(lines.first)).to match({
         "call_site_file" => "fixtures/a_usage.rb",
         "call_site_line_number" => 3,
         "called_method_file" => "fixtures/a.rb",
@@ -40,8 +33,8 @@ RSpec.describe "integration .finish!" do
         "container_method_line_number" => 3,
         "container_method_name" => "(main)",
         "container_method_type" => "InstanceMethod",
-        "k0" => "Object",
-        "k1" => "A",
+        "container_method_klass_name" => "Object",
+        "called_method_klass_name" => "A",
         "stack_uuid" => anything,
         "step_number" => 1,
       })

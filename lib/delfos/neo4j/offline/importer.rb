@@ -2,6 +2,7 @@
 
 require "json"
 require "delfos/neo4j"
+require "delfos/neo4j/call_site_query"
 
 module Delfos
   module Neo4j
@@ -15,9 +16,10 @@ module Delfos
 
         def perform
           File.open(filename, "r") do |f|
-            f.each_line.lazy.each do |line|
-              query, params = line.split("\t")
-              Delfos::Neo4j.execute_sync(query, JSON.parse(params))
+            f.each_line.lazy.each do |params|
+              params = JSON.parse(params)
+              query = Delfos::Neo4j::CallSiteQuery::Body.new(params).to_s
+              Delfos::Neo4j.execute_sync(query, params)
             end
           end
         end

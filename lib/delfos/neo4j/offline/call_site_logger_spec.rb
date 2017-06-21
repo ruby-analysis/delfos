@@ -16,7 +16,7 @@ module Delfos
         let(:step_number) { 1 }
         let(:query_body) { "query body" }
         let(:params) { {some: "params"} }
-        let(:single_output_line) { "#{query_body}\t#{params.to_json}\n" }
+        let(:single_output_line) { "#{params.to_json}\n" }
         let(:tempfile) { Tempfile.new }
 
         before do

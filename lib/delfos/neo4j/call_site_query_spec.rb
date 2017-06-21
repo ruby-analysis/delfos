@@ -48,7 +48,7 @@ module Delfos
       it "#params" do
         params = subject.params
 
-        expect(params).to eq("k0" => "A",                               # class A
+        expect(params).to eq("container_method_klass_name" => "A",           # class A
                              "container_method_type" => "ClassMethod",  #   def self.method_a    # called_method
                              "container_method_name" => "method_a",     #     E.new.method_e     # call site
                              "container_method_file" => "a.rb",
@@ -59,7 +59,7 @@ module Delfos
                              "stack_uuid" => stack_uuid,
                              "step_number" => step_number,
 
-                             "k1" => "E",                              # class E
+                             "called_method_klass_name" => "E",                              # class E
                              "called_method_type" => "InstanceMethod", #   def method_e        # m2
                              "called_method_name" => "method_e",       #
                              "called_method_file" => "e.rb",
@@ -70,10 +70,10 @@ module Delfos
         query = subject.query
 
         expected = <<-QUERY
-          MERGE (k0:Class {name: {k0}})
-          MERGE (k1:Class {name: {k1}})
+          MERGE (container_method_klass:Class {name: {container_method_klass_name}})
+          MERGE (called_method_klass:Class {name: {called_method_klass_name}})
 
-          MERGE (k0) - [:OWNS] ->
+          MERGE (container_method_klass) - [:OWNS] ->
             (container_method:Method
               {
                 type: {container_method_type},
@@ -91,7 +91,7 @@ module Delfos
               }
             )
 
-          MERGE (k1) - [:OWNS] ->
+          MERGE (called_method_klass) - [:OWNS] ->
             (called_method:Method
               {
                 type: {called_method_type},
@@ -104,7 +104,7 @@ module Delfos
           MERGE (call_site) - [:CALLS] -> (called_method)
           MERGE (call_stack:CallStack{uuid: {stack_uuid}})
           MERGE (call_stack) - [:STEP {number: {step_number}}] -> (call_site)
-                    
+
         QUERY
 
         expect(strip_whitespace(query)).to eq strip_whitespace(expected)
@@ -118,7 +118,7 @@ module Delfos
           it "only has one class param" do
             params = subject.params
 
-            expect(params).to eq("k0" => "A", # class A
+            expect(params).to eq("container_method_klass_name" => "A",        # class A
                                  "container_method_type" => "ClassMethod",    #   def self.method_a    # container_method
                                  "container_method_name" => "method_a",       #     E.new.method_e     # call site
                                  "container_method_file" => "a.rb",
@@ -129,55 +129,11 @@ module Delfos
                                  "stack_uuid" => stack_uuid,
                                  "step_number" => step_number,
 
+                                 "called_method_klass_name" => "A",        #   def method_e        # called_method
                                  "called_method_type" => "InstanceMethod", #   def method_e        # called_method
                                  "called_method_name" => "method_e",       #
                                  "called_method_file" => "e.rb",
                                  "called_method_line_number" => 2)
-          end
-        end
-
-        describe "#query" do
-          it "only creates one class node" do
-            query = subject.query
-
-            expected = <<-QUERY
-              MERGE (k0:Class {name: {k0}})
-
-              MERGE (k0) - [:OWNS] ->
-                (container_method:Method
-                  {
-                    type: {container_method_type},
-                    name: {container_method_name},
-                    file: {container_method_file},
-                    line_number: {container_method_line_number}
-                 }
-               )
-
-              MERGE (container_method) - [:CONTAINS] ->
-                (call_site:CallSite
-                  {
-                    file: {call_site_file},
-                    line_number: {call_site_line_number}
-                  }
-                )
-
-              MERGE (k0) - [:OWNS] ->
-                (called_method:Method
-                  {
-                    type: {called_method_type},
-                    name: {called_method_name},
-                    file: {called_method_file},
-                    line_number: {called_method_line_number}
-                 }
-               )
-
-              MERGE (call_site) - [:CALLS] -> (called_method)
-
-              MERGE (call_stack:CallStack{uuid: {stack_uuid}})
-              MERGE (call_stack) - [:STEP {number: {step_number}}] -> (call_site)
-            QUERY
-
-            expect(strip_whitespace(query)).to eq strip_whitespace(expected)
           end
         end
       end
