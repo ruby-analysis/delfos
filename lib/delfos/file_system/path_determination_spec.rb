@@ -4,7 +4,7 @@ require_relative "path_determination"
 
 module Delfos
   module FileSystem
-    describe PathDetermination do
+    RSpec.describe PathDetermination do
       before do
         Delfos.setup! application_directories: ["fixtures/path_determination"]
       end

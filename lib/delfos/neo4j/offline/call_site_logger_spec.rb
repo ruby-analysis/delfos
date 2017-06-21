@@ -15,7 +15,7 @@ module Delfos
         let(:stack_uuid) { "some uuid" }
         let(:step_number) { 1 }
         let(:query_body) { "query body" }
-        let(:params) { {some: "params"} }
+        let(:params) { { some: "params" } }
         let(:single_output_line) { "#{params.to_json}\n" }
         let(:tempfile) { Tempfile.new }
 

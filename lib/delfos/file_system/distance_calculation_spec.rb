@@ -4,7 +4,7 @@ require_relative "distance_calculation"
 
 module Delfos
   module FileSystem
-    describe DistanceCalculation do
+    RSpec.describe DistanceCalculation do
       let(:distance_calculation) { described_class.new(a, b) }
 
       describe "#traversal_path" do

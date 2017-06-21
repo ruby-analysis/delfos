@@ -2,12 +2,9 @@
 
 require_relative "call_site_query"
 
-class A; end
-class E; end
-
 module Delfos
   module Neo4j
-    describe CallSiteQuery do
+    RSpec.describe CallSiteQuery do
       let(:step_number) { 0 }
       let(:stack_uuid) { "some-uuid" }
       let(:container_method_line_number) { 2 }
@@ -15,7 +12,7 @@ module Delfos
       let(:called_method_klass_name) { "E" }
       let(:container_method) do
         double "ContainerMethod",
-          klass_name: container_method_klass_name,  # class A
+          klass_name: container_method_klass_name, # class A
           method_type: "ClassMethod",     #   def self.method_a    # called_method
           method_name: "method_a",        #     E.new.method_e     # call site
           file: "a.rb",
@@ -32,7 +29,7 @@ module Delfos
 
       let(:called_method) do
         double "CalledCode",
-          klass_name: called_method_klass_name,     # class E
+          klass_name: called_method_klass_name, # class E
           method_type: "InstanceMethod",  #   def method_e        # m2
           method_name: "method_e",        #
           file: "e.rb",
@@ -48,7 +45,7 @@ module Delfos
       it "#params" do
         params = subject.params
 
-        expect(params).to eq("container_method_klass_name" => "A",           # class A
+        expect(params).to eq("container_method_klass_name" => "A", # class A
                              "container_method_type" => "ClassMethod",  #   def self.method_a    # called_method
                              "container_method_name" => "method_a",     #     E.new.method_e     # call site
                              "container_method_file" => "a.rb",
@@ -59,7 +56,7 @@ module Delfos
                              "stack_uuid" => stack_uuid,
                              "step_number" => step_number,
 
-                             "called_method_klass_name" => "E",                              # class E
+                             "called_method_klass_name" => "E", # class E
                              "called_method_type" => "InstanceMethod", #   def method_e        # m2
                              "called_method_name" => "method_e",       #
                              "called_method_file" => "e.rb",
@@ -67,56 +64,16 @@ module Delfos
       end
 
       it "#query_for" do
-        query = subject.query
-
-        expected = <<-QUERY
-          MERGE (container_method_klass:Class {name: {container_method_klass_name}})
-          MERGE (called_method_klass:Class {name: {called_method_klass_name}})
-
-          MERGE (container_method_klass) - [:OWNS] ->
-            (container_method:Method
-              {
-                type: {container_method_type},
-                name: {container_method_name},
-                file: {container_method_file},
-                line_number: {container_method_line_number}
-             }
-           )
-
-          MERGE (container_method) - [:CONTAINS] ->
-            (call_site:CallSite
-              {
-                file: {call_site_file},
-                line_number: {call_site_line_number}
-              }
-            )
-
-          MERGE (called_method_klass) - [:OWNS] ->
-            (called_method:Method
-              {
-                type: {called_method_type},
-                name: {called_method_name},
-                file: {called_method_file},
-                line_number: {called_method_line_number}
-             }
-           )
-
-          MERGE (call_site) - [:CALLS] -> (called_method)
-          MERGE (call_stack:CallStack{uuid: {stack_uuid}})
-          MERGE (call_stack) - [:STEP {number: {step_number}}] -> (call_site)
-
-        QUERY
-
-        expect(strip_whitespace(query)).to eq strip_whitespace(expected)
+        expect(subject.query).to eq described_class::BODY
       end
 
       context "with missing container method line number" do
         let(:container_method_line_number) { nil }
 
         it do
-          expect(subject.query      ).to include "line_number: {container_method_line_number}"
+          expect(subject.query).to include "line_number: {container_method_line_number}"
           expect(subject.params.keys).to include "container_method_line_number"
-          expect(subject.params["container_method_line_number"]).to eq -1
+          expect(subject.params["container_method_line_number"]).to eq(-1)
         end
       end
     end

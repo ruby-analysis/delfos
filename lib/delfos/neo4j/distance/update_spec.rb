@@ -6,7 +6,7 @@ require "delfos"
 module Delfos
   module Neo4j
     module Distance
-      describe Update do
+      RSpec.describe Update do
         def preload_graph!
           Delfos.setup_neo4j!
           perform_query File.read "fixtures/cypher/coupling.cypher"

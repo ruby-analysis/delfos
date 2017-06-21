@@ -4,7 +4,7 @@ require_relative "app_directories"
 
 module Delfos
   module FileSystem
-    describe AppDirectories do
+    RSpec.describe AppDirectories do
       let(:call_site_logger) { double "call_site_logger", log: nil }
 
       let(:a_path) { File.expand_path "./fixtures/a.rb" }

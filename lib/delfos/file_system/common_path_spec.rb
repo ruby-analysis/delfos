@@ -4,7 +4,7 @@ require_relative "common_path"
 
 module Delfos
   module FileSystem
-    describe CommonPath do
+    RSpec.describe CommonPath do
       def pathname(path_string, directory:)
         path = double "path: #{path_string}", to_s: path_string, directory?: directory
 

@@ -43,9 +43,10 @@ module Delfos
                 status: 200,
                 body: response,
                 headers: { location: transaction_url },
-            )
+              )
 
-            response_transaction_url, response_commit_url, response_expiry = described_class.new(some_query, some_params).perform
+            response_transaction_url, response_commit_url, response_expiry =
+              described_class.new(some_query, some_params).perform
 
             expect(response_transaction_url).to eq transaction_url
             expect(response_commit_url).to eq commit_url

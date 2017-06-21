@@ -4,7 +4,7 @@ require "spec_helper"
 require "tempfile"
 require_relative "delfos"
 
-describe Delfos do
+RSpec.describe Delfos do
   before do
     Delfos::Setup.reset_top_level_variables!
   end
@@ -57,5 +57,4 @@ describe Delfos do
       end
     end
   end
-
 end

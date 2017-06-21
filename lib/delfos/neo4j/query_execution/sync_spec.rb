@@ -23,7 +23,12 @@ module Delfos
           context "with a successful response" do
             before do
               data = [{ "row" => ["some name", 2, "other name"] }]
-              body = { "results" => [{ "columns" => ["n.name", "r.rel_attribute", "o.name"], "data" => data }], "errors" => [] }.to_json
+              body = {
+                "results" => [
+                  { "columns" => ["n.name", "r.rel_attribute", "o.name"], "data" => data },
+                ],
+                "errors" => [],
+              }.to_json
 
               stub_request(:post, Delfos.neo4j.uri_for("/db/data/transaction/commit")).
                 to_return(

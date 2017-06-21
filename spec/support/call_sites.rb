@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CallSiteHelpers
   def expect_call_stack(call_stack, expected)
     call_stack.each_with_index do |cs, i|

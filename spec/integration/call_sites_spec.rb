@@ -2,13 +2,13 @@
 
 require "delfos"
 
-describe "integration" do
+RSpec.describe "integration" do
   let(:call_site_logger) { double "call_site_logger", log: nil, save_call_stack: nil }
 
   before(:each) do
     Delfos.setup!(application_directories: ["fixtures"],
                   call_site_logger: call_site_logger,
-                  logger: $delfos_test_logger)
+                  logger: DelfosSpecs.logger)
   end
 
   context "records call sites" do
@@ -22,9 +22,14 @@ describe "integration" do
         ["b.rb:17 C#third",              "b.rb:18",       "b.rb:11 B#cyclic_dependency"],
         ["b.rb:11 B#cyclic_dependency",  "b.rb:12",       "b.rb:21 C#fourth"],
         ["b.rb:21 C#fourth",             "b.rb:22",       "b.rb:25 C#fifth"],
-        ["b.rb:25 C#fifth",              "b.rb:26",       "b.rb:29 C#sixth"], # first execution chain ends here
-        ["a.rb:5 A#some_method",         "a.rb:7",        "b.rb:33 C#method_with_no_more_method_calls"], # 2nd execution chain ends here
-        ["a.rb:5 A#some_method",         "a.rb:8",        "a.rb:21 D.some_class_method"], # 3rd execution chain ends here
+        ["b.rb:25 C#fifth",              "b.rb:26",       "b.rb:29 C#sixth"],
+        # first execution chain ends here
+
+        ["a.rb:5 A#some_method",         "a.rb:7",        "b.rb:33 C#method_with_no_more_method_calls"],
+        # 2nd execution chain ends here
+
+        ["a.rb:5 A#some_method",         "a.rb:8",        "a.rb:21 D.some_class_method"],
+        # 3rd execution chain ends here
       ]
     end
 

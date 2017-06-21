@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "tempfile"
 
 RSpec.describe "integration .finish!" do
@@ -11,35 +13,30 @@ RSpec.describe "integration .finish!" do
 
     it "calling Delfos.finish! closes the file" do
       Delfos.setup! offline_query_saving: tempfile.path,
-        application_directories: "fixtures"
+                    application_directories: "fixtures"
 
       load "fixtures/a_usage.rb"
-
-      lines = File.readlines(tempfile.path)
 
       Delfos.finish!
 
       lines = File.readlines(tempfile.path)
       expect(lines.length).to eq 11
 
-      expect(JSON.parse(lines.first)).to match({
-        "call_site_file" => "fixtures/a_usage.rb",
-        "call_site_line_number" => 3,
-        "called_method_file" => "fixtures/a.rb",
-        "called_method_line_number" => 5,
-        "called_method_name" => "some_method",
-        "called_method_type" => "InstanceMethod",
-        "container_method_file" => "fixtures/a_usage.rb",
-        "container_method_line_number" => 3,
-        "container_method_name" => "(main)",
-        "container_method_type" => "InstanceMethod",
-        "container_method_klass_name" => "Object",
-        "called_method_klass_name" => "A",
-        "stack_uuid" => anything,
-        "step_number" => 1,
-      })
+      expect(JSON.parse(lines.first)).to match("call_site_file" => "fixtures/a_usage.rb",
+                                               "call_site_line_number" => 3,
+                                               "called_method_file" => "fixtures/a.rb",
+                                               "called_method_line_number" => 5,
+                                               "called_method_name" => "some_method",
+                                               "called_method_type" => "InstanceMethod",
+                                               "container_method_file" => "fixtures/a_usage.rb",
+                                               "container_method_line_number" => 3,
+                                               "container_method_name" => "(main)",
+                                               "container_method_type" => "InstanceMethod",
+                                               "container_method_klass_name" => "Object",
+                                               "called_method_klass_name" => "A",
+                                               "stack_uuid" => anything,
+                                               "step_number" => 1)
     end
-
 
     let(:query) do
       <<-QUERY
@@ -61,7 +58,7 @@ RSpec.describe "integration .finish!" do
       wipe_db!
 
       Delfos.setup! offline_query_saving: tempfile.path,
-        application_directories: "fixtures"
+                    application_directories: "fixtures"
 
       load "fixtures/a_usage.rb"
 
@@ -69,7 +66,7 @@ RSpec.describe "integration .finish!" do
       Delfos.import_offline_queries(tempfile.path)
 
       result = Delfos::Neo4j.execute_sync(query).first
-      a_method_count, method_a, b_method_count, method_b, c_method_count, method_c = result
+      a_method_count, method_a, b_method_count, _, c_method_count, = result
 
       expect(a_method_count).to eq 1
 
@@ -81,7 +78,5 @@ RSpec.describe "integration .finish!" do
       expect(b_method_count).to eq 1
       expect(c_method_count).to eq 1
     end
-
-
   end
 end
