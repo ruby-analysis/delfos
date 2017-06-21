@@ -78,6 +78,10 @@ module Delfos
       end
     end
 
+    def update_distance!
+      Neo4j.update_distance!
+    end
+
     def flush!
       Neo4j.flush!
     end

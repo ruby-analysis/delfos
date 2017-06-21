@@ -28,8 +28,11 @@ process_split_files () {
   do
     echo "Processing $f file..."
     FILE=$f delfos_import_offline_queries
+
   done
 }
 
 split_file
 process_split_files
+
+delfos_update_distance
