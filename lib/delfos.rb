@@ -73,16 +73,18 @@ module Delfos
         Delfos.call_site_logger.finish!
       else
         flush!
-        Neo4j.update_distance!
+        update_distance!
         disable!
       end
     end
 
     def update_distance!
+      require "delfos/neo4j"
       Neo4j.update_distance!
     end
 
     def flush!
+      require "delfos/neo4j"
       Neo4j.flush!
     end
 
