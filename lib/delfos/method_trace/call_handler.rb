@@ -2,14 +2,14 @@
 
 require "delfos/call_stack"
 require_relative "code_location"
-require_relative "code_location/filename_helpers"
+require_relative "code_location/eval_in_caller"
 
 module Delfos
   module MethodTrace
     CallHandler = Struct.new(:trace_point)
 
     class CallHandler
-      include CodeLocation::FilenameHelpers
+      include CodeLocation::EvalInCaller
 
       def perform
         return unless relevant?
@@ -17,8 +17,12 @@ module Delfos
         CallStack.push(call_site)
       end
 
+      STACK_OFFSET = 7
+
       def call_site
         @call_site ||= CodeLocation.callsite_from(
+          file:             eval_in_caller("__FILE__", STACK_OFFSET),
+          line_number:      eval_in_caller("__LINE__", STACK_OFFSET),
           container_method: container_method,
           called_method:    called_method,
         )

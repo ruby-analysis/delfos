@@ -32,8 +32,8 @@ RSpec.describe "integration with a custom call_stack_logger" do
         case count
         when 1
           expect(call_site.summary).to eq(
-            container_method:  "fixtures/app/include_this/start_here.rb:3 Object#(main)",
-            call_site:         "fixtures/app/include_this/start_here.rb:3",
+            container_method:  "include_this/start_here.rb:3 Object#(main)",
+            call_site:         "include_this/start_here.rb:3",
             called_method:     "include_this/called_app_class.rb:5 IncludeThis::CalledAppClass#some_called_method",
           )
 
@@ -60,7 +60,7 @@ RSpec.describe "integration with a custom call_stack_logger" do
         expect(call_site) .to be_a cl::CallSite
       end.exactly(4).times
 
-      load "fixtures/app/include_this/start_here.rb"
+      load "./fixtures/app/include_this/start_here.rb"
     end
     # rubocop:enable Metrics/BlockLength
   end

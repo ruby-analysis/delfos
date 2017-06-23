@@ -9,6 +9,7 @@ module Delfos
         include FilenameHelpers
         attr_reader :object, :line_number, :class_method, :method_object, :super_method
 
+        # rubocop:disable Metrics/ParameterLists
         def initialize(object:, method_name:, file:, line_number:, class_method:, method_object: nil, super_method: nil)
           @object        = object
           @method_name   = method_name
@@ -18,6 +19,7 @@ module Delfos
           @method_object = method_object
           @super_method  = super_method
         end
+        # rubocop:enable Metrics/ParameterLists
 
         def klass_name
           klass.name
