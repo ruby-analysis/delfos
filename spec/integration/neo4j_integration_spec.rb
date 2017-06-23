@@ -42,7 +42,7 @@ RSpec.describe "integration with default neo4j logging" do
         "file"        => "fixtures/a.rb",
         "line_number" => 5,
         "name"        => "some_method",
-        "type"        => "InstanceMethod"
+        "type"        => "InstanceMethod",
       )
 
       expect(b_method_count).to eq 1

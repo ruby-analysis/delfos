@@ -41,7 +41,7 @@ RSpec.describe "integration with a custom call_stack_logger" do
           "include_this/called_app_class.rb:13 IncludeThis::CalledAppClass#penultimate",
           "include_this/called_app_class.rb:14",
           "include_this/called_app_class.rb:17 IncludeThis::CalledAppClass#final_method",
-        ]
+        ],
       ]
     end
 

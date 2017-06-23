@@ -36,7 +36,7 @@ RSpec.describe "integration .finish!" do
         "container_method_klass_name"  => "Object",
         "called_method_klass_name"     => "A",
         "stack_uuid"                   => anything,
-        "step_number"                  => 1
+        "step_number"                  => 1,
       )
     end
 
@@ -60,7 +60,7 @@ RSpec.describe "integration .finish!" do
       wipe_db!
 
       Delfos.setup! offline_query_saving: tempfile.path,
-        application_directories: "fixtures"
+                    application_directories: "fixtures"
 
       load "fixtures/a_usage.rb"
 
@@ -76,7 +76,7 @@ RSpec.describe "integration .finish!" do
         "file"        => "fixtures/a.rb",
         "line_number" => 5,
         "name"        => "some_method",
-        "type"        => "InstanceMethod"
+        "type"        => "InstanceMethod",
       )
 
       expect(b_method_count).to eq 1

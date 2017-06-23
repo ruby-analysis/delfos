@@ -7,7 +7,7 @@ module CallSiteHelpers
     end
   end
 
-  def expect_call_sites(call_site, index, expected, prefix="fixtures/")
+  def expect_call_sites(call_site, index, expected, prefix = "fixtures/")
     expect_call_site(call_site, *expected[index], prefix)
   end
 

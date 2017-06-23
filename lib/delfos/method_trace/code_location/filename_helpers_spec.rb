@@ -8,12 +8,11 @@ module Delfos
     module CodeLocation
       RSpec.describe FilenameHelpers do
         describe "#file" do
-
           class SomeClass
             include FilenameHelpers
 
             def initialize(file)
-              @file=file
+              @file = file
             end
           end
 
@@ -23,8 +22,7 @@ module Delfos
               and_return [
                 Pathname.new("./fixtures"),
                 Pathname.new("./another_directory"),
-            ]
-
+              ]
           end
 
           subject { SomeClass.new(file) }
@@ -52,7 +50,6 @@ module Delfos
 
             context "with a sub directory level file" do
               let(:file) { File.expand_path "fixtures/sub_directory/a.rb" }
-
 
               it do
                 expect(subject.file).to eq "fixtures/sub_directory/a.rb"
@@ -101,7 +98,6 @@ module Delfos
               expect(subject.raw_path).to eq "another_directory/a.rb"
             end
           end
-
         end
       end
     end
