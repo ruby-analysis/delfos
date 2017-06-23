@@ -6,7 +6,7 @@ RSpec.describe "integration" do
   let(:call_site_logger) { double "call_site_logger", log: nil, save_call_stack: nil }
 
   before(:each) do
-    Delfos.setup!(application_directories: ["fixtures"],
+    Delfos.setup!(application_directories: ["./fixtures"],
                   call_site_logger: call_site_logger,
                   logger: DelfosSpecs.logger)
   end

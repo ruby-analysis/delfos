@@ -7,14 +7,14 @@ module CallSiteHelpers
     end
   end
 
-  def expect_call_sites(call_site, index, expected)
-    expect_call_site(call_site, *expected[index])
+  def expect_call_sites(call_site, index, expected, prefix="fixtures/")
+    expect_call_site(call_site, *expected[index], prefix)
   end
 
-  def expect_call_site(call_site, container_summary, cs_summary, called_method_summary)
-    expect(call_site.summary[:container_method]).to eq "fixtures/#{container_summary}"
-    expect(call_site.summary[:call_site])       .to eq "fixtures/#{cs_summary}"
-    expect(call_site.summary[:called_method])   .to eq "fixtures/#{called_method_summary}"
+  def expect_call_site(call_site, container_summary, cs_summary, called_method_summary, prefix)
+    expect(call_site.summary[:container_method]).to eq "#{prefix}#{container_summary}"
+    expect(call_site.summary[:call_site])       .to eq "#{prefix}#{cs_summary}"
+    expect(call_site.summary[:called_method])   .to eq "#{prefix}#{called_method_summary}"
   end
 end
 

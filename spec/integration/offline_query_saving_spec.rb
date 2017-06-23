@@ -22,20 +22,22 @@ RSpec.describe "integration .finish!" do
       lines = File.readlines(tempfile.path)
       expect(lines.length).to eq 11
 
-      expect(JSON.parse(lines.first)).to match("call_site_file" => "fixtures/a_usage.rb",
-                                               "call_site_line_number" => 3,
-                                               "called_method_file" => "fixtures/a.rb",
-                                               "called_method_line_number" => 5,
-                                               "called_method_name" => "some_method",
-                                               "called_method_type" => "InstanceMethod",
-                                               "container_method_file" => "fixtures/a_usage.rb",
-                                               "container_method_line_number" => 3,
-                                               "container_method_name" => "(main)",
-                                               "container_method_type" => "InstanceMethod",
-                                               "container_method_klass_name" => "Object",
-                                               "called_method_klass_name" => "A",
-                                               "stack_uuid" => anything,
-                                               "step_number" => 1)
+      expect(JSON.parse(lines.first)).to match(
+        "call_site_file"               => "fixtures/a_usage.rb",
+        "call_site_line_number"        => 3,
+        "called_method_file"           => "fixtures/a.rb",
+        "called_method_line_number"    => 5,
+        "called_method_name"           => "some_method",
+        "called_method_type"           => "InstanceMethod",
+        "container_method_file"        => "fixtures/a_usage.rb",
+        "container_method_line_number" => 3,
+        "container_method_name"        => "(main)",
+        "container_method_type"        => "InstanceMethod",
+        "container_method_klass_name"  => "Object",
+        "called_method_klass_name"     => "A",
+        "stack_uuid"                   => anything,
+        "step_number"                  => 1
+      )
     end
 
     let(:query) do
@@ -58,7 +60,7 @@ RSpec.describe "integration .finish!" do
       wipe_db!
 
       Delfos.setup! offline_query_saving: tempfile.path,
-                    application_directories: "fixtures"
+        application_directories: "fixtures"
 
       load "fixtures/a_usage.rb"
 
@@ -70,10 +72,12 @@ RSpec.describe "integration .finish!" do
 
       expect(a_method_count).to eq 1
 
-      expect(method_a).to eq("file" => "fixtures/a.rb",
-                             "line_number" => 5,
-                             "name" => "some_method",
-                             "type" => "InstanceMethod")
+      expect(method_a).to eq(
+        "file"        => "fixtures/a.rb",
+        "line_number" => 5,
+        "name"        => "some_method",
+        "type"        => "InstanceMethod"
+      )
 
       expect(b_method_count).to eq 1
       expect(c_method_count).to eq 1

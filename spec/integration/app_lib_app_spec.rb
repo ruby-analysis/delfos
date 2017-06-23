@@ -20,48 +20,41 @@ RSpec.describe "integration with a custom call_stack_logger" do
   end
 
   context "with app code calling lib code which calls back into lib code" do
-    # rubocop:disable Metrics/BlockLength
-    it "logs the call sites" do
-      cl = Delfos::MethodTrace::CodeLocation
+    let(:expected_call_sites) do
+      [
+        [
+          "include_this/start_here.rb:3 Object#(main)",
+          "include_this/start_here.rb:3",
+          "include_this/called_app_class.rb:5 IncludeThis::CalledAppClass#some_called_method",
+        ],
+        [
+          "exclude_this/exclude_this.rb:10 ExcludeThis#further",
+          "exclude_this/exclude_this.rb:11",
+          "include_this/called_app_class.rb:9 IncludeThis::CalledAppClass#next_method",
+        ],
+        [
+          "include_this/called_app_class.rb:9 IncludeThis::CalledAppClass#next_method",
+          "include_this/called_app_class.rb:10",
+          "include_this/called_app_class.rb:13 IncludeThis::CalledAppClass#penultimate",
+        ],
+        [
+          "include_this/called_app_class.rb:13 IncludeThis::CalledAppClass#penultimate",
+          "include_this/called_app_class.rb:14",
+          "include_this/called_app_class.rb:17 IncludeThis::CalledAppClass#final_method",
+        ]
+      ]
+    end
 
-      count = 0
+    it do
+      index = 0
 
       expect(call_site_logger).to receive(:log) do |call_site|
-        count += 1
+        expect_call_sites(call_site, index, expected_call_sites, "")
 
-        case count
-        when 1
-          expect(call_site.summary).to eq(
-            container_method:  "include_this/start_here.rb:3 Object#(main)",
-            call_site:         "include_this/start_here.rb:3",
-            called_method:     "include_this/called_app_class.rb:5 IncludeThis::CalledAppClass#some_called_method",
-          )
-
-        when 2
-          expect(call_site.summary).to eq(
-            container_method: "exclude_this/exclude_this.rb:10 ExcludeThis#further",
-            call_site: "exclude_this/exclude_this.rb:11",
-            called_method: "include_this/called_app_class.rb:9 IncludeThis::CalledAppClass#next_method",
-          )
-
-        when 3
-          expect(call_site.summary).to eq(
-            container_method: "include_this/called_app_class.rb:9 IncludeThis::CalledAppClass#next_method",
-            call_site:        "include_this/called_app_class.rb:10",
-            called_method:    "include_this/called_app_class.rb:13 IncludeThis::CalledAppClass#penultimate",
-          )
-        when 4
-          expect(call_site.summary).to eq(
-            container_method: "include_this/called_app_class.rb:13 IncludeThis::CalledAppClass#penultimate",
-            call_site:        "include_this/called_app_class.rb:14",
-            called_method:    "include_this/called_app_class.rb:17 IncludeThis::CalledAppClass#final_method",
-          )
-        end
-        expect(call_site) .to be_a cl::CallSite
-      end.exactly(4).times
+        index += 1
+      end.exactly(expected_call_sites.length).times
 
       load "./fixtures/app/include_this/start_here.rb"
     end
-    # rubocop:enable Metrics/BlockLength
   end
 end
