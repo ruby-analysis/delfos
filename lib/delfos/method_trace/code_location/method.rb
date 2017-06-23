@@ -7,14 +7,16 @@ module Delfos
     module CodeLocation
       class Method
         include FilenameHelpers
-        attr_reader :object, :line_number, :class_method
+        attr_reader :object, :line_number, :class_method, :method_object, :super_method
 
-        def initialize(object:, method_name:, file:, line_number:, class_method:)
-          @object       = object
-          @method_name  = method_name
-          @file         = file
-          @line_number  = line_number
-          @class_method = class_method
+        def initialize(object:, method_name:, file:, line_number:, class_method:, method_object: nil, super_method: nil)
+          @object        = object
+          @method_name   = method_name
+          @file          = file
+          @line_number   = line_number
+          @class_method  = class_method
+          @method_object = method_object
+          @super_method  = super_method
         end
 
         def klass_name
