@@ -48,13 +48,15 @@ module Delfos
         def with_errors
           @no_errors = true
 
-          error_filename = "#{filename}.errors"
-
           File.open(error_filename, "w") do |err|
             yield err
           end
 
           FileUtils.rm_rf error_filename if @no_errors
+        end
+
+        def error_filename
+          "#{filename}.errors"
         end
 
         def with_input
