@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "neo4j/query_execution/sync"
-require_relative "neo4j/batch/retryable"
+require_relative "neo4j/query_execution/batch/retryable"
 require_relative "neo4j/schema"
 require_relative "neo4j/distance/update"
 
@@ -14,11 +14,11 @@ module Delfos
     end
 
     def execute(query, params = {})
-      Batch::Retryable.execute!(query, params: params, size: Delfos.batch_size)
+      QueryExecution::Batch::Retryable.execute!(query, params: params, size: Delfos.batch_size)
     end
 
     def flush!
-      Batch::Retryable.flush!
+      QueryExecution::Batch::Retryable.flush!
     end
 
     def ensure_schema!
