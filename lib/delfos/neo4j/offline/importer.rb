@@ -52,7 +52,7 @@ module Delfos
             yield err
           end
 
-          FileUtils.rm_rf error_filename if @no_errors
+          FileUtils.rm_rf(error_filename) if @no_errors
         end
 
         def error_filename
