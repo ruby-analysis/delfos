@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 require_relative "common_path"
+require_relative "file_cache"
 
 module Delfos
   module FileSystem
     module AppDirectories
+      include FileCache
       extend self
 
       def exclude_file?(file)
@@ -16,10 +18,6 @@ module Delfos
         with_cache(file) { should_include?(file) }
       end
 
-      def reset!
-        @cache = nil
-      end
-
       private
 
       def should_include?(file)
@@ -28,14 +26,6 @@ module Delfos
 
       def expand_path(f)
         Pathname.new(f).expand_path
-      end
-
-      def with_cache(key)
-        cache.include?(key) ? cache[key] : cache[key] = yield
-      end
-
-      def cache
-        @cache ||= {}
       end
     end
   end

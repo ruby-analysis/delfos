@@ -19,6 +19,34 @@ RSpec.describe Delfos do
     end
   end
 
+  describe "#ignored_files=" do
+    let(:ignored_file) { "app/some_file.rb" }
+
+    it do
+      Delfos.setup!(ignored_files: [ignored_file])
+
+      expect(Delfos.ignored_files).to eq [Pathname.new(File.expand_path(ignored_file))]
+    end
+  end
+
+  describe "#include_file?" do
+    let(:application_directories) { "fixtures" }
+    let(:ignored_file) { "fixtures/a.rb" }
+    let(:included_file) { "fixtures/b.rb" }
+
+    before do
+      Delfos.setup!(ignored_files: [ignored_file], application_directories: application_directories)
+    end
+
+    it "includes the correct file" do
+      expect(Delfos.include_file?(included_file)).to be true
+    end
+
+    it "excludes the correct file" do
+      expect(Delfos.include_file?(ignored_file)).to be false
+    end
+  end
+
   describe "offline_query_saving=" do
     before do
       allow(Delfos::MethodTrace).to receive(:trace!)

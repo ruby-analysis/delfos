@@ -7,8 +7,10 @@ module Delfos
 
     def perform!(call_site_logger: nil,
       application_directories: nil,
+      ignored_files: nil,
       offline_query_saving: nil)
       self.application_directories = application_directories if application_directories
+      self.ignored_files = ignored_files if ignored_files
       self.call_site_logger = call_site_logger if call_site_logger
 
       assign_offline_attributes(offline_query_saving)
@@ -21,6 +23,10 @@ module Delfos
       dirs ||= %w[app lib]
       require "pathname"
       Delfos.application_directories = Array(dirs).map { |f| Pathname.new(f.to_s).expand_path }
+    end
+
+    def ignored_files=(files)
+      Delfos.ignored_files = Array(files).map { |f| Pathname.new(f.to_s).expand_path }
     end
 
     def call_site_logger=(call_site_logger)
@@ -47,6 +53,7 @@ module Delfos
 
       reset_top_level_variables!
       reset_app_directories!
+      reset_app_files!
     end
 
     def disable_tracepoint!
@@ -77,12 +84,17 @@ module Delfos
       ignoring_undefined("Delfos::FileSystem::AppDirectories", &:reset!)
     end
 
+    def reset_app_files!
+      ignoring_undefined("Delfos::FileSystem::AppFiles", &:reset!)
+    end
+
     def reset_top_level_variables!
       Delfos.offline_query_saving    = nil
       Delfos.offline_query_filename  = nil
       Delfos.neo4j                   = nil
       Delfos.logger                  = nil
       Delfos.application_directories = nil
+      Delfos.ignored_files           = nil
       Delfos.call_site_logger        = nil
       Delfos.max_query_size          = nil
       Delfos.neo4j                   = nil

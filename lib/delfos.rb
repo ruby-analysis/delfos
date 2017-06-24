@@ -5,6 +5,7 @@ require "delfos/setup"
 module Delfos
   class << self
     attr_accessor :application_directories,
+      :ignored_files,
       :offline_query_saving,
       :offline_query_filename
 
@@ -15,6 +16,7 @@ module Delfos
       logger: nil,
       call_site_logger: nil,
       application_directories: nil,
+      ignored_files: nil,
       batch_size: nil,
       max_query_size: nil,
       offline_query_saving: nil
@@ -27,6 +29,7 @@ module Delfos
       Setup.perform!(
         call_site_logger: call_site_logger,
         application_directories: application_directories,
+        ignored_files: ignored_files,
         offline_query_saving: offline_query_saving,
       )
     end
