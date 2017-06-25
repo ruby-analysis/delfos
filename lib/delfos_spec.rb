@@ -11,20 +11,20 @@ RSpec.describe Delfos do
 
   describe "#application_directories=" do
     let(:directory) { "some/dir" }
+    after { Delfos.disable! }
 
     it do
-      Delfos.setup!(application_directories: [directory])
-
+      Delfos.configure { |c| c.application_directories = directory }
+      Delfos.start!
       expect(Delfos.application_directories).to eq [Pathname.new(File.expand_path(directory))]
     end
   end
 
-  describe "#ignored_files=" do
+  describe "ignored_files" do
     let(:ignored_file) { "app/some_file.rb" }
 
     it do
-      Delfos.setup!(ignored_files: [ignored_file])
-
+      Delfos.configure { |c| c.ignored_files = ignored_file }
       expect(Delfos.ignored_files).to eq [Pathname.new(File.expand_path(ignored_file))]
     end
   end
@@ -35,8 +35,14 @@ RSpec.describe Delfos do
     let(:included_file) { "fixtures/b.rb" }
 
     before do
-      Delfos.setup!(ignored_files: [ignored_file], application_directories: application_directories)
+      Delfos.configure do |c|
+        c.application_directories = application_directories
+        c.ignored_files = ignored_file
+      end
+      Delfos.start!
     end
+
+    after { Delfos.disable! }
 
     it "includes the correct file" do
       expect(Delfos.include_file?(included_file)).to be true
@@ -52,15 +58,19 @@ RSpec.describe Delfos do
       allow(Delfos::MethodTrace).to receive(:trace!)
       allow(Delfos).to receive(:call_site_logger).and_return double("call site logger")
 
-      Delfos.setup!(offline_query_saving: offline_query_saving)
+      Delfos.configure do |c|
+        c.offline_query_saving = offline_query_saving
+        c.offline_query_filename = offline_query_filename
+      end
     end
 
     after do
-      Delfos::Setup.reset_top_level_variables!
+      Delfos.disable!
     end
 
     context "with a boolean true" do
       let(:offline_query_saving) { true }
+      let(:offline_query_filename) { nil }
 
       it "has a default filename" do
         expect(Delfos.offline_query_saving).to eq true
@@ -70,17 +80,19 @@ RSpec.describe Delfos do
 
     context "with a boolean false" do
       let(:offline_query_saving) { false }
+      let(:offline_query_filename) { nil }
 
       it do
-        expect(Delfos.offline_query_saving).to eq nil
+        expect(Delfos.offline_query_saving).to eq false
         expect(Delfos.offline_query_filename).to eq nil
       end
     end
 
-    context "with a string argument" do
-      let(:offline_query_saving) { "some/path/some_file.cypher" }
+    context "with a path" do
+      let(:offline_query_saving) { true }
+      let(:offline_query_filename) { "some/path/some_file.cypher" }
       it do
-        expect(Delfos.offline_query_saving).to eq "some/path/some_file.cypher"
+        expect(Delfos.offline_query_saving).to eq true
         expect(Delfos.offline_query_filename).to eq "some/path/some_file.cypher"
       end
     end

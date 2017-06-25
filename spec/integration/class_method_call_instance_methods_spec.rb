@@ -12,7 +12,11 @@ RSpec.describe "integration with default neo4j logging" do
   before(:each) do
     wipe_db!
 
-    Delfos.setup!(application_directories: ["fixtures"], logger: DelfosSpecs.logger)
+    Delfos.configure do |c|
+      c.application_directories = "fixtures"
+      c.logger = DelfosSpecs.logger
+    end
+    Delfos.start!
   end
 
   context "class method calls an instance method" do

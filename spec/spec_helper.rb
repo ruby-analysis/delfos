@@ -6,7 +6,7 @@ require "byebug"
 require "delfos"
 require_relative "support/logging"
 
-Delfos.logger = DelfosSpecs.logger
+Delfos.configure { |c| c.logger = DelfosSpecs.logger }
 
 require "ostruct"
 
@@ -47,6 +47,6 @@ RSpec.configure do |c|
       Delfos.finish!
     end
     ShowClassInstanceVariables.variables_for(Delfos)
-    Delfos.logger = DelfosSpecs.logger
+    Delfos.configure { |config| config.logger = DelfosSpecs.logger }
   end
 end

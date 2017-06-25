@@ -8,7 +8,7 @@ module Delfos
       RSpec.describe ContainerMethodFactory do
         describe ".create" do
           before do
-            Delfos.application_directories = [Pathname.new("fixtures")]
+            Delfos.configure { |c| c.application_directories = [Pathname.new("fixtures")] }
             require "./fixtures/container_method_factory/usage.rb"
           end
 

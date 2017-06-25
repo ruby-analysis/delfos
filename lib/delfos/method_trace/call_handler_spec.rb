@@ -22,7 +22,7 @@ module Delfos
       end
 
       before do
-        Delfos.application_directories = application_directories
+        Delfos.configure { |c| c.application_directories = application_directories }
       end
 
       let(:application_directories) do

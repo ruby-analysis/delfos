@@ -126,7 +126,7 @@ gem 'delfos', :git => 'https://github.com/ruby-analysis/delfos.git'
 
 # Delfos affects performance, so we recommend only setting up when required
 if defined?(Delfos) && ENV["DELFOS_ENABLED"]
-  Delfos.setup!
+  Delfos.start!
 end
 
 # Any code defined in the app or lib directories executed after this point will
@@ -150,7 +150,7 @@ RSpec.configure do |c|
     require "delfos"
 
     your_library_path = File.expand_path("../../lib", __FILE__)
-    Delfos.setup! application_directories: your_library_path
+    Delfos.start! application_directories: your_library_path
   end
 
   c.after(:suite) do
@@ -159,7 +159,7 @@ RSpec.configure do |c|
 end
 ```
 
-#### Delfos.setup! options
+#### Delfos.start! options
 
 
 * `application_directories` An array of application directories. Defaults to `app` and `lib`
@@ -195,7 +195,7 @@ probably preferable to save the queries offline for later processing.
 
 ```ruby
 config.before(:suite) do
-  Delfos.setup! offline_query_saving: true
+  Delfos.start! offline_query_saving: true
 endt
 
 ```

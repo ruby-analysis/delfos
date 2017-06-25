@@ -10,7 +10,7 @@ module Delfos
     let(:raise_handler) { double "Raise Handler", perform: nil }
 
     before do
-      Delfos.setup! application_directories: ["fixtures"]
+      Delfos.configure { |c| c.application_directories = "fixtures" }
       # we manually start the TracePoints in our tests so
       # disable the automatically started ones
       described_class.disable!

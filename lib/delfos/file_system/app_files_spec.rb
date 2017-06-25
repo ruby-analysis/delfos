@@ -14,8 +14,10 @@ module Delfos
         path_fixtures = Pathname.new(File.expand_path(__FILE__)) + "../../../../fixtures"
         path_spec     = Pathname.new(File.expand_path(__FILE__)) + "../.."
 
-        Delfos.application_directories = [path_spec, path_fixtures]
-        Delfos.ignored_files = [a_path]
+        Delfos.configure do |c|
+          c.application_directories = [path_spec, path_fixtures]
+          c.ignored_files = a_path
+        end
       end
 
       describe "#include_file?" do

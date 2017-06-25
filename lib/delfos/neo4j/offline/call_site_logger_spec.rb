@@ -24,7 +24,10 @@ module Delfos
             to receive(:new).with(call_site, stack_uuid, step_number).
             and_return(call_site_query).at_least(:once)
 
-          Delfos.offline_query_filename = tempfile.path
+          Delfos.configure do |c|
+            c.offline_query_saving = true
+            c.offline_query_filename = tempfile.path
+          end
         end
 
         describe "#log" do
