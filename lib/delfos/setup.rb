@@ -52,8 +52,8 @@ module Delfos
     end
 
     def reset_top_level_variables!
-      Delfos.clear_config!
-      Delfos.neo4j = nil
+      Delfos.config = nil
+      Delfos.neo4j  = nil
     end
 
     # This method allows resetting in between every spec.  So we avoid load

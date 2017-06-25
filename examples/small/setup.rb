@@ -4,8 +4,16 @@ $LOAD_PATH.unshift File.expand_path("../../../lib", __FILE__)
 require "delfos"
 file = __FILE__
 require "pathname"
+
 app_dir = Pathname.new(File.expand_path(file)) + "../app"
-Delfos.start! application_directories: app_dir
+ignored_file = Pathname.new(File.expand_path(file)) + "../app/app_config.rb"
+
+Delfos.configure do |config|
+  config.application_directories = app_dir
+  config.ignored_files = ignored_file
+end
+
+Delfos.start!
 
 require_relative "./app/product_usage.rb"
 

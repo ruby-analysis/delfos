@@ -5,6 +5,7 @@ $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 
 require "delfos"
 
-Delfos.start! application_directories: "."
+Delfos.configure { |c| c.application_directories = "." }
+Delfos.start!
 Delfos.update_distance!
 Delfos.finish!

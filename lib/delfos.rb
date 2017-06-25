@@ -8,7 +8,7 @@ module Delfos
   class << self
     extend Forwardable
 
-    attr_writer :neo4j
+    attr_writer :neo4j, :config
 
     def_delegators :config,
       :application_directories,
@@ -26,10 +26,6 @@ module Delfos
 
     def configure
       yield config
-    end
-
-    def clear_config!
-      @config = nil
     end
 
     def start!
