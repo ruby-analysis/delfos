@@ -17,11 +17,11 @@ module Delfos
       :offline_query_saving,
       :offline_query_filename
 
-    def config
-      @config ||= Delfos::Config.new
-    end
+    attr_reader :config
 
     def configure
+      new_config
+
       yield config
     end
 
@@ -31,6 +31,13 @@ module Delfos
 
     def reset_config!
       @config = nil
+    end
+
+    def flush!
+      ::Delfos::MethodTrace.disable!
+
+      config.call_site_logger.reset!
+      reset_config!
     end
 
     def finish!
@@ -46,6 +53,10 @@ module Delfos
 
     def include_file?(file)
       config.include?(file)
+    end
+
+    def new_config
+      @config ||= Delfos::Config.new
     end
   end
 end

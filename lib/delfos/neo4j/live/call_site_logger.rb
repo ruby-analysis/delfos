@@ -14,8 +14,15 @@ module Delfos
 
         def finish!
           reset_call_stack!
-          flush!
           update_distance!
+        end
+
+        def flush!
+          Neo4j.flush!
+        end
+
+        def reset!
+          reset_call_stack!
           flush!
         end
 
@@ -23,15 +30,13 @@ module Delfos
 
         def update_distance!
           Neo4j.update_distance!
-        end
-
-        def flush!
-          Neo4j.flush!
+          flush!
         end
 
         def reset_call_stack!
           Delfos::CallStack.pop_until_top!
           Delfos::CallStack.reset!
+          flush!
         end
       end
     end

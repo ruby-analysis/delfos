@@ -19,12 +19,15 @@ module DelfosSpecNeo4jHelpers
     Delfos::Neo4j.execute_sync(q)
   end
 end
+
+# rubocop:disable Metrics/BlockLength
 RSpec.configure do |c|
   c.include DelfosSpecNeo4jHelpers
 
   c.before(:suite) do
     require "delfos/neo4j/query_execution/errors"
     begin
+      Delfos.new_config
       DelfosSpecNeo4jHelpers.wipe_db!
     rescue *Delfos::Neo4j::QueryExecution::HTTP_ERRORS => e
       puts <<-ERROR
@@ -54,3 +57,4 @@ RSpec.configure do |c|
     Delfos::Neo4j.ensure_schema!
   end
 end
+# rubocop:enable Metrics/BlockLength
