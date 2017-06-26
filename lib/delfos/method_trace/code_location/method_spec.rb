@@ -20,9 +20,9 @@ module Delfos
             config = double "config"
 
             expect(config).to receive(:included_directories).and_return([
-              "/Users/mark/code/some_app/app",
-              "/Users/mark/code/some_app/lib",
-            ])
+                                                                          "/Users/mark/code/some_app/app",
+                                                                          "/Users/mark/code/some_app/lib",
+                                                                        ])
 
             allow(Delfos).to receive(:config).and_return config
           end

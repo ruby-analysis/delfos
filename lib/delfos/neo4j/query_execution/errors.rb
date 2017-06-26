@@ -24,7 +24,7 @@ module Delfos
         Net::ReadTimeout,
         SocketError,
         Timeout::Error,
-        ConnectionError
+        ConnectionError,
       ].freeze
 
       class InvalidQuery < IOError
@@ -36,7 +36,6 @@ module Delfos
           super [message, { query: query.to_s }, { params: params.to_s }].join("\n\n")
         end
       end
-
     end
   end
 end

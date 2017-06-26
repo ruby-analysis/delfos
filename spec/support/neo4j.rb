@@ -19,8 +19,6 @@ module DelfosSpecNeo4jHelpers
     Delfos::Neo4j.execute_sync(q)
   end
 end
-
-# rubocop:disable Metrics/BlockLength
 RSpec.configure do |c|
   c.include DelfosSpecNeo4jHelpers
 

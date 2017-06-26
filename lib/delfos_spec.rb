@@ -67,13 +67,6 @@ RSpec.describe Delfos do
       end
     end
 
-    after do
-      begin
-      Delfos.finish!
-      rescue Errno::ENOENT
-      end
-    end
-
     context "with a boolean true" do
       let(:offline_query_saving) { true }
       let(:offline_query_filename) { nil }

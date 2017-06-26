@@ -11,12 +11,12 @@ module Delfos
 
     describe "#include" do
       it "accepts an array of directories" do
-        subject.include ["another", "yet_another"]
+        subject.include %w[another yet_another]
         expect(subject.included_directories).to include(expand("another"), expand("yet_another"))
       end
 
       it "ensures uniqueness" do
-        subject.include ["another", "another"]
+        subject.include %w[another another]
         expect(subject.included_directories).to eq [app_path, lib_path, expand("another")]
       end
 
@@ -33,12 +33,12 @@ module Delfos
 
     describe "#exclude" do
       it "accepts an array of directories" do
-        subject.exclude ["another", "yet_another"]
+        subject.exclude %w[another yet_another]
         expect(subject.excluded_directories).to include(expand("another"), expand("yet_another"))
       end
 
       it "ensures uniqueness" do
-        subject.exclude ["another", "another"]
+        subject.exclude %w[another another]
         expect(subject.excluded_directories).to eq [expand("another")]
       end
 
@@ -54,7 +54,7 @@ module Delfos
 
     describe "#include=" do
       it "replaces the existing paths" do
-        subject.include= "app"
+        subject.include = "app"
 
         expect(subject.included_directories).to eq [app_path]
       end
@@ -62,7 +62,7 @@ module Delfos
 
     describe "#exclude=" do
       it "replaces the existing paths" do
-        subject.exclude= "app"
+        subject.exclude = "app"
 
         expect(subject.excluded_directories).to eq [app_path]
       end
@@ -70,37 +70,33 @@ module Delfos
   end
 end
 
-
-
-=begin
-Delfos.config do |c|
-  c.include= ["my-app"] # overwrites the defaults of ["app", "lib"]
-  c.include ["app", "lib"] # appends 
-  c.include "and_this.rb"
-  c.include /this/
-  c.include ["some_file.rb"]
-
-  c.include do |file, klass, method_name, class_method|
-    klass == Object && method_name == :to_s
-  end
-
-  c.exclude= "exclude_only_this"
-  c.exclude /that/
-  c.exclude RSpec
-  c.exclude ["some_other.rb", "another.rb"]
-end
-
-Delfos.include?
-  config.inclusion.include?
-
-    inclusion = Inclusion.new
-    inclusion << AppDirectories.new
-    inclusion << AppFiles.new
-    inclusion << ->{|f,klass,_,_| klass == Object }
-
-    inclusion.all? do |i|
-      i.include?(file, _klass, _method_name)
-    end
-
-
-=end
+# Delfos.config do |c|
+#   c.include= ["my-app"] # overwrites the defaults of ["app", "lib"]
+#   c.include ["app", "lib"] # appends
+#   c.include "and_this.rb"
+#   c.include /this/
+#   c.include ["some_file.rb"]
+#
+#   c.include do |file, klass, method_name, class_method|
+#     klass == Object && method_name == :to_s
+#   end
+#
+#   c.exclude= "exclude_only_this"
+#   c.exclude /that/
+#   c.exclude RSpec
+#   c.exclude ["some_other.rb", "another.rb"]
+# end
+#
+# Delfos.include?
+#   config.inclusion.include?
+#
+#     inclusion = Inclusion.new
+#     inclusion << AppDirectories.new
+#     inclusion << AppFiles.new
+#     inclusion << ->{|f,klass,_,_| klass == Object }
+#
+#     inclusion.all? do |i|
+#       i.include?(file, _klass, _method_name)
+#     end
+#
+#

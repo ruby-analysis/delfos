@@ -20,9 +20,9 @@ module Delfos
             allow(Delfos).
               to receive(:config).
               and_return double("Config", included_directories: [
-                Pathname.new("./fixtures"),
-                Pathname.new("./another_directory"),
-              ])
+                                  Pathname.new("./fixtures"),
+                                  Pathname.new("./another_directory"),
+                                ])
           end
 
           subject { SomeClass.new(file) }

@@ -12,7 +12,7 @@ module Delfos
         described_class.new(included_files, excluded_files)
       end
 
-      let(:excluded_files) { [ a_path ] }
+      let(:excluded_files) { [a_path] }
       let(:included_files) { [] }
 
       describe "#include?" do

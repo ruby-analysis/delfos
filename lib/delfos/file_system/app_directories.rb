@@ -9,7 +9,8 @@ module Delfos
       include FileCache
 
       def initialize(included, excluded)
-        @included, @excluded = included, excluded
+        @included = included
+        @excluded = excluded
       end
 
       def exclude?(file)

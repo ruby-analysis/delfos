@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "delfos/file_system/app_directories"
 require "delfos/file_system/app_files"
 
@@ -65,8 +67,7 @@ module Delfos
       end
 
       def files_and_directories_from(paths)
-        paths = expand_paths(paths)
-        files, directories = paths.partition(&:file?)
+        expand_paths(paths).partition(&:file?)
       end
 
       def app_directories
