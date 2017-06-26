@@ -7,7 +7,7 @@ module Delfos
   module MethodTrace
     module CodeLocation
       RSpec.describe FilenameHelpers do
-        let(:call_site_logger) { double("call site logger", log: nil, finish!: nil) }
+        let(:call_site_logger) { double("call site logger", log: nil, reset!: nil) }
 
         describe "#file" do
           class SomeClass

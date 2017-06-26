@@ -13,12 +13,13 @@ module Delfos
         RSpec.describe Retryable do
           before do
             described_class.reset!
+            Delfos.configure
           end
 
           let(:size) { 10 }
           let(:execution) { described_class.new(size: size) }
-          let(:transaction_url) { Delfos.neo4j.uri_for("/db/data/transaction/1") }
-          let(:commit_url) { Delfos.neo4j.uri_for("/db/data/transaction/1/commit") }
+          let(:transaction_url) { Delfos.config.neo4j.uri_for("/db/data/transaction/1") }
+          let(:commit_url) { Delfos.config.neo4j.uri_for("/db/data/transaction/1/commit") }
 
           let(:expires_string) { "Wed, 14 Dec 2016 10:39:44 GMT" }
           let(:expires) { Time.parse(expires_string) }

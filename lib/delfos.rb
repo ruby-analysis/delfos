@@ -22,7 +22,7 @@ module Delfos
     def configure
       new_config
 
-      yield config
+      yield config if block_given?
     end
 
     def start!
@@ -52,7 +52,7 @@ module Delfos
     end
 
     def include_file?(file)
-      config.include?(file)
+      config&.include?(file)
     end
 
     def new_config

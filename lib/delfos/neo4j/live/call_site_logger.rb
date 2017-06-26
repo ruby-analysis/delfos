@@ -23,7 +23,7 @@ module Delfos
 
         def reset!
           reset_call_stack!
-          flush!
+          Neo4j.reset!
         end
 
         private

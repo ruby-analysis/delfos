@@ -23,7 +23,6 @@ module Delfos
       end
 
       after(:each) do
-        puts "after in spec"
         Delfos.reset_config!
       end
 
