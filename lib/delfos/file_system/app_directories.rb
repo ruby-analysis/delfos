@@ -5,15 +5,18 @@ require_relative "file_cache"
 
 module Delfos
   module FileSystem
-    module AppDirectories
+    class AppDirectories
       include FileCache
-      extend self
 
-      def exclude_file?(file)
-        !include_file?(file)
+      def initialize(included, excluded)
+        @included, @excluded = included, excluded
       end
 
-      def include_file?(file)
+      def exclude?(file)
+        !include?(file)
+      end
+
+      def include?(file)
         return false if file.nil?
         with_cache(file) { should_include?(file) }
       end
@@ -21,7 +24,11 @@ module Delfos
       private
 
       def should_include?(file)
-        CommonPath.included_in?(expand_path(file), Delfos.application_directories)
+        !matches(file, @excluded) && matches(file, @included)
+      end
+
+      def matches(f, directories)
+        CommonPath.included_in?(expand_path(f), directories)
       end
 
       def expand_path(f)

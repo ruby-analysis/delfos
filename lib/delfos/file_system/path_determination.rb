@@ -16,7 +16,7 @@ module Delfos
       def full_path
         return @file.realpath if Pathname.new(@file).exist?
 
-        Delfos.application_directories.map do |d|
+        Delfos.config.included_directories.map do |d|
           path = try_path { d + @file }
 
           path || try_path do

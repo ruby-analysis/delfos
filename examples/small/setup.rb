@@ -6,11 +6,11 @@ file = __FILE__
 require "pathname"
 
 app_dir = Pathname.new(File.expand_path(file)) + "../app"
-ignored_file = Pathname.new(File.expand_path(file)) + "../app/app_config.rb"
+excluded_file = Pathname.new(File.expand_path(file)) + "../app/app_config.rb"
 
 Delfos.configure do |config|
-  config.application_directories = app_dir
-  config.ignored_files = ignored_file
+  config.include app_dir
+  config.exclude excluded_file
 end
 
 Delfos.start!

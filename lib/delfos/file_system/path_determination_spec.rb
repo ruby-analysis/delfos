@@ -6,7 +6,7 @@ module Delfos
   module FileSystem
     RSpec.describe PathDetermination do
       before do
-        Delfos.configure { |c| c.application_directories = "fixtures/path_determination" }
+        Delfos.configure { |c| c.include = "fixtures/path_determination" }
       end
 
       describe "#full_path" do

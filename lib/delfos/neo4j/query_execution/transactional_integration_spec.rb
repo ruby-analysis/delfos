@@ -9,7 +9,6 @@ module Delfos
       RSpec.describe Transactional do
         before do
           WebMock.allow_net_connect!
-          Delfos.setup_neo4j!
         end
 
         describe "#perform" do
@@ -25,12 +24,12 @@ module Delfos
 
             it "returns a transaction url" do
               expect(transaction_url).to be_a URI
-              expect(transaction_url.to_s).to match Delfos.neo4j.url
+              expect(transaction_url.to_s).to match Delfos.config.neo4j.url
               expect(transaction_url.path).to match %r{/db/data/transaction/\d+}
             end
 
             it "returns a commit url" do
-              expect(commit_url.to_s).to match Delfos.neo4j.url
+              expect(commit_url.to_s).to match Delfos.config.neo4j.url
               expect(commit_url.path).to match %r{/db/data/transaction/\d+/commit}
             end
 

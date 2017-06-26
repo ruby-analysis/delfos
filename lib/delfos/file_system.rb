@@ -11,7 +11,8 @@ module Delfos
     end
 
     def self.include_file?(file)
-      FileSystem::AppDirectories.include_file?(file) && FileSystem::AppFiles.include_file?(file)
+      Delfos.config.app_directories.include_file?(file) &&
+        Delfos.config.app_files.include_file?(file)
     end
   end
 end

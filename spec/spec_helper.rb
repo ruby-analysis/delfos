@@ -32,21 +32,21 @@ RSpec.configure do |c|
     m.syntax = :expect
   end
 
-  c.before(:suite) do
+  c.before(:each) do |e|
+    puts "before each in spec_helper #{e.inspect} #{Delfos.instance_eval{@config.inspect}}"
+    Delfos.reset_config!
+    ShowClassInstanceVariables.variables_for(Delfos)
+    Delfos.configure { |c| c.logger = DelfosSpecs.logger }
+  end
+
+  c.after(:each) do |e|
+    Delfos.finish!
+    puts "after each in spec_helper #{e.inspect} #{Delfos.instance_eval{@config.inspect}}"
+
+    Delfos.reset_config!
+    puts "after each after reset in spec_helper #{e.inspect} #{Delfos.instance_eval{@config.inspect}}"
+    ShowClassInstanceVariables.last_executed_rspec_test = e.location
     Delfos.finish!
   end
 
-  c.after(:each) do |example|
-    ShowClassInstanceVariables.last_executed_rspec_test = example.location
-  end
-
-  c.before(:each) do
-    begin
-      Delfos.finish!
-    rescue Delfos::Neo4j::QueryExecution::ExpiredTransaction
-      Delfos.finish!
-    end
-    ShowClassInstanceVariables.variables_for(Delfos)
-    Delfos.configure { |config| config.logger = DelfosSpecs.logger }
-  end
 end

@@ -22,7 +22,7 @@ module Delfos
           return unless f
           file = f.to_s
 
-          Delfos.application_directories.map do |d|
+          Delfos.config.included_directories.map do |d|
             file = relative_path(file, d)
           end
 

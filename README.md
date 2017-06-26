@@ -150,7 +150,7 @@ RSpec.configure do |c|
     require "delfos"
 
     your_library_path = File.expand_path("../../lib", __FILE__)
-    Delfos.configure { |c| c.application_directories = your_library_path }
+    Delfos.configure { |c| c.include = your_library_path }
     Delfos.start!
   end
 

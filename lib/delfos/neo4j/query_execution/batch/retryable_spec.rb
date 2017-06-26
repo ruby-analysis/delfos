@@ -11,6 +11,10 @@ module Delfos
     module QueryExecution
       module Batch
         RSpec.describe Retryable do
+          before do
+            described_class.reset!
+          end
+
           let(:size) { 10 }
           let(:execution) { described_class.new(size: size) }
           let(:transaction_url) { Delfos.neo4j.uri_for("/db/data/transaction/1") }
@@ -22,7 +26,6 @@ module Delfos
           let(:execution) { double "execution" }
 
           before do
-            Delfos.setup_neo4j!
             WebMock.disable_net_connect! allow_localhost: false
 
             allow(Execution).
@@ -39,12 +42,11 @@ module Delfos
 
           after do
             WebMock.disable_net_connect! allow_localhost: true
-            Delfos::Setup.reset_batch!
           end
 
           describe ".execute!" do
             before do
-              allow(described_class).
+              expect(described_class).
                 to receive(:new).
                 with(size: size).
                 and_return(execution)

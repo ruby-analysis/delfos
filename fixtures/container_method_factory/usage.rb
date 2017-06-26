@@ -1,7 +1,7 @@
 # This file is both a fixture and part of the spec definition:
 #
 # The ContainerMethodFactory uses binding.of_caller
-# So we call it from within a directory in Delfos.application_directories
+# So we call it from within a directory in Delfos.config.included
 # i.e. 'fixtures'
 #
 # That is: if we called it from our specs, it wouldn't get picked up.

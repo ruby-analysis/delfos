@@ -9,7 +9,6 @@ module Delfos
       RSpec.describe Sync, "Integration" do
         before do
           WebMock.allow_net_connect!
-          Delfos.setup_neo4j!
         end
 
         describe "#perform" do

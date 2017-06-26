@@ -8,24 +8,19 @@ module Delfos
       let(:a_path) { Pathname(File.expand_path("./fixtures/a.rb")) }
       let(:b_path) { Pathname(File.expand_path("./fixtures/b.rb")) }
 
-      before do
-        described_class.reset!
-
-        path_fixtures = Pathname.new(File.expand_path(__FILE__)) + "../../../../fixtures"
-        path_spec     = Pathname.new(File.expand_path(__FILE__)) + "../.."
-
-        Delfos.configure do |c|
-          c.application_directories = [path_spec, path_fixtures]
-          c.ignored_files = a_path
-        end
+      subject do
+        described_class.new(included_files, excluded_files)
       end
 
-      describe "#include_file?" do
+      let(:excluded_files) { [ a_path ] }
+      let(:included_files) { [] }
+
+      describe "#include?" do
         context "with a file to exclude" do
           let(:file) { a_path }
 
           it do
-            expect(described_class.include_file?(file)).to eq false
+            expect(subject.include?(file)).to eq false
           end
         end
 
@@ -33,7 +28,7 @@ module Delfos
           let(:file) { b_path }
 
           it do
-            expect(described_class.include_file?(file)).to eq true
+            expect(subject.include?(file)).to eq true
           end
         end
       end

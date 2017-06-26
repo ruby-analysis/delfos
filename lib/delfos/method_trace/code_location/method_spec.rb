@@ -17,10 +17,14 @@ module Delfos
           let(:dir) { "/Users/mark/code/some_app" }
 
           before do
-            expect(Delfos).to receive(:application_directories).and_return [
+            config = double "config"
+
+            expect(config).to receive(:included_directories).and_return([
               "/Users/mark/code/some_app/app",
               "/Users/mark/code/some_app/lib",
-            ]
+            ])
+
+            allow(Delfos).to receive(:config).and_return config
           end
 
           context "with a file in one of the defined directories" do

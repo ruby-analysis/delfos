@@ -13,7 +13,7 @@ RSpec.describe "integration with default neo4j logging" do
     wipe_db!
 
     Delfos.configure do |c|
-      c.application_directories = "fixtures"
+      c.include = "fixtures"
       c.logger = DelfosSpecs.logger
     end
     Delfos.start!

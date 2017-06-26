@@ -1,37 +1,30 @@
 # frozen_string_literal: true
 
+require "forwardable"
+require_relative "config/inclusion"
+
 module Delfos
   class Config
-    attr_reader :application_directories,
-      :ignored_files,
-      :offline_query_saving,
-      :offline_query_filename
+    attr_reader :offline_query_saving, :offline_query_filename
 
     attr_accessor :batch_size,
       :call_site_logger,
-      :ignored_files,
       :logger,
       :max_query_size
 
+    extend Forwardable
+
+    def_delegators :inclusion,
+      :included_directories, :included_files, :include=, :include, :include?,
+      :excluded_directories, :excluded_files, :exclude=, :exclude, :exclude?
+
     def initialize
-      @application_directories = default_application_directories
-      @batch_size = default_batch_size
-      @call_site_logger = default_call_site_logger
-      @ignored_files = default_ignored_files
-      @logger = default_logger
-      @max_query_size = default_max_query_size
-      @offline_query_saving = default_offline_query_saving
-      @offline_query_filename = default_offline_query_filename
-    end
-
-    def application_directories=(dirs)
-      require "pathname"
-      @application_directories = Array(dirs).map { |f| Pathname.new(f.to_s).expand_path }
-    end
-
-    def ignored_files=(files)
-      require "pathname"
-      @ignored_files = Array(files).map { |f| Pathname.new(f.to_s).expand_path }
+      @batch_size              = default_batch_size
+      @call_site_logger        = default_call_site_logger
+      @logger                  = default_logger
+      @max_query_size          = default_max_query_size
+      @offline_query_saving    = default_offline_query_saving
+      @offline_query_filename  = default_offline_query_filename
     end
 
     def offline_query_saving=(bool)
@@ -43,12 +36,15 @@ module Delfos
       @offline_query_filename = path || default_offline_query_filename
     end
 
-    private
-
-    def default_application_directories
-      require "pathname"
-      %w[app lib].map { |f| Pathname.new(f.to_s).expand_path }
+    def inclusion
+      @inclusion ||= Inclusion.new
     end
+
+    def neo4j
+      setup_neo4j!
+    end
+
+    private
 
     def default_batch_size
       100
@@ -59,14 +55,15 @@ module Delfos
         require "delfos/neo4j/offline/call_site_logger"
         Delfos:: Neo4j::Offline::CallSiteLogger.new
       else
-        Delfos.setup_neo4j!
+        setup_neo4j!
         require "delfos/neo4j/live/call_site_logger"
         Delfos:: Neo4j::Live::CallSiteLogger.new
       end
     end
 
-    def default_ignored_files
-      []
+    def setup_neo4j!
+      require "delfos/neo4j"
+      @neo4j ||= Neo4j.config
     end
 
     def default_logger
@@ -85,7 +82,7 @@ module Delfos
     end
 
     def default_offline_query_filename
-      @offline_query_saving ? "delfos_query_parameters.json" : nil
+      @offline_query_saving ? "./tmp/delfos_query_parameters.json" : nil
     end
   end
 end

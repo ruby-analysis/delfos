@@ -9,14 +9,14 @@ RSpec.describe "integration with a custom call_stack_logger" do
     WebMock.disable_net_connect! allow_localhost: false
 
     Delfos.configure do |c|
-      c.application_directories = "fixtures/app/include_this"
+      c.include = "fixtures/app/include_this"
       c.call_site_logger = call_site_logger
     end
     Delfos.start!
   end
 
   after do
-    Delfos.disable!
+    Delfos.finish!
     WebMock.disable_net_connect! allow_localhost: true
   end
 

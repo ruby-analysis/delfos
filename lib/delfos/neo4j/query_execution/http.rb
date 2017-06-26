@@ -53,7 +53,7 @@ module Delfos
 
         def add_headers(request)
           request.initialize_http_header("Accept" => "application/json; charset=UTF-8")
-          request.basic_auth(Delfos.neo4j.username, Delfos.neo4j.password)
+          request.basic_auth(Delfos.config.neo4j.username, Delfos.config.neo4j.password)
           request.content_type = "application/json"
         end
       end

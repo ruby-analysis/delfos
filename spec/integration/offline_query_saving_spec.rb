@@ -8,12 +8,11 @@ RSpec.describe "integration .finish!" do
 
     after do
       tempfile.close
-      Delfos::Setup.reset_top_level_variables!
     end
 
     it "calling Delfos.finish! closes the file" do
       Delfos.configure do |c|
-        c.application_directories = "fixtures"
+        c.include = "fixtures"
         c.offline_query_saving = true
         c.offline_query_filename = tempfile.path
       end
@@ -64,7 +63,7 @@ RSpec.describe "integration .finish!" do
       wipe_db!
 
       Delfos.configure do |c|
-        c.application_directories = "fixtures"
+        c.include = "fixtures"
         c.offline_query_saving = true
         c.offline_query_filename = tempfile.path
       end

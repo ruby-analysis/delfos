@@ -7,7 +7,7 @@ RSpec.describe "integration" do
 
   before(:each) do
     Delfos.configure do |c|
-      c.application_directories = "fixtures"
+      c.include = "fixtures"
       c.call_site_logger = call_site_logger
       c.logger = DelfosSpecs.logger
     end

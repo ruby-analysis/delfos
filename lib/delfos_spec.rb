@@ -5,28 +5,31 @@ require "tempfile"
 require_relative "delfos"
 
 RSpec.describe Delfos do
-  before do
-    Delfos::Setup.reset_top_level_variables!
-  end
-
-  describe "#application_directories=" do
-    let(:directory) { "some/dir" }
-    after { Delfos.disable! }
+  describe "#include=" do
+    let(:directory) { "fixtures" }
 
     it do
-      Delfos.configure { |c| c.application_directories = directory }
-      Delfos.start!
-      expect(Delfos.application_directories).to eq [Pathname.new(File.expand_path(directory))]
+      Delfos.configure { |c| c.include = directory }
+      expect(Delfos.config.included_directories).to eq [expand(directory)]
+    end
+
+    it do
+      Delfos.configure { |c| c.include directory }
+      expect(Delfos.config.included_directories).to include expand(directory)
     end
   end
 
-  describe "ignored_files" do
-    let(:ignored_file) { "app/some_file.rb" }
+  describe "excluded_files" do
+    let(:ignored_file) { "fixtures/a.rb" }
 
     it do
-      Delfos.configure { |c| c.ignored_files = ignored_file }
-      expect(Delfos.ignored_files).to eq [Pathname.new(File.expand_path(ignored_file))]
+      Delfos.configure { |c| c.exclude = ignored_file }
+      expect(Delfos.config.excluded_files).to eq [expand(ignored_file)]
     end
+  end
+
+  def expand(file)
+    Pathname.new(File.expand_path(file))
   end
 
   describe "#include_file?" do
@@ -36,13 +39,13 @@ RSpec.describe Delfos do
 
     before do
       Delfos.configure do |c|
-        c.application_directories = application_directories
-        c.ignored_files = ignored_file
+        c.include = application_directories
+        c.exclude ignored_file
       end
       Delfos.start!
     end
 
-    after { Delfos.disable! }
+    after { Delfos.finish! }
 
     it "includes the correct file" do
       expect(Delfos.include_file?(included_file)).to be true
@@ -65,7 +68,10 @@ RSpec.describe Delfos do
     end
 
     after do
-      Delfos.disable!
+      begin
+      Delfos.finish!
+      rescue Errno::ENOENT
+      end
     end
 
     context "with a boolean true" do
@@ -74,7 +80,7 @@ RSpec.describe Delfos do
 
       it "has a default filename" do
         expect(Delfos.offline_query_saving).to eq true
-        expect(Delfos.offline_query_filename).to eq "delfos_query_parameters.json"
+        expect(Delfos.offline_query_filename).to eq "./tmp/delfos_query_parameters.json"
       end
     end
 

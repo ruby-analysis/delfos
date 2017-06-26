@@ -12,28 +12,23 @@ module Delfos
       let(:method_a) { double "method a", source_location: [a_path, 4] }
       let(:method_b) { double "method b", source_location: [b_path, 2] }
 
-      before do
-        described_class.reset!
+      let(:path_fixtures) { Pathname.new(File.expand_path("fixtures")) }
+      let(:path_spec) { Pathname.new(File.expand_path(__FILE__)) + "../.." }
 
-        path_fixtures = Pathname.new(File.expand_path(__FILE__)) + "../../../../fixtures"
-        path_spec     = Pathname.new(File.expand_path(__FILE__)) + "../.."
-
-        Delfos.configure do |c|
-          c.application_directories = [path_spec, path_fixtures]
-          c.call_site_logger = call_site_logger
-        end
+      subject do
+        described_class.new([path_fixtures, path_spec], [])
       end
 
-      describe ".exclude_file?" do
+      describe "#exclude?" do
         context "with a file to include" do
           let(:file) { a_path }
 
           it do
-            expect(described_class.exclude_file?(file)).to eq false
+            expect(subject.exclude?(file)).to eq false
 
             # reads from cache
-            expect(described_class).not_to receive(:should_include?)
-            expect(described_class.exclude_file?(file)).to eq false
+            expect(subject).not_to receive(:should_include?)
+            expect(subject.exclude?(file)).to eq false
           end
         end
 
@@ -41,11 +36,10 @@ module Delfos
           let(:file) { "/etc/hosts" }
 
           it do
-            expect(described_class.exclude_file?(file)).to eq true
-
+            expect(subject.exclude?(file)).to eq true
             # reads from cache
-            expect(described_class).not_to receive(:should_include?)
-            expect(described_class.exclude_file?(file)).to eq true
+            expect(subject).not_to receive(:should_include?)
+            expect(subject.exclude?(file)).to eq true
           end
         end
       end

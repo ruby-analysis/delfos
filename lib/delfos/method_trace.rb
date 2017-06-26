@@ -7,6 +7,23 @@ module Delfos
   module MethodTrace
     class << self
       def trace!
+        method_trace.perform
+      end
+
+      def disable!
+        @method_trace&.disable!
+        @method_trace = nil
+      end
+
+      private
+
+      def method_trace
+        @method_trace ||= Setup.new
+      end
+    end
+
+    class Setup
+      def perform
         on_call.enable
         on_return.enable
         @last_returned = nil
@@ -14,12 +31,7 @@ module Delfos
 
       def disable!
         @on_call&.disable
-        @on_call = nil
-
         @on_return&.disable
-        @on_return = nil
-
-        @last_returned = nil
       end
 
       def on_call
