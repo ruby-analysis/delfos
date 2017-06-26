@@ -10,7 +10,7 @@ RSpec.describe "integration with a custom call_stack_logger" do
     end
   end
 
-  let(:call_site_logger) { double "call stack logger", log: nil, save_call_stack: nil }
+  let(:call_site_logger) { double "call stack logger", log: nil, save_call_stack: nil, finish!: nil }
 
   before do
     WebMock.disable_net_connect! allow_localhost: false

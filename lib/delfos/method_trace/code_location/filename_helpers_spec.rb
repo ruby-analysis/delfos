@@ -7,6 +7,8 @@ module Delfos
   module MethodTrace
     module CodeLocation
       RSpec.describe FilenameHelpers do
+        let(:call_site_logger) { double("call site logger", log: nil, finish!: nil) }
+        
         describe "#file" do
           class SomeClass
             include FilenameHelpers
@@ -17,12 +19,15 @@ module Delfos
           end
 
           before do
+
             allow(Delfos).
               to receive(:config).
               and_return double("Config", included_directories: [
                                   Pathname.new("./fixtures"),
                                   Pathname.new("./another_directory"),
-                                ])
+                                ],
+                                call_site_logger: call_site_logger
+                                )
           end
 
           subject { SomeClass.new(file) }

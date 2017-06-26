@@ -6,8 +6,6 @@ require "byebug"
 require "delfos"
 require_relative "support/logging"
 
-Delfos.configure { |c| c.logger = DelfosSpecs.logger }
-
 require "ostruct"
 
 require_relative "support/timeout" if ENV["TIMEOUT"]
@@ -33,8 +31,8 @@ RSpec.configure do |c|
   end
 
   c.before(:each) do |e|
-    puts "before each in spec_helper #{e.inspect} #{Delfos.instance_eval { @config.inspect }}"
     Delfos.reset_config!
+    puts "before each in spec_helper #{e.inspect} #{Delfos.instance_eval { @config.inspect }}"
     ShowClassInstanceVariables.variables_for(Delfos)
     Delfos.configure { |config| config.logger = DelfosSpecs.logger }
   end

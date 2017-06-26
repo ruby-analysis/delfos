@@ -15,15 +15,14 @@ module Delfos
 
       def full_path
         return @file.realpath if Pathname.new(@file).exist?
-
         Delfos.config.included_directories.map do |d|
-          determine_path(d, path)
+          determine_path(d)
         end.compact.first
       end
 
       private
 
-      def determine_path(d, path)
+      def determine_path(d)
         path = try_path { d + @file }
 
         path || try_path do

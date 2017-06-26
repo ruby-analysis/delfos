@@ -25,6 +25,7 @@ module Delfos
                                                                         ])
 
             allow(Delfos).to receive(:config).and_return config
+            allow(config).to receive(:call_site_logger).and_return double("call site logger", log: nil, finish!: nil)
           end
 
           context "with a file in one of the defined directories" do

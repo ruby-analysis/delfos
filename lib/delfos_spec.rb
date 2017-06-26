@@ -90,6 +90,12 @@ RSpec.describe Delfos do
     context "with a path" do
       let(:offline_query_saving) { true }
       let(:offline_query_filename) { "some/path/some_file.cypher" }
+      let(:file_object) { Tempfile.new }
+
+      before do
+        allow(File).to receive(:open).with(offline_query_filename, "a").and_return file_object
+      end
+
       it do
         expect(Delfos.offline_query_saving).to eq true
         expect(Delfos.offline_query_filename).to eq "some/path/some_file.cypher"

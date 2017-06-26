@@ -5,7 +5,7 @@ require "delfos/neo4j"
 
 RSpec.describe "integration with default neo4j logging" do
   let(:result) do
-    Delfos.flush!
+    Delfos::Neo4j.flush!
     Delfos::Neo4j.execute_sync(query).first
   end
 

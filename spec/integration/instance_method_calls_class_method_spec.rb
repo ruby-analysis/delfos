@@ -3,7 +3,7 @@
 require "delfos"
 
 RSpec.describe "integration" do
-  let(:call_site_logger) { double "call_site_logger", log: nil, save_call_stack: nil }
+  let(:call_site_logger) { double "call_site_logger", log: nil, save_call_stack: nil, finish!: nil }
 
   before(:each) do
     Delfos.configure do |c|

@@ -37,6 +37,7 @@ module Delfos
       ::Delfos::MethodTrace.disable!
 
       config.call_site_logger.finish!
+      reset_config!
     end
 
     def import_offline_queries(filename)
