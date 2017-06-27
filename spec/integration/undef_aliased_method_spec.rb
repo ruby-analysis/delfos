@@ -1,7 +1,7 @@
 # This happens in bundler
 
 RSpec.describe "integration - undefing an aliased method" do
-  include DelfosSpecs.stub_neo4j(include_path: "fixtures")
+  include DelfosSpecs.stub_neo4j
 
   let(:expected_call_sites) do
     [
