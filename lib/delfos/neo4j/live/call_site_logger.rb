@@ -17,16 +17,16 @@ module Delfos
           update_distance!
         end
 
-        def flush!
-          Neo4j.flush!
-        end
-
         def reset!
           reset_call_stack!
           Neo4j.reset!
         end
 
         private
+
+        def flush!
+          Neo4j.flush!
+        end
 
         def update_distance!
           Neo4j.update_distance!

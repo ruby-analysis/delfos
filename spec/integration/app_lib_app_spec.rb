@@ -10,7 +10,7 @@ RSpec.describe "integration with a custom call_stack_logger" do
 
     Delfos.configure do |c|
       c.include = "fixtures/app/include_this"
-      c.call_site_logger = call_site_logger
+      allow(c).to receive(:call_site_logger).and_return call_site_logger
     end
     Delfos.start!
   end

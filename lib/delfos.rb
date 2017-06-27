@@ -19,32 +19,31 @@ module Delfos
 
     attr_reader :config
 
-    def configure
-      new_config
-
-      yield config if block_given?
-    end
-
     def start!
-      ::Delfos::MethodTrace.trace!
-    end
-
-    def reset_config!
-      @config = nil
-    end
-
-    def flush!
-      ::Delfos::MethodTrace.disable!
-
-      config.call_site_logger.reset!
-      reset_config!
+      ::Delfos::MethodTrace.enable!
     end
 
     def finish!
       ::Delfos::MethodTrace.disable!
 
       config.call_site_logger.finish!
+    end
+
+    def reset!
+      ::Delfos::MethodTrace.disable!
+
+      config&.call_site_logger&.reset!
       reset_config!
+    end
+
+    def configure
+      new_config
+
+      yield config if block_given?
+    end
+
+    def reset_config!
+      @config = nil
     end
 
     def import_offline_queries(filename)

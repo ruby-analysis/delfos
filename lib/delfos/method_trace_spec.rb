@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "delfos"
 require_relative "method_trace"
 require "./fixtures/a"
 
@@ -24,6 +25,7 @@ module Delfos
 
       after(:each) do
         Delfos.reset_config!
+        subject.disable!
       end
 
       describe "#on_call" do
@@ -43,6 +45,10 @@ module Delfos
       end
 
       describe "#on_return" do
+        before do
+          Delfos.configure
+        end
+
         it do
           expect(CallStack).to receive(:pop).at_least(:once)
 

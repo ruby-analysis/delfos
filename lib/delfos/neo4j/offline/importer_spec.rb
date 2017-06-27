@@ -26,15 +26,15 @@ module Delfos
               let(:errors) { [] }
               let(:invalid) { Delfos::Neo4j::QueryExecution::InvalidQuery.new(errors, query, params) }
 
-              before do
+              it "it saves an error file with unprocessed query parameter" do
                 allow(subject).to receive(:error_filename).and_return(error_filename)
+
                 expect(Delfos.logger).to receive(:error).exactly(11).times
+
                 expect(Neo4j).
                   to receive(:execute_sync).
                   and_raise(invalid).exactly(11).times
-              end
 
-              it "it saves an error file with unprocessed query parameter" do
                 subject.perform
                 expect(File.readlines(error_filename).length).to eq 11
                 FileUtils.rm_rf error_filename

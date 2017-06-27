@@ -58,7 +58,7 @@ RSpec.describe Delfos do
 
   describe "offline_query_saving=" do
     before do
-      allow(Delfos::MethodTrace).to receive(:trace!)
+      allow(Delfos::MethodTrace).to receive(:enable!)
       allow(Delfos).to receive(:call_site_logger).and_return double("call site logger")
 
       Delfos.configure do |c|

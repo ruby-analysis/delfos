@@ -38,10 +38,6 @@ module Delfos
 
       subject { described_class.new(call_site, stack_uuid, step_number) }
 
-      before do
-        wipe_db!
-      end
-
       it "#params" do
         params = subject.params
 

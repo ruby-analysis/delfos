@@ -16,6 +16,7 @@ require_relative "support/web_mock"
 require_relative "support/helper_methods"
 require_relative "support/show_class_instance_variables"
 require_relative "support/code_climate" if ENV["CI"]
+
 RSpec.configure do |c|
   c.disable_monkey_patching!
 
@@ -30,19 +31,21 @@ RSpec.configure do |c|
   end
 
   c.before(:each) do |_e|
-    Delfos.reset_config!
     ShowClassInstanceVariables.variables_for(Delfos)
     Delfos.configure { |config| config.logger = DelfosSpecs.logger }
   end
 
   c.after(:each) do |e|
-    Delfos&.config&.call_site_logger&.reset!
-    Delfos.reset_config!
+    if Delfos.config.is_a?(RSpec::Mocks::TestDouble)
+      allow(Delfos).to receive(:config).and_call_original
+    end
 
-    Delfos.reset_config!
+    if Delfos.config&.call_site_logger.is_a? RSpec::Mocks::TestDouble
+      allow(Delfos.config).to receive(:call_site_logger).and_call_original
+    end
+
+    Delfos.reset!
     ShowClassInstanceVariables.last_executed_rspec_test = e.location
-    Delfos&.config&.call_site_logger&.reset!
-    Delfos.reset_config!
   end
 end
 # rubocop:enable Metrics/BlockLength

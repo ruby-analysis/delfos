@@ -42,6 +42,7 @@ module Delfos
           end
 
           after do
+            Delfos.reset!
             WebMock.disable_net_connect! allow_localhost: true
           end
 

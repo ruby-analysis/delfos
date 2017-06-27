@@ -6,7 +6,7 @@ require_relative "call_stack"
 module Delfos
   module MethodTrace
     class << self
-      def trace!
+      def enable!
         method_trace.perform
       end
 

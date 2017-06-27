@@ -8,7 +8,7 @@ RSpec.describe "integration" do
   before(:each) do
     Delfos.configure do |c|
       c.include = "fixtures"
-      c.call_site_logger = call_site_logger
+      allow(c).to receive(:call_site_logger).and_return call_site_logger
       c.logger = DelfosSpecs.logger
     end
     Delfos.start!

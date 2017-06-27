@@ -19,13 +19,12 @@ module Delfos
           end
 
           before do
-            allow(Delfos).
-              to receive(:config).
-              and_return double("Config", included_directories: [
-                                  Pathname.new("./fixtures"),
-                                  Pathname.new("./another_directory"),
-                                ],
-                                          call_site_logger: call_site_logger)
+            Delfos.configure do |c|
+              allow(c).to receive(:included_directories).and_return [
+                Pathname.new("./fixtures"),
+                Pathname.new("./another_directory"),
+              ]
+            end
           end
 
           subject { SomeClass.new(file) }
