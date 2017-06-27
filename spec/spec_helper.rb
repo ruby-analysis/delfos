@@ -18,6 +18,7 @@ require_relative "support/show_class_instance_variables"
 require_relative "support/reset"
 require_relative "support/temp_directory"
 require_relative "support/web_mock"
+require_relative "support/stub_neo4j"
 
 RSpec.configure do |c|
   c.disable_monkey_patching!
