@@ -25,19 +25,21 @@ Gem::Specification.new do |spec|
     raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
   end
 
-  spec.files         = `git ls-files | grep lib/delfos | grep -v _spec.rb`.split("\n")
   spec.bindir        = "exe"
+
+  spec.files = `git ls-files`.split("\n").reject{|l| l[/_spec\.rb|^spec\//] }.select{|l| l[/^lib|^exe/]}
+
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
   spec.add_dependency "binding_of_caller", "~> 0.7.2", ">= 0.7.0"
 
-  spec.add_development_dependency "simplecov"
-  spec.add_development_dependency "rspec_junit_formatter", ">= 0.2.3"
-  spec.add_development_dependency "codeclimate-test-reporter"
-  spec.add_development_dependency "webmock", ">= 2.3.2"
-  spec.add_development_dependency "rake-compiler"
+  spec.add_development_dependency 'simplecov', '~> 0'
+  spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2', '>= 0.2.3'
+  spec.add_development_dependency 'codeclimate-test-reporter', '~> 0'
+  spec.add_development_dependency 'webmock', '~> 2.3', '>= 2.3.2'
+  spec.add_development_dependency 'rake-compiler', '~> 0'
   spec.add_development_dependency "pry-byebug", "~> 3.4", ">= 3.4.0"
   spec.add_development_dependency "rake", "~> 11.3.0", ">= 11.3.0"
-  spec.add_development_dependency "rspec", "~>3.5.0", ">= 3.5.0"
+  spec.add_development_dependency "rspec", "~>3.6.0", ">= 3.6.0"
 end

@@ -4,6 +4,7 @@ require_relative "neo4j/query_execution/sync"
 require_relative "neo4j/query_execution/batch/retryable"
 require_relative "neo4j/schema"
 require_relative "neo4j/distance/update"
+require_relative "neo4j/offline"
 
 module Delfos
   module Neo4j
@@ -30,6 +31,10 @@ module Delfos
         "Class"     => "name",
         "CallStack" => "number",
       )
+    end
+
+    def import_offline_queries(filename)
+      Offline.import_queries(filename)
     end
 
     def update_distance!

@@ -56,6 +56,18 @@ RSpec.describe Delfos do
     end
   end
 
+  describe ".import_offline_queries" do
+    let(:filename) { "some filename" }
+
+    it do
+      neo4j = class_double("#{described_class}::Neo4j", flush!: nil, reset!: nil)
+      stub_const("#{described_class}::Neo4j", neo4j)
+
+      expect(neo4j).to receive(:import_offline_queries).with(filename)
+      described_class.import_offline_queries(filename)
+    end
+  end
+
   describe "offline_query_saving=" do
     before do
       allow(Delfos::MethodTrace).to receive(:enable!)

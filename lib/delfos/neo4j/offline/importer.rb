@@ -2,6 +2,7 @@
 
 require "json"
 require "delfos/neo4j/call_site_query"
+require "delfos/neo4j/query_execution/errors"
 require "fileutils"
 
 module Delfos

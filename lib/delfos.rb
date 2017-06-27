@@ -4,7 +4,7 @@ require "forwardable"
 
 require "delfos/config"
 require "delfos/method_trace"
-require "delfos/neo4j/offline/importer"
+require "delfos/neo4j"
 
 module Delfos
   class << self
@@ -41,11 +41,15 @@ module Delfos
     end
 
     def import_offline_queries(filename)
-      Neo4j::Offline::Importer.new(filename).perform
+      Neo4j.import_offline_queries(filename)
     end
 
     def include_file?(file)
       config&.include?(file)
+    end
+
+    def update_distance!
+      Neo4j.update_distance!
     end
 
     def new_config
