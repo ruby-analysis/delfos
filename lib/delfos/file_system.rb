@@ -10,9 +10,12 @@ module Delfos
       DistanceCalculation.new(start_file, finish_file)
     end
 
-    def self.include_file?(file)
-      Delfos.config.app_directories.include_file?(file) &&
-        Delfos.config.app_files.include_file?(file)
+    def self.app_directories(included, excluded)
+      AppDirectories.new(included, excluded)
+    end
+
+    def self.app_files(included, excluded)
+      AppFiles.new(included, excluded)
     end
   end
 end

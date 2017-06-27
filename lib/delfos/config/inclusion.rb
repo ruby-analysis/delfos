@@ -71,11 +71,11 @@ module Delfos
       end
 
       def app_directories
-        @app_directories ||= FileSystem::AppDirectories.new(@included_directories, @excluded_directories)
+        @app_directories ||= FileSystem.app_directories(@included_directories, @excluded_directories)
       end
 
       def app_files
-        @app_files ||= FileSystem::AppFiles.new(@included_files, @excluded_files)
+        @app_files ||= FileSystem.app_files(@included_files, @excluded_files)
       end
 
       def default_included_directories
