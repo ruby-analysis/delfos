@@ -55,7 +55,7 @@ RSpec.configure do |c|
     end
 
     Delfos::Neo4j.ensure_schema!
-    Delfos.reset_config!
+    DelfosSpecs.reset_config!
   end
 end
 # rubocop:enable Metrics/BlockLength

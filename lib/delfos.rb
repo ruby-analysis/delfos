@@ -29,21 +29,10 @@ module Delfos
       config.call_site_logger.finish!
     end
 
-    def reset!
-      ::Delfos::MethodTrace.disable!
-
-      config&.call_site_logger&.reset!
-      reset_config!
-    end
-
     def configure
       new_config
 
       yield config if block_given?
-    end
-
-    def reset_config!
-      @config = nil
     end
 
     def import_offline_queries(filename)

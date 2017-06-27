@@ -46,8 +46,18 @@ module ShowClassInstanceVariables
       val = klass.instance_eval(iv.to_s)
 
       unless val.nil?
-        raise "non-nil class variable found after running #{last_executed_rspec_test}:\n  #{klass} #{iv}: #{val.inspect}"
+        puts "non-nil class variable found after running #{last_executed_rspec_test}:\n  #{klass} #{iv}: #{val.inspect}"
       end
     end
+  end
+end
+
+RSpec.configure do |c|
+  c.before(:each) do |_e|
+    ShowClassInstanceVariables.variables_for(Delfos)
+  end
+
+  c.after(:each) do |e|
+    ShowClassInstanceVariables.last_executed_rspec_test = e.location
   end
 end

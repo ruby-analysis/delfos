@@ -35,16 +35,21 @@ module Delfos
           QUERY
 
           @result = Delfos::Neo4j.execute_sync(query)
+          DelfosSpecs.reset!
+        end
+
+        after(:all) do
+          DelfosSpecs.reset!
+        end
+
+        after(:each) do
+          DelfosSpecs.reset!
         end
 
         MAPPING = { klass: 0, method: 1, call_site: 2, called: 4, called_klass: 6 }.freeze
 
         def parse_result(key)
           @result.map { |r| r[MAPPING[key]] }.flatten.uniq
-        end
-
-        after do
-          Delfos.reset_config!
         end
 
         it "records the Classes" do
