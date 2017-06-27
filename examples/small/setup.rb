@@ -9,8 +9,8 @@ app_dir = Pathname.new(File.expand_path(file)) + "../app"
 excluded_file = Pathname.new(File.expand_path(file)) + "../app/app_config.rb"
 
 Delfos.configure do |config|
-  config.include app_dir
-  config.exclude excluded_file
+  config.include = app_dir
+  config.exclude = excluded_file
 end
 
 Delfos.start!
