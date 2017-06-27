@@ -4,4 +4,6 @@
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 
 require "delfos"
+
+Delfos.configure
 Delfos.import_offline_queries(ENV["FILE"])

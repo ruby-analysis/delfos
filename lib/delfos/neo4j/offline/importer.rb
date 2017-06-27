@@ -17,8 +17,6 @@ module Delfos
 
         def perform
           each_line do |params, err|
-            params = JSON.parse(params)
-
             execute(CallSiteQuery::BODY, params, err)
           end
 
@@ -28,8 +26,9 @@ module Delfos
         private
 
         def execute(query, params, err)
+          params = JSON.parse(params)
           Neo4j.execute_sync(query, params)
-        rescue Delfos::Neo4j::QueryExecution::InvalidQuery => e
+        rescue Delfos::Neo4j::QueryExecution::InvalidQuery, JSON::ParserError => e
           @no_errors = false
           Delfos.logger.error e.message.to_s
           err.puts JSON.dump(params)
