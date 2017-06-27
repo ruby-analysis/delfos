@@ -2,8 +2,13 @@ machine:
   ruby:
     version: 2.4.0
 
-  pre:
-    - sudo sed -i "s|dbms.security.auth_enabled=true|dbms.security.auth_enabled=false|g" /etc/neo4j/neo4j-server.properties
+  # pre:
+  #  - sudo sed -i "s|dbms.security.auth_enabled=true|dbms.security.auth_enabled=false|g" /etc/neo4j/neo4j-server.properties
   services:
-    - neo4j
+    - docker
+  # - neo4j
+
+dependencies:
+  pre:
+    - docker run -d --publish=7474:7474 --volume=$HOME/neo4j/data:/data --env=NEO4J_AUTH=none neo4j:3.0
 
