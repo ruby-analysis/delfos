@@ -72,6 +72,7 @@ module Delfos
           expect(subject.query).to include "line_number: {container_method_line_number}"
           expect(subject.params.keys).to include "container_method_line_number"
           expect(subject.params["container_method_line_number"]).to eq(-1)
+          Delfos.reset_config!
         end
       end
     end

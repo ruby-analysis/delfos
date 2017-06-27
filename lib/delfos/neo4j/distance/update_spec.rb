@@ -43,6 +43,10 @@ module Delfos
           @result.map { |r| r[MAPPING[key]] }.flatten.uniq
         end
 
+        after do
+          Delfos.reset_config!
+        end
+
         it "records the Classes" do
           klasses = parse_result(:klass)
 

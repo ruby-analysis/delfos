@@ -46,7 +46,7 @@ module ShowClassInstanceVariables
       val = klass.instance_eval(iv.to_s)
 
       unless val.nil?
-        puts "non-nil class variable found after running #{last_executed_rspec_test}:\n  #{klass} #{iv}: #{val.inspect}"
+        raise "non-nil class variable found after running #{last_executed_rspec_test}:\n  #{klass} #{iv}: #{val.inspect}"
       end
     end
   end

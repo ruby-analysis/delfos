@@ -35,6 +35,7 @@ RSpec.configure do |c|
   end
 
   c.before(:each) do |_e|
+    Delfos.reset_config!
     ShowClassInstanceVariables.variables_for(Delfos)
     Delfos.configure { |config| config.logger = DelfosSpecs.logger }
   end

@@ -24,7 +24,6 @@ module Delfos
       end
 
       after(:each) do
-        Delfos.reset_config!
         subject.disable!
       end
 
