@@ -13,8 +13,8 @@ module Delfos
       let(:container_method) do
         double "ContainerMethod",
           klass_name: container_method_klass_name, # class A
-          method_type: "ClassMethod",     #   def self.method_a    # called_method
-          method_name: "method_a",        #     E.new.method_e     # call site
+          method_type: "ClassMethod",              #   def self.method_a    # called_method
+          method_name: "method_a",                 #     E.new.method_e     # call site
           file: "a.rb",
           line_number: container_method_line_number
       end
@@ -41,22 +41,24 @@ module Delfos
       it "#params" do
         params = subject.params
 
-        expect(params).to eq("container_method_klass_name" => "A", # class A
-                             "container_method_type" => "ClassMethod",  #   def self.method_a    # called_method
-                             "container_method_name" => "method_a",     #     E.new.method_e     # call site
-                             "container_method_file" => "a.rb",
-                             "container_method_line_number" => 2,
+        expect(params).to eq(
+          "container_method_klass_name"  => "A",            # class A
+          "container_method_type"        => "ClassMethod",  #   def self.method_a    # called_method
+          "container_method_name"        => "method_a",     #     E.new.method_e     # call site
+          "container_method_file"        => "a.rb",
+          "container_method_line_number" => 2,
 
-                             "call_site_file"        => "a.rb",
-                             "call_site_line_number" => 3,
-                             "stack_uuid" => stack_uuid,
-                             "step_number" => step_number,
+          "call_site_file"               => "a.rb",
+          "call_site_line_number"        => 3,
+          "stack_uuid"                   => stack_uuid,
+          "step_number"                  => step_number,
 
-                             "called_method_klass_name" => "E", # class E
-                             "called_method_type" => "InstanceMethod", #   def method_e        # m2
-                             "called_method_name" => "method_e",       #
-                             "called_method_file" => "e.rb",
-                             "called_method_line_number" => 2)
+          "called_method_klass_name"     => "E",              # class E
+          "called_method_type"           => "InstanceMethod", #   def method_e        # m2
+          "called_method_name"           => "method_e",
+          "called_method_file"           => "e.rb",
+          "called_method_line_number"    => 2,
+        )
       end
 
       it "#query_for" do

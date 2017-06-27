@@ -30,6 +30,10 @@ RSpec.configure do |c|
     m.syntax = :expect
   end
 
+  c.before(:suite) do |_e|
+    FileUtils.rm_rf("./tmp")
+  end
+
   c.before(:each) do |_e|
     ShowClassInstanceVariables.variables_for(Delfos)
     Delfos.configure { |config| config.logger = DelfosSpecs.logger }

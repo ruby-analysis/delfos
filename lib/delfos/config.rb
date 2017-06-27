@@ -36,15 +36,15 @@ module Delfos
       @offline_query_filename = path || default_offline_query_filename
     end
 
-    def inclusion
-      @inclusion ||= Inclusion.new
-    end
-
     def neo4j
       setup_neo4j!
     end
 
     private
+
+    def inclusion
+      @inclusion ||= Inclusion.new
+    end
 
     def default_batch_size
       100
@@ -82,7 +82,11 @@ module Delfos
     end
 
     def default_offline_query_filename
-      @offline_query_saving ? "./tmp/delfos_query_parameters.json" : nil
+      return unless @offline_query_saving
+
+      FileUtils.mkdir "./tmp"
+
+      "./tmp/delfos_query_parameters.json"
     end
   end
 end
