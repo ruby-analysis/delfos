@@ -165,9 +165,21 @@ end
 ```ruby
 # Example configuration
 Delfos.configure do |config|
-  config.application_directories = ["app"]
-  config.ignored_files = ["app/app_config.rb"]
-  config.call_site_logger = CustomCallSiteLogger.new
+  config.include = ["app"] # default value is ["app", "lib"]
+  config.include "another_directory"
+  config.include ["an", "array", "of", "directories", "or", "files.rb"]
+  config.include "a_file.rb"
+
+  config.exclude = ["app/app_config.rb", "app/another.rb"]
+  config.exclude   "app/yet_another.rb"
+  config.exclude   ["exclude", "works" "like", "include"]
+
+  config.call_site_logger       = CustomCallSiteLogger.new
+  config.logger                 = Logger.new
+  config.batch_size             = 1_000
+  config.logger.max_query_size  = 10_000
+  config.offline_query_saving   = false
+  config.offline_query_filename = nil
 end
 
 Delfos.start!
@@ -175,17 +187,20 @@ Delfos.start!
 
 Possible config values:
 
-* `application_directories` An array of application directories. Defaults to `app` and `lib`
-* `ignored_files` An array of filenames to exclude from method tracing as some app files can be problematic.
+* `include=` _array_ or _string_ | Files/directories to method trace. Defaults to `app` and `lib`
+* `include` _array_ or _string_ | Append files/directories to method tracing.
+* `exclude=` _array_ or _string_ | Files/directories to exclude from method tracing. Defaults to empty
+* `exclude` _array_ or _string_ | Append files/directories to exclusion from method tracing.
 * `call_site_logger` _const_ | Defaults to recording to neo4j.
 * `logger` _const_ | For outputing debug information during method recording.
 * `batch_size` _int_ | Default batch size for neo4j query.
-* `max_query_size` _int_ | Max string length for neo4j queries before flushing
+* `max_query_size` _int_ | Max string length for neo4j queries before flushing.
 * `offline_query_saving` _boolean_ | Outputs call site queries to a local file. Defaults to `delfos_cypher_output.cypher`  if `true`.
 * `offline_query_filename` _string_ | Define your own file to save offline queries to.
 
 ### call_site_logger
-You can supply an object for the `call_site_logger` that responds to `#log`
+You can supply an object for the `call_site_logger` that responds to `#log` and `#finish`
+
 
 `#log` receives the following arguments : `(call_site, stack_uuid, stack_step)`
 
@@ -199,6 +214,10 @@ Where:
     * `line_number`
     * `object` - self at that point during runtime
     * `class_method` - boolean
+
+`#finish` receives no arguments. Use this to tidy up.
+E.g. flush queries/ flush files etc. Perform any extra
+calculations after all the data has been gathered, etc.
 
 # Offline mode
 
