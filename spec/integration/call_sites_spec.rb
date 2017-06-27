@@ -28,14 +28,7 @@ RSpec.describe "integration" do
     end
 
     it do
-      index = 0
-      expect(call_site_logger).to receive(:log) do |call_site|
-        expect_call_sites(call_site, index, expected_call_sites)
-
-        index += 1
-      end.exactly(expected_call_sites.length).times
-
-      load "./fixtures/a_usage.rb"
+      expect_these_call_sites("./fixtures/a_usage.rb")
     end
   end
 end

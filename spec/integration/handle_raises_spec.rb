@@ -8,91 +8,76 @@ RSpec.describe "integration with a custom call_stack_logger" do
   let(:cl) { Delfos::MethodTrace::CodeLocation }
 
   context "with distantly handled exceptions" do
-    let(:code_to_run) { "./fixtures/with_distantly_handled_exception.rb" }
-
     # rubocop:disable Metrics/BlockLength
-    it "still logs correctly" do
-      count = 0
-
-      expect(call_site_logger).to receive(:log) do |call_site|
-        count += 1
-
-        case count
-        when 1
-          expect(call_site.summary).to eq(
-            container_method:  "fixtures/with_distantly_handled_exception.rb:21 Object#(main)",
-            call_site:         "fixtures/with_distantly_handled_exception.rb:21",
-            called_method:     "fixtures/with_distantly_handled_exception.rb:1 Object#outer",
-          )
-
-        when 2
-          expect(call_site.summary).to eq(
-            container_method:  "fixtures/with_distantly_handled_exception.rb:1 Object#outer",
-            call_site:         "fixtures/with_distantly_handled_exception.rb:2",
-            called_method:     "fixtures/with_distantly_handled_exception.rb:5 Object#inner",
-          )
-        when 3
-          expect(call_site.summary).to eq(
-            container_method:  "fixtures/with_distantly_handled_exception.rb:5 Object#inner",
-            call_site:         "fixtures/with_distantly_handled_exception.rb:6",
-            called_method:     "fixtures/with_distantly_handled_exception.rb:9 Object#wait_for_it___",
-          )
-        when 4
-          expect(call_site.summary).to eq(
-            container_method:  "fixtures/with_distantly_handled_exception.rb:9 Object#wait_for_it___",
-            call_site:         "fixtures/with_distantly_handled_exception.rb:10",
-            called_method:     "fixtures/with_distantly_handled_exception.rb:13 Object#boom",
-          )
-        end
-      end.exactly(5).times
-
-      load code_to_run
+    let(:expected_call_sites) do
+      [
+        [
+          "with_distantly_handled_exception.rb:21 Object#(main)",
+          "with_distantly_handled_exception.rb:21",
+          "with_distantly_handled_exception.rb:1 Object#outer",
+        ],
+        [
+          "with_distantly_handled_exception.rb:1 Object#outer",
+          "with_distantly_handled_exception.rb:2",
+          "with_distantly_handled_exception.rb:5 Object#inner",
+        ],
+        [
+          "with_distantly_handled_exception.rb:5 Object#inner",
+          "with_distantly_handled_exception.rb:6",
+          "with_distantly_handled_exception.rb:9 Object#wait_for_it___",
+        ],
+        [
+          "with_distantly_handled_exception.rb:9 Object#wait_for_it___",
+          "with_distantly_handled_exception.rb:10",
+          "with_distantly_handled_exception.rb:13 Object#boom",
+        ],
+        [
+          "with_distantly_handled_exception.rb:23 Object#(main)",
+          "with_distantly_handled_exception.rb:23",
+          "with_distantly_handled_exception.rb:17 Object#another",
+        ],
+      ]
     end
-    # rubocop:enable Metrics/BlockLength
+    # rubocop:ensable Metrics/BlockLength
+
+    it "still logs correctly" do
+      expect_these_call_sites("./fixtures/with_distantly_handled_exception.rb")
+    end
   end
 
   context "with code that raises and rescues" do
     let(:code_to_run) { "fixtures/with_raise.rb" }
 
-    # rubocop:disable Metrics/BlockLength
-    it "logs the call sites" do
-      count = 0
+    let(:expected_call_sites) do
+      [
+        [
+          "with_raise.rb:13 Object#(main)",
+          "with_raise.rb:13",
+          "with_raise.rb:5 Object#execution_1",
+        ],
 
-      expect(call_site_logger).to receive(:log) do |call_site|
-        count += 1
+        [
+          "with_raise.rb:5 Object#execution_1",
+          "with_raise.rb:6",
+          "with_raise.rb:1 Object#boom",
+        ],
 
-        case count
-        when 1
-          expect(call_site.summary).to eq(
-            container_method:  "fixtures/with_raise.rb:13 Object#(main)",
-            call_site:         "fixtures/with_raise.rb:13",
-            called_method:     "fixtures/with_raise.rb:5 Object#execution_1",
-          )
+        [
+          "with_raise.rb:5 Object#execution_1",
+          "with_raise.rb:7",
+          "with_raise.rb:10 Object#another_method",
+        ],
 
-        when 2
-          expect(call_site.summary).to eq(
-            container_method: "fixtures/with_raise.rb:5 Object#execution_1",
-            call_site:        "fixtures/with_raise.rb:6",
-            called_method:    "fixtures/with_raise.rb:1 Object#boom",
-          )
-        when 3
-          expect(call_site.summary).to eq(
-            container_method: "fixtures/with_raise.rb:5 Object#execution_1",
-            call_site:        "fixtures/with_raise.rb:7",
-            called_method:    "fixtures/with_raise.rb:10 Object#another_method",
-          )
-        when 4
-          expect(call_site.summary).to eq(
-            container_method: "fixtures/with_raise.rb:14 Object#(main)",
-            call_site:        "fixtures/with_raise.rb:14",
-            called_method:    "fixtures/with_raise.rb:10 Object#another_method",
-          )
-        end
-        expect(call_site).to be_a cl::CallSite
-      end.exactly(4).times
-
-      load code_to_run
+        [
+          "with_raise.rb:14 Object#(main)",
+          "with_raise.rb:14",
+          "with_raise.rb:10 Object#another_method",
+        ],
+      ]
     end
-    # rubocop:enable Metrics/BlockLength
+
+    it "logs the call sites" do
+      expect_these_call_sites "fixtures/with_raise.rb"
+    end
   end
 end

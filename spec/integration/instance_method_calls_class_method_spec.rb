@@ -22,25 +22,7 @@ RSpec.describe "integration" do
     end
 
     it do
-      index = 0
-
-      expect(call_site_logger).to receive(:log) do |call_site|
-        expect_call_sites(call_site, index, expected_call_sites)
-
-        index += 1
-      end.exactly(expected_call_sites.length).times
-
-      load "./fixtures/instance_method_calls_a_class_method_usage.rb"
-    end
-
-    def expect_call_sites(call_site, index, _call_sites)
-      expect_call_site(call_site, *expected_call_sites[index])
-    end
-
-    def expect_call_site(call_site, container_summary, cs_summary, called_method_summary)
-      expect(call_site.summary[:container_method]).to eq "fixtures/#{container_summary}"
-      expect(call_site.summary[:call_site])       .to eq "fixtures/#{cs_summary}"
-      expect(call_site.summary[:called_method])   .to eq "fixtures/#{called_method_summary}"
+      expect_these_call_sites("./fixtures/instance_method_calls_a_class_method_usage.rb")
     end
   end
 end

@@ -1,6 +1,18 @@
 # frozen_string_literal: true
 
 module CallSiteHelpers
+  def expect_these_call_sites(code, prefix: "fixtures/")
+    index = 0
+
+    expect(call_site_logger).to receive(:log) do |call_site|
+      expect_call_sites(call_site, index, expected_call_sites, prefix)
+
+      index += 1
+    end.exactly(expected_call_sites.length).times
+
+    load code
+  end
+
   def expect_call_stack(call_stack, expected)
     call_stack.each_with_index do |cs, i|
       expect_call_sites(cs, i, expected)

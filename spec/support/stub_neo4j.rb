@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/MethodLength,Metrics/AbcSize
 module DelfosSpecs
   def self.stub_neo4j(include_path: "fixtures")
     Module.new do

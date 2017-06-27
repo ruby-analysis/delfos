@@ -32,15 +32,7 @@ RSpec.describe "integration with a custom call_stack_logger" do
     end
 
     it do
-      index = 0
-
-      expect(call_site_logger).to receive(:log) do |call_site|
-        expect_call_sites(call_site, index, expected_call_sites, "")
-
-        index += 1
-      end.exactly(expected_call_sites.length).times
-
-      load "./fixtures/app/include_this/start_here.rb"
+      expect_these_call_sites("./fixtures/app/include_this/start_here.rb", prefix: "")
     end
   end
 end

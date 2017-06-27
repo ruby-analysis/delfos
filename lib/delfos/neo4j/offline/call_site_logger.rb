@@ -12,7 +12,6 @@ module Delfos
         def log(call_site, stack_uuid, step_number)
           query = CallSiteQuery.new(call_site, stack_uuid, step_number)
 
-          file.open if file.closed?
           file.puts JSON.dump(query.params)
           self.count += 1
           file.flush if (count % 100).zero?
