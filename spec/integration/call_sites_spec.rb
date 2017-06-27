@@ -3,12 +3,15 @@
 require "delfos"
 
 RSpec.describe "integration" do
-  let(:call_site_logger) { double "call_site_logger", log: nil, save_call_stack: nil }
+  let(:call_site_logger) { double "call_site_logger", log: nil, save_call_stack: nil, finish!: nil }
 
   before(:each) do
-    Delfos.setup!(application_directories: ["./fixtures"],
-                  call_site_logger: call_site_logger,
-                  logger: DelfosSpecs.logger)
+    Delfos.configure do |c|
+      c.include = "fixtures"
+      allow(c).to receive(:call_site_logger).and_return call_site_logger
+      c.logger = DelfosSpecs.logger
+    end
+    Delfos.start!
   end
 
   context "records call sites" do

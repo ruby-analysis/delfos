@@ -9,7 +9,6 @@ module Delfos
       module Batch
         RSpec.describe Retryable, "integration" do
           before do
-            Delfos.setup_neo4j!
             WebMock.disable_net_connect! allow_localhost: true
           end
 

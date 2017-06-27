@@ -51,3 +51,13 @@ module ShowClassInstanceVariables
     end
   end
 end
+
+RSpec.configure do |c|
+  c.before(:each) do |_e|
+    ShowClassInstanceVariables.variables_for(Delfos)
+  end
+
+  c.after(:each) do |e|
+    ShowClassInstanceVariables.last_executed_rspec_test = e.location
+  end
+end

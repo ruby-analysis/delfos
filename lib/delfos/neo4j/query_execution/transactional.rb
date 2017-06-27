@@ -62,7 +62,7 @@ module Delfos
         end
 
         def uri
-          @uri ||= Delfos.neo4j.uri_for("/db/data/transaction")
+          @uri ||= Delfos.config.neo4j.uri_for("/db/data/transaction")
         end
       end
 

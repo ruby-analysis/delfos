@@ -9,7 +9,7 @@ module Delfos
       class Update
         def perform
           results = CallSiteFetcher.perform
-          return if results.length.negative?
+          return unless results.length.positive?
 
           results.each do |start_file, call_site_id, finish_file, called_id|
             handle(start_file, call_site_id, finish_file, called_id)

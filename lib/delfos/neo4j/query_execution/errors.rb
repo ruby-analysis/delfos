@@ -5,6 +5,9 @@ require "net/http"
 module Delfos
   module Neo4j
     module QueryExecution
+      class ConnectionError < IOError
+      end
+
       HTTP_ERRORS = [
         EOFError,
         Errno::EAGAIN,
@@ -21,6 +24,7 @@ module Delfos
         Net::ReadTimeout,
         SocketError,
         Timeout::Error,
+        ConnectionError,
       ].freeze
 
       class InvalidQuery < IOError
@@ -31,9 +35,6 @@ module Delfos
 
           super [message, { query: query.to_s }, { params: params.to_s }].join("\n\n")
         end
-      end
-
-      class ConnectionError < IOError
       end
     end
   end

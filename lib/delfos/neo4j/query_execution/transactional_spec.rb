@@ -8,7 +8,6 @@ module Delfos
     module QueryExecution
       RSpec.describe Transactional do
         before do
-          Delfos.setup_neo4j!
           WebMock.disable_net_connect! allow_localhost: false
         end
 
@@ -19,8 +18,8 @@ module Delfos
         describe "#perform" do
           let(:some_params) { {} }
           let(:some_query) { "some query" }
-          let(:transaction_url) { Delfos.neo4j.uri_for("/db/data/transaction/10") }
-          let(:commit_url) { Delfos.neo4j.uri_for("/db/data/transaction/10/commit") }
+          let(:transaction_url) { Delfos.config.neo4j.uri_for("/db/data/transaction/10") }
+          let(:commit_url) { Delfos.config.neo4j.uri_for("/db/data/transaction/10/commit") }
           let(:expiry) { "Thu, 08 Dec 2016 11:13:49 +0000" }
 
           it do
@@ -38,7 +37,7 @@ module Delfos
             }
             RESPONSE
 
-            stub_request(:post, Delfos.neo4j.uri_for("/db/data/transaction")).
+            stub_request(:post, Delfos.config.neo4j.uri_for("/db/data/transaction")).
               to_return(
                 status: 200,
                 body: response,

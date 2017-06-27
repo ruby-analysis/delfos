@@ -15,17 +15,20 @@ module Delfos
 
       def full_path
         return @file.realpath if Pathname.new(@file).exist?
-
-        Delfos.application_directories.map do |d|
-          path = try_path { d + @file }
-
-          path || try_path do
-            Pathname.new(d + @file.to_s.gsub(%r{[^/]*/}, ""))
-          end
+        Delfos.config.included_directories.map do |d|
+          determine_path(d)
         end.compact.first
       end
 
       private
+
+      def determine_path(d)
+        path = try_path { d + @file }
+
+        path || try_path do
+          Pathname.new(d + @file.to_s.gsub(%r{[^/]*/}, ""))
+        end
+      end
 
       def strip_block_message(f)
         f.to_s.split(" in block").first

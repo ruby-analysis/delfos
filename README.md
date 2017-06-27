@@ -126,7 +126,7 @@ gem 'delfos', :git => 'https://github.com/ruby-analysis/delfos.git'
 
 # Delfos affects performance, so we recommend only setting up when required
 if defined?(Delfos) && ENV["DELFOS_ENABLED"]
-  Delfos.setup!
+  Delfos.start!
 end
 
 # Any code defined in the app or lib directories executed after this point will
@@ -150,7 +150,8 @@ RSpec.configure do |c|
     require "delfos"
 
     your_library_path = File.expand_path("../../lib", __FILE__)
-    Delfos.setup! application_directories: your_library_path
+    Delfos.configure { |c| c.include = your_library_path }
+    Delfos.start!
   end
 
   c.after(:suite) do
@@ -159,18 +160,47 @@ RSpec.configure do |c|
 end
 ```
 
-#### Delfos.setup! options
+#### Configuration options
 
+```ruby
+# Example configuration
+Delfos.configure do |config|
+  config.include = ["app"] # default value is ["app", "lib"]
+  config.include "another_directory"
+  config.include ["an", "array", "of", "directories", "or", "files.rb"]
+  config.include "a_file.rb"
 
-* `application_directories` An array of application directories. Defaults to `app` and `lib`
-* `logger` For outputing debug information during method recording.
-* `call_site_logger` Defaults to recording to neo4j.
-* `batch_size` Default batch size for neo4j querie
-* `max_query_size` Max string length for neo4j queries before flushing
-* `offline_query_saving` sets the offline query output file path or defaults to `delfos_cypher_output.cypher`  if `true`
+  config.exclude = ["app/app_config.rb", "app/another.rb"]
+  config.exclude   "app/yet_another.rb"
+  config.exclude   ["exclude", "works" "like", "include"]
+
+  config.call_site_logger       = CustomCallSiteLogger.new
+  config.logger                 = Logger.new
+  config.batch_size             = 1_000
+  config.logger.max_query_size  = 10_000
+  config.offline_query_saving   = false
+  config.offline_query_filename = nil
+end
+
+Delfos.start!
+```
+
+Possible config values:
+
+* `include=` _array_ or _string_ | Files/directories to method trace. Defaults to `app` and `lib`
+* `include` _array_ or _string_ | Append files/directories to method tracing.
+* `exclude=` _array_ or _string_ | Files/directories to exclude from method tracing. Defaults to empty
+* `exclude` _array_ or _string_ | Append files/directories to exclusion from method tracing.
+* `call_site_logger` _const_ | Defaults to recording to neo4j.
+* `logger` _const_ | For outputing debug information during method recording.
+* `batch_size` _int_ | Default batch size for neo4j query.
+* `max_query_size` _int_ | Max string length for neo4j queries before flushing.
+* `offline_query_saving` _boolean_ | Outputs call site queries to a local file. Defaults to `delfos_cypher_output.cypher`  if `true`.
+* `offline_query_filename` _string_ | Define your own file to save offline queries to.
 
 ### call_site_logger
-You can supply an object for the `call_site_logger` that responds to `#log`
+You can supply an object for the `call_site_logger` that responds to `#log` and `#finish`
+
 
 `#log` receives the following arguments : `(call_site, stack_uuid, stack_step)`
 
@@ -185,17 +215,22 @@ Where:
     * `object` - self at that point during runtime
     * `class_method` - boolean
 
+`#finish` receives no arguments. Use this to tidy up.
+E.g. flush queries/ flush files etc. Perform any extra
+calculations after all the data has been gathered, etc.
+
 # Offline mode
 
 By default delfos tries to push queries in batches to neo4j during runtime.
 This tends to work fine for small projects and for manually interacting with an application,
 but starts to fallover when running against a whole test suite.
-Whilst, you can tweak the batch size and experiment with `sleep`ing in between specs, it is 
+Whilst, you can tweak the batch size and experiment with `sleep`ing in between specs, it is
 probably preferable to save the queries offline for later processing.
 
 ```ruby
 config.before(:suite) do
-  Delfos.setup! offline_query_saving: true
+  Delfos.configure { |c| c.offline_query_saving = true }
+  Delfos.start!
 endt
 
 ```
@@ -244,7 +279,7 @@ nodes have been added to the graph. This can be done by calling
 
 You may do this in an after suite hook like this:
 
-```
+```ruby
 config.after(:suite) do
   Delfos.finish!
 end
@@ -359,5 +394,3 @@ The rake task is setup to handle this default and is equivalent to the following
 ```
 NEO4J_HOST=http://localhost NEO4J_PORT=7476 NEO4J_USERNAME=username NEO4J_PASSWORD=password bundle exec rspec lib
 ```
-
-

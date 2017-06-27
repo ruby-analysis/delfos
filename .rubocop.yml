@@ -12,7 +12,7 @@ Rails:
   Enabled: false
 
 Metrics/BlockLength:
-  ExcludedMethods: ['describe', 'context']
+  ExcludedMethods: ['describe', 'context', 'it']
 
 Metrics/LineLength:
   Max: 120

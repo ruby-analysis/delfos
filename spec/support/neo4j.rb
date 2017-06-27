@@ -10,7 +10,6 @@ module DelfosSpecNeo4jHelpers
 
   def wipe_db!
     require "delfos/neo4j"
-    Delfos.setup_neo4j!
 
     perform_query "MATCH (m)-[rel]->(n) DELETE m, rel, n"
     perform_query "MATCH (m) DELETE m"
@@ -28,9 +27,9 @@ RSpec.configure do |c|
   c.before(:suite) do
     require "delfos/neo4j/query_execution/errors"
     begin
+      Delfos.new_config
       DelfosSpecNeo4jHelpers.wipe_db!
-    rescue *Delfos::Neo4j::QueryExecution::HTTP_ERRORS,
-           Delfos::Neo4j::QueryExecution::ConnectionError => e
+    rescue *Delfos::Neo4j::QueryExecution::HTTP_ERRORS => e
       puts <<-ERROR
        ***************************************
        ***************************************
@@ -40,7 +39,7 @@ RSpec.configure do |c|
          #{e}
 
        Neo4j config:
-         #{Delfos.neo4j}
+         #{Delfos.config.neo4j}
 
        Start Neo4j or set the following environment variables:
          NEO4J_HOST
@@ -56,15 +55,7 @@ RSpec.configure do |c|
     end
 
     Delfos::Neo4j.ensure_schema!
-  end
-
-  c.after(:suite) do
-    require "delfos/neo4j"
-
-    begin
-      Delfos::Neo4j.flush!
-    rescue Delfos::Neo4j::QueryExecution::ExpiredTransaction
-      Delfos.logger.debug "rescuing expired transaction"
-    end
+    DelfosSpecs.reset_config!
   end
 end
+# rubocop:enable Metrics/BlockLength

@@ -8,7 +8,7 @@ module Delfos
     module Distance
       RSpec.describe Update do
         def preload_graph!
-          Delfos.setup_neo4j!
+          Delfos.configure
           perform_query File.read "fixtures/cypher/coupling.cypher"
         end
 
@@ -35,6 +35,15 @@ module Delfos
           QUERY
 
           @result = Delfos::Neo4j.execute_sync(query)
+          DelfosSpecs.reset!
+        end
+
+        after(:all) do
+          DelfosSpecs.reset!
+        end
+
+        after(:each) do
+          DelfosSpecs.reset!
         end
 
         MAPPING = { klass: 0, method: 1, call_site: 2, called: 4, called_klass: 6 }.freeze

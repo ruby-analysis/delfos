@@ -17,10 +17,15 @@ module Delfos
           let(:dir) { "/Users/mark/code/some_app" }
 
           before do
-            expect(Delfos).to receive(:application_directories).and_return [
-              "/Users/mark/code/some_app/app",
-              "/Users/mark/code/some_app/lib",
-            ]
+            config = double "config"
+
+            expect(config).to receive(:included_directories).and_return([
+                                                                          "/Users/mark/code/some_app/app",
+                                                                          "/Users/mark/code/some_app/lib",
+                                                                        ])
+
+            allow(Delfos).to receive(:config).and_return config
+            allow(config).to receive(:call_site_logger).and_return double("call site logger", log: nil, reset!: nil)
           end
 
           context "with a file in one of the defined directories" do

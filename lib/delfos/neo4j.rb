@@ -21,6 +21,10 @@ module Delfos
       QueryExecution::Batch::Retryable.flush!
     end
 
+    def reset!
+      Delfos::Neo4j::QueryExecution::Batch::Retryable.reset!
+    end
+
     def ensure_schema!
       Schema.ensure_constraints!(
         "Class"     => "name",

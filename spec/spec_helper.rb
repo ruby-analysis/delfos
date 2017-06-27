@@ -6,18 +6,18 @@ require "byebug"
 require "delfos"
 require_relative "support/logging"
 
-Delfos.logger = DelfosSpecs.logger
-
 require "ostruct"
 
+require_relative "support/code_climate" if ENV["CI"]
 require_relative "support/timeout" if ENV["TIMEOUT"]
 
 require_relative "support/call_sites"
-require_relative "support/neo4j"
-require_relative "support/web_mock"
 require_relative "support/helper_methods"
+require_relative "support/neo4j"
 require_relative "support/show_class_instance_variables"
-require_relative "support/code_climate" if ENV["CI"]
+require_relative "support/reset"
+require_relative "support/temp_directory"
+require_relative "support/web_mock"
 
 RSpec.configure do |c|
   c.disable_monkey_patching!
@@ -30,23 +30,5 @@ RSpec.configure do |c|
 
   c.mock_with :rspec do |m|
     m.syntax = :expect
-  end
-
-  c.before(:suite) do
-    Delfos.finish!
-  end
-
-  c.after(:each) do |example|
-    ShowClassInstanceVariables.last_executed_rspec_test = example.location
-  end
-
-  c.before(:each) do
-    begin
-      Delfos.finish!
-    rescue Delfos::Neo4j::QueryExecution::ExpiredTransaction
-      Delfos.finish!
-    end
-    ShowClassInstanceVariables.variables_for(Delfos)
-    Delfos.logger = DelfosSpecs.logger
   end
 end

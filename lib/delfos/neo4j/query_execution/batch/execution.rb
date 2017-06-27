@@ -47,7 +47,7 @@ module Delfos
           end
 
           def new_transaction_url
-            Delfos.neo4j.uri_for("/db/data/transaction")
+            Delfos.config.neo4j.uri_for("/db/data/transaction")
           end
 
           def flush_if_required!

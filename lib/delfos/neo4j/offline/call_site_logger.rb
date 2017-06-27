@@ -17,6 +17,10 @@ module Delfos
           file.flush if (count % 100).zero?
         end
 
+        def reset!
+          finish!
+        end
+
         def finish!
           return if file.closed?
 

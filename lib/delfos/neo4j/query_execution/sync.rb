@@ -28,7 +28,7 @@ module Delfos
         end
 
         def uri
-          @uri ||= Delfos.neo4j.uri_for("/db/data/transaction/commit")
+          @uri ||= Delfos.config.neo4j.uri_for("/db/data/transaction/commit")
         end
       end
     end

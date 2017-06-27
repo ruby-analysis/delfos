@@ -8,7 +8,6 @@ module Delfos
     module QueryExecution
       RSpec.describe Sync do
         before do
-          Delfos.setup_neo4j!
           WebMock.disable_net_connect! allow_localhost: false
         end
 
@@ -30,7 +29,7 @@ module Delfos
                 "errors" => [],
               }.to_json
 
-              stub_request(:post, Delfos.neo4j.uri_for("/db/data/transaction/commit")).
+              stub_request(:post, Delfos.config.neo4j.uri_for("/db/data/transaction/commit")).
                 to_return(
                   status: 200,
                   body: body,
@@ -50,7 +49,7 @@ module Delfos
             before do
               body = { "results" => [], "errors" => [{ code: "some error", message: "some message" }] }.to_json
 
-              stub_request(:post, Delfos.neo4j.uri_for("/db/data/transaction/commit")).
+              stub_request(:post, Delfos.config.neo4j.uri_for("/db/data/transaction/commit")).
                 to_return(
                   status: 200,
                   body: body,
