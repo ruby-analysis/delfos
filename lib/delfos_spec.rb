@@ -73,7 +73,7 @@ RSpec.describe Delfos do
 
       it "has a default filename" do
         expect(Delfos.offline_query_saving).to eq true
-        expect(Delfos.offline_query_filename).to eq "./tmp/delfos_query_parameters.json"
+        expect(Delfos.offline_query_filename).to eq "./tmp/delfos/query_parameters.json"
       end
     end
 
@@ -83,7 +83,7 @@ RSpec.describe Delfos do
 
       it do
         expect(Delfos.offline_query_saving).to eq false
-        expect(Delfos.offline_query_filename).to eq nil
+        expect(Delfos.offline_query_filename).to eq "./tmp/delfos/query_parameters.json"
       end
     end
 

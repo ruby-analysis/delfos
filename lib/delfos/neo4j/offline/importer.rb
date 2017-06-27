@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "json"
-require "delfos/neo4j"
 require "delfos/neo4j/call_site_query"
 require "fileutils"
 

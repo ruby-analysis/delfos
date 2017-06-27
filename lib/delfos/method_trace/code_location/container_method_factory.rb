@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "delfos/method_trace/code_location"
-
 require_relative "eval_in_caller"
 require_relative "filename_helpers"
 

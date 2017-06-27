@@ -20,11 +20,11 @@ module Delfos
 
     def initialize
       @batch_size              = default_batch_size
-      @call_site_logger        = default_call_site_logger
       @logger                  = default_logger
       @max_query_size          = default_max_query_size
       @offline_query_saving    = default_offline_query_saving
-      @offline_query_filename  = default_offline_query_filename
+      @offline_query_filename  = nil
+      @call_site_logger        = default_call_site_logger
     end
 
     def offline_query_saving=(bool)
@@ -82,11 +82,9 @@ module Delfos
     end
 
     def default_offline_query_filename
-      return unless @offline_query_saving
+      FileUtils.mkdir_p "./tmp/delfos" if @offline_query_saving
 
-      FileUtils.mkdir "./tmp"
-
-      "./tmp/delfos_query_parameters.json"
+      "./tmp/delfos/query_parameters.json"
     end
   end
 end

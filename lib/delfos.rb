@@ -1,7 +1,7 @@
 # frozen_string_literal: true
+require "forwardable"
 
 require "delfos/config"
-require "forwardable"
 require "delfos/method_trace"
 require "delfos/neo4j/offline/importer"
 
@@ -27,6 +27,10 @@ module Delfos
       ::Delfos::MethodTrace.disable!
 
       config.call_site_logger.finish!
+    end
+
+    def reset!
+      Delfos.config&.call_site_logger&.reset!
     end
 
     def configure

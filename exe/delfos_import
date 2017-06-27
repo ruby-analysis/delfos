@@ -7,7 +7,7 @@ set -e
 NUMBER_OF_SPLIT_LINES=10000
 SPLIT_FILE_PREFIX='delfos_queries_'
 
-BIG_FILE_PATH=${1:-"./tmp/delfos_query_parameters.json"}
+BIG_FILE_PATH=${1:-"./tmp/delfos/query_parameters.json"}
 
 BIG_FILENAME=$(basename $BIG_FILE_PATH)
 
