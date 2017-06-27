@@ -4,13 +4,13 @@ class SuperClass
 end
 
 class SubClass < SuperClass
-  #alias_method :_a_method, :a_method
-  #undef :a_method
+  alias_method :_a_method, :a_method
+  undef :a_method
 
   def calls_a_method
-    a_method
+    _a_method
   end
 end
 
 
-SubClass.new.a_method
+SubClass.new.calls_a_method

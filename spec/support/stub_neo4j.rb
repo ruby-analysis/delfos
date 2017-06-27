@@ -1,5 +1,5 @@
 module DelfosSpecs
-  def self.stub_neo4j(include_path: include_path)
+  def self.stub_neo4j(include_path: "fixtures")
     Module.new do
       define_singleton_method :included do |base|
         base.class_eval do

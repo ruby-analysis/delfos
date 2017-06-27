@@ -6,24 +6,14 @@ RSpec.describe "integration - undefing an aliased method" do
   let(:expected_call_sites) do
     [
       [
-        "include_this/start_here.rb:3 Object#(main)",
-        "include_this/start_here.rb:3",
-        "include_this/called_app_class.rb:5 IncludeThis::CalledAppClass#some_called_method",
+        "fixtures/undef/alias_and_undef_super_method.rb:16 Object#(main)",
+        "fixtures/undef/alias_and_undef_super_method.rb:16",
+        "fixtures/undef/alias_and_undef_super_method.rb:10 SubClass#calls_a_method",
       ],
       [
-        "exclude_this/exclude_this.rb:10 ExcludeThis#further",
-        "exclude_this/exclude_this.rb:11",
-        "include_this/called_app_class.rb:9 IncludeThis::CalledAppClass#next_method",
-      ],
-      [
-        "include_this/called_app_class.rb:9 IncludeThis::CalledAppClass#next_method",
-        "include_this/called_app_class.rb:10",
-        "include_this/called_app_class.rb:13 IncludeThis::CalledAppClass#penultimate",
-      ],
-      [
-        "include_this/called_app_class.rb:13 IncludeThis::CalledAppClass#penultimate",
-        "include_this/called_app_class.rb:14",
-        "include_this/called_app_class.rb:17 IncludeThis::CalledAppClass#final_method",
+        "fixtures/undef/alias_and_undef_super_method.rb:10 SubClass#calls_a_method",
+        "fixtures/undef/alias_and_undef_super_method.rb:11",
+        "fixtures/undef/alias_and_undef_super_method.rb:2 SubClass#a_method",
       ],
     ]
   end
@@ -31,7 +21,6 @@ RSpec.describe "integration - undefing an aliased method" do
   it do
     index = 0
 
-byebug
     expect(call_site_logger).to receive(:log) do |call_site|
       expect_call_sites(call_site, index, expected_call_sites, "")
 

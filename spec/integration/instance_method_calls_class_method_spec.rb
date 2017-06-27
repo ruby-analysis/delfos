@@ -3,16 +3,7 @@
 require "delfos"
 
 RSpec.describe "integration" do
-  let(:call_site_logger) { double "call_site_logger", log: nil, save_call_stack: nil, finish!: nil }
-
-  before(:each) do
-    Delfos.configure do |c|
-      c.include = "fixtures"
-      allow(c).to receive(:call_site_logger).and_return call_site_logger
-      c.logger = DelfosSpecs.logger
-    end
-    Delfos.start!
-  end
+  include DelfosSpecs.stub_neo4j
 
   context "instance method calls a class method" do
     let(:expected_call_sites) do
