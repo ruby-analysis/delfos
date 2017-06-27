@@ -36,7 +36,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'simplecov', '~> 0'
   spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2', '>= 0.2.3'
-  spec.add_development_dependency 'codeclimate-test-reporter', '~> 0'
+  spec.add_development_dependency 'codeclimate-test-reporter', '~> 1.0.8'
   spec.add_development_dependency 'webmock', '~> 2.3', '>= 2.3.2'
   spec.add_development_dependency 'rake-compiler', '~> 0'
   spec.add_development_dependency "pry-byebug", "~> 3.4", ">= 3.4.0"
