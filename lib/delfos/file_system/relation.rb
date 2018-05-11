@@ -102,7 +102,7 @@ module Delfos
         private
 
         def all
-          Dir.glob(path.dirname + "*").map { |f| Pathname.new(f) }
+          Dir.glob(path.dirname + "*").sort.map { |f| Pathname.new(f) }
         end
       end
     end
