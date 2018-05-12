@@ -5,26 +5,26 @@ module ShowClassInstanceVariables
     attr_accessor :last_executed_rspec_test
   end
 
-  def self.variables_for(n)
-    return unless n.is_a?(Module)
-    return if n.ancestors.include? Struct
+  def self.variables_for(namespace)
+    return unless namespace.is_a?(Module)
+    return if namespace.ancestors.include? Struct
 
-    display_variables(n)
+    display_variables(namespace)
 
-    n.constants.each do |c|
-      klass = relevant_constant_for(c, n)
+    namespace.constants.each do |c|
+      klass = relevant_constant_for(c, namespace)
       next unless klass
 
       display_variables(klass)
 
-      handle_nesting(klass, n)
+      handle_nesting(klass, namespace)
     end
   end
 
-  def self.handle_nesting(klass, n)
+  def self.handle_nesting(klass, namespace)
     klass.constants.each do |k|
       k = klass.const_get(k)
-      next if (k == klass) || (k == n)
+      next if (k == klass) || (k == namespace)
 
       variables_for(k)
     end
