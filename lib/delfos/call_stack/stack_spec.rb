@@ -145,4 +145,3 @@ module Delfos
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

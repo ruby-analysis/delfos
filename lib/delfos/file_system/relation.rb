@@ -67,9 +67,7 @@ module Delfos
         start_index  = index_from(collection, start,  start_at_end: start_at_end)
         finish_index = index_from(collection, finish, start_at_end: start_at_end, reverse: true)
 
-        if start_index.zero? && finish_index.zero?
-          finish_index = collection.length - 1
-        end
+        finish_index = collection.length - 1 if start_index.zero? && finish_index.zero?
 
         [start_index, finish_index].sort
       end

@@ -45,7 +45,7 @@ module Delfos
 
         params
       end
-      # rubocop:enable Metrics/MethodLength,Metrics/LineLength,Metrics/AbcSize
+      # rubocop:enable Metrics/MethodLength
 
       BODY = <<-QUERY
           MERGE (container_method_klass:Class {name: {container_method_klass_name}})

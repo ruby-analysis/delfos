@@ -44,9 +44,7 @@ module Delfos
                   allow_any_instance_of(QueryExecution::Transactional).to receive(:perform).and_wrap_original do |m|
                     call_count += 1
 
-                    if call_count <= 4
-                      raise QueryExecution::ExpiredTransaction.new("some commit url".inspect, "")
-                    end
+                    raise QueryExecution::ExpiredTransaction.new("some commit url".inspect, "") if call_count <= 4
 
                     m.()
                   end

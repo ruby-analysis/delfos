@@ -20,9 +20,7 @@ RSpec.configure do |c|
   end
 
   c.after(:each) do
-    if Delfos.config.is_a?(RSpec::Mocks::TestDouble)
-      allow(Delfos).to receive(:config).and_call_original
-    end
+    allow(Delfos).to receive(:config).and_call_original if Delfos.config.is_a?(RSpec::Mocks::TestDouble)
 
     if Delfos.config&.call_site_logger.is_a? RSpec::Mocks::TestDouble
       allow(Delfos.config).to receive(:call_site_logger).and_call_original
