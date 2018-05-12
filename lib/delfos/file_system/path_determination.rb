@@ -22,16 +22,16 @@ module Delfos
 
       private
 
-      def determine_path(d)
-        path = try_path { d + @file }
+      def determine_path(directory)
+        path = try_path { directory + @file }
 
         path || try_path do
-          Pathname.new(d + @file.to_s.gsub(%r{[^/]*/}, ""))
+          Pathname.new(directory + @file.to_s.gsub(%r{[^/]*/}, ""))
         end
       end
 
-      def strip_block_message(f)
-        f.to_s.split(" in block").first
+      def strip_block_message(file)
+        file.to_s.split(" in block").first
       end
 
       def try_path

@@ -18,9 +18,9 @@ module Delfos
 
         private
 
-        def relative_filename(f)
-          return unless f
-          file = f.to_s
+        def relative_filename(file)
+          return unless file
+          file = file.to_s
 
           Delfos.config.included_directories.map do |d|
             file = relative_path(file, d)

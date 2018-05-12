@@ -159,5 +159,6 @@ module Delfos
         end
       end
     end
+    # rubocop:enable Metrics/ModuleLength
   end
 end

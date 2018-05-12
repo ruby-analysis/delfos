@@ -38,7 +38,7 @@ RSpec.describe "integration with a custom call_stack_logger" do
         ],
       ]
     end
-    # rubocop:ensable Metrics/BlockLength
+    # rubocop:enable Metrics/BlockLength
 
     it "still logs correctly" do
       expect_these_call_sites("./fixtures/with_distantly_handled_exception.rb")

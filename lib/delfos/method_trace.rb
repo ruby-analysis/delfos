@@ -56,8 +56,8 @@ module Delfos
       # when returning to (main) is duplicated. Can't get to the source of
       # this.  But the only effect seems to be popping the stacking beyond the
       # end so this is a workaround
-      def check_for_bug!(tp)
-        (@last_returned == tp) && CallStack.height.zero?
+      def check_for_bug!(tracepoint)
+        (@last_returned == tracepoint) && CallStack.height.zero?
       end
 
       def setup_trace_point(type)

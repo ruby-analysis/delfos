@@ -48,8 +48,8 @@ module Delfos
       end
     end
 
-    def expand(p)
-      Pathname.new(p).expand_path
+    def expand(path)
+      Pathname.new(path).expand_path
     end
 
     describe "#include=" do
