@@ -18,7 +18,7 @@ module Delfos
       :offline_query_saving,
       :offline_query_filename
 
-    attr_reader :config
+    attr_accessor :config
 
     def start!
       ::Delfos::MethodTrace.enable!
@@ -53,7 +53,7 @@ module Delfos
     end
 
     def new_config
-      @config ||= Delfos::Config.new
+      self.config ||= Delfos::Config.new
     end
   end
 end

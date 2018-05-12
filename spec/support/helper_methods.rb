@@ -21,17 +21,17 @@ module DelfosSpecHelpers
     Pathname
   end
 
-  def match_file_array(a, b)
+  def match_file_array(files, other_files)
     format = ->(f) { f.to_s.gsub(Regexp.escape(fixture_path.to_s), "") }
 
-    a = a.map(&format)
-    b = b.map(&format)
+    files = files.map(&format)
+    other_files = other_files.map(&format)
 
-    expect(a).to match_array(b.map { |f| t(f) }.map(&format))
+    expect(files).to match_array(other_files.map { |f| t(f) }.map(&format))
   end
 
-  def strip_whitespace(s)
-    s.
+  def strip_whitespace(string)
+    string.
       gsub(/^\s+/, "").
       gsub(/ +/, " ").
       gsub("\n\n", "\n").

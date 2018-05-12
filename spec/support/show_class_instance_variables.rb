@@ -30,9 +30,9 @@ module ShowClassInstanceVariables
     end
   end
 
-  def self.relevant_constant_for(c, namespace)
-    return if namespace == c
-    klass = namespace.const_get(c)
+  def self.relevant_constant_for(constant, namespace)
+    return if namespace == constant
+    klass = namespace.const_get(constant)
 
     return unless klass.is_a?(Module)
     return unless klass.name[namespace.name]
