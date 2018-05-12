@@ -12,6 +12,8 @@ module Delfos
       :logger,
       :max_query_size
 
+    attr_writer :neo4j
+
     extend Forwardable
 
     def_delegators :inclusion,
@@ -37,7 +39,7 @@ module Delfos
     end
 
     def neo4j
-      setup_neo4j!
+      @neo4j ||= setup_neo4j!
     end
 
     private
@@ -55,7 +57,7 @@ module Delfos
         require "delfos/neo4j/offline/call_site_logger"
         Delfos:: Neo4j::Offline::CallSiteLogger.new
       else
-        setup_neo4j!
+        self.neo4j = setup_neo4j!
         require "delfos/neo4j/live/call_site_logger"
         Delfos:: Neo4j::Live::CallSiteLogger.new
       end
@@ -63,7 +65,7 @@ module Delfos
 
     def setup_neo4j!
       require "delfos/neo4j"
-      @neo4j ||= Neo4j.config
+      Neo4j.config
     end
 
     def default_logger

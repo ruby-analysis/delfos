@@ -23,8 +23,8 @@ module Delfos
 
       private
 
-      def log(s, type = :debug)
-        Delfos.logger.send(type, s)
+      def log(message, type = :debug)
+        Delfos.logger.send(type, message)
       end
 
       def create_constraint(label, attribute)

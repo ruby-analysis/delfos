@@ -34,8 +34,8 @@ module Delfos
         result
       end
 
-      def klass_for(a, b)
-        return ChildFile if b + ".." == a
+      def klass_for(start, finish)
+        return ChildFile if finish + ".." == start
         Relation
       end
 
@@ -98,31 +98,31 @@ module Delfos
             @in_parent = false
           end
 
-          def process(i)
+          def process(path)
             if @in_parent
               @in_parent = false
-              remove_parent(i)
+              remove_parent(path)
             else
-              add_item(i)
+              add_item(path)
             end
           end
 
           private
 
-          def add_item(i)
-            @in_parent = ((last && last + "..") == i)
-            push i
+          def add_item(path)
+            @in_parent = ((last && last + "..") == path)
+            push path
           end
 
-          def remove_parent(i)
-            return unless same_dir?(i)
+          def remove_parent(path)
+            return unless same_dir?(path)
 
             pop
-            push(i)
+            push(path)
           end
 
-          def same_dir?(i)
-            self[-2] && self[-2].dirname == i.dirname
+          def same_dir?(path)
+            self[-2] && self[-2].dirname == path.dirname
           end
         end
       end

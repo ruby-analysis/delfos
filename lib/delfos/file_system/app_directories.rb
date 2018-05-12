@@ -28,12 +28,12 @@ module Delfos
         !matches(file, @excluded) && matches(file, @included)
       end
 
-      def matches(f, directories)
-        CommonPath.included_in?(expand_path(f), directories)
+      def matches(file, directories)
+        CommonPath.included_in?(expand_path(file), directories)
       end
 
-      def expand_path(f)
-        Pathname.new(f).expand_path
+      def expand_path(file)
+        Pathname.new(file).expand_path
       end
     end
   end

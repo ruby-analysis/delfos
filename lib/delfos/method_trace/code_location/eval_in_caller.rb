@@ -6,8 +6,8 @@ module Delfos
   module MethodTrace
     module CodeLocation
       module EvalInCaller
-        def eval_in_caller(s, offset)
-          binding.of_caller(offset).eval(s)
+        def eval_in_caller(to_eval, offset)
+          binding.of_caller(offset).eval(to_eval)
         end
       end
     end

@@ -119,6 +119,7 @@ module Delfos
 
               subject.perform
             end
+            # rubocop:enable Metrics/BlockLength
           end
         end
       end

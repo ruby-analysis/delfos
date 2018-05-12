@@ -15,8 +15,8 @@ module DelfosSpecNeo4jHelpers
     perform_query "MATCH (m) DELETE m"
   end
 
-  def perform_query(q)
-    Delfos::Neo4j.execute_sync(q)
+  def perform_query(query)
+    Delfos::Neo4j.execute_sync(query)
   end
 end
 
@@ -27,6 +27,7 @@ RSpec.configure do |c|
   c.before(:suite) do
     require "delfos/neo4j/query_execution/errors"
     begin
+      Delfos.config = nil
       Delfos.new_config
       DelfosSpecNeo4jHelpers.wipe_db!
     rescue *Delfos::Neo4j::QueryExecution::HTTP_ERRORS => e

@@ -59,8 +59,8 @@ module Delfos
           end
         end
 
-        def strip_whitespace(s)
-          s.
+        def strip_whitespace(string)
+          string.
             gsub(/^\s+/, "").
             gsub(/ +/, " ").
             gsub("\n\n", "\n").

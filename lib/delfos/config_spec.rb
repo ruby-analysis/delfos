@@ -48,8 +48,8 @@ module Delfos
       end
     end
 
-    def expand(p)
-      Pathname.new(p).expand_path
+    def expand(path)
+      Pathname.new(path).expand_path
     end
 
     describe "#include=" do
@@ -69,34 +69,3 @@ module Delfos
     end
   end
 end
-
-# Delfos.config do |c|
-#   c.include= ["my-app"] # overwrites the defaults of ["app", "lib"]
-#   c.include ["app", "lib"] # appends
-#   c.include "and_this.rb"
-#   c.include /this/
-#   c.include ["some_file.rb"]
-#
-#   c.include do |file, klass, method_name, class_method|
-#     klass == Object && method_name == :to_s
-#   end
-#
-#   c.exclude= "exclude_only_this"
-#   c.exclude /that/
-#   c.exclude RSpec
-#   c.exclude ["some_other.rb", "another.rb"]
-# end
-#
-# Delfos.include?
-#   config.inclusion.include?
-#
-#     inclusion = Inclusion.new
-#     inclusion << AppDirectories.new
-#     inclusion << AppFiles.new
-#     inclusion << ->{|f,klass,_,_| klass == Object }
-#
-#     inclusion.all? do |i|
-#       i.include?(file, _klass, _method_name)
-#     end
-#
-#
