@@ -40,11 +40,11 @@ module Delfos
       end
 
       def sum_traversals
-        traversals.sum(&:distance)
+        sum(:distance)
       end
 
       def sum_possible_traversals
-        traversals.sum(&:possible_length)
+        sum(:possible_length)
       end
 
       def sibling_directories(path)
@@ -53,6 +53,12 @@ module Delfos
 
       def traversal_path
         TraversalPathCalculator.new(path_a, path_b).path
+      end
+
+      private
+
+      def sum(meth)
+        traversals.inject(0) { |r, t| r + t.send(meth) }
       end
 
       class TraversalPathCalculator
