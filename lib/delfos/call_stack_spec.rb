@@ -39,7 +39,7 @@ module Delfos
       it "logs the call site" do
         expect(call_site_logger).
           to receive(:log).
-          with(call_site, an_instance_of(String), an_instance_of(Integer))
+          with(call_site, String, Integer)
 
         CallStack.push call_site
       end
